@@ -1,0 +1,274 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+
+.arch { padding: 1.5rem 0; }
+
+.intro { color: var(--text-secondary); font-size: 13px; margin-bottom: 1.5rem; line-height: 1.6; }
+
+.tier-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  padding-left: 2px;
+}
+
+.tier { margin-bottom: 20px; }
+
+.pillar-row {
+  display: grid;
+  gap: 8px;
+}
+
+.pillars-5 { grid-template-columns: repeat(5, 1fr); }
+.pillars-4 { grid-template-columns: repeat(4, 1fr); }
+.pillars-3 { grid-template-columns: repeat(3, 1fr); }
+.pillars-2 { grid-template-columns: repeat(2, 1fr); }
+.pillars-1 { grid-template-columns: 1fr; }
+
+.card {
+  border-radius: 10px;
+  padding: 12px 14px;
+  border: 0.5px solid var(--border);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: var(--surface-1);
+}
+.card:hover { border-color: var(--border-strong); background: var(--surface-2); }
+
+.card.c-purple { background: #EEEDFE; border-color: #AFA9EC; }
+.card.c-teal   { background: #E1F5EE; border-color: #5DCAA5; }
+.card.c-amber  { background: #FAEEDA; border-color: #EF9F27; }
+.card.c-coral  { background: #FAECE7; border-color: #F0997B; }
+.card.c-blue   { background: #E6F1FB; border-color: #85B7EB; }
+.card.c-pink   { background: #FBEAF0; border-color: #ED93B1; }
+.card.c-green  { background: #EAF3DE; border-color: #97C459; }
+
+@media (prefers-color-scheme: dark) {
+  .card.c-purple { background: #26215C; border-color: #534AB7; }
+  .card.c-teal   { background: #04342C; border-color: #0F6E56; }
+  .card.c-amber  { background: #412402; border-color: #854F0B; }
+  .card.c-coral  { background: #4A1B0C; border-color: #993C1D; }
+  .card.c-blue   { background: #042C53; border-color: #185FA5; }
+  .card.c-pink   { background: #4B1528; border-color: #993556; }
+  .card.c-green  { background: #173404; border-color: #3B6D11; }
+
+  .card.c-purple .ctitle { color: #CECBF6; }
+  .card.c-teal   .ctitle { color: #9FE1CB; }
+  .card.c-amber  .ctitle { color: #FAC775; }
+  .card.c-coral  .ctitle { color: #F5C4B3; }
+  .card.c-blue   .ctitle { color: #B5D4F4; }
+  .card.c-pink   .ctitle { color: #F4C0D1; }
+  .card.c-green  .ctitle { color: #C0DD97; }
+}
+
+.ctitle {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+  line-height: 1.3;
+}
+.card.c-purple .ctitle { color: #3C3489; }
+.card.c-teal   .ctitle { color: #085041; }
+.card.c-amber  .ctitle { color: #633806; }
+.card.c-coral  .ctitle { color: #712B13; }
+.card.c-blue   .ctitle { color: #0C447C; }
+.card.c-pink   .ctitle { color: #72243E; }
+.card.c-green  .ctitle { color: #27500A; }
+
+.csub {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.wide-card {
+  border-radius: 10px;
+  padding: 14px 18px;
+  border: 0.5px solid var(--border-accent);
+  background: var(--bg-accent);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.wide-card:hover { border-color: var(--text-accent); }
+.wide-card .ctitle { font-size: 13px; font-weight: 500; color: var(--text-accent); margin-bottom: 2px; }
+.wide-card .csub { font-size: 12px; color: var(--text-secondary); }
+
+.connector {
+  display: flex;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 18px;
+  margin: 2px 0;
+  line-height: 1;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.section-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+</style>
+
+<div class="arch">
+  <div class="tier">
+    <div class="tier-label">Foundation — who you are &amp; where you're going</div>
+    <div class="pillar-row pillars-3">
+      <div class="card c-purple" onclick="sendPrompt('Write the Identity & Vision section of my life guide: mission statement, core values, and 3-year vision of dangerous')">
+        <div class="ctitle">Identity &amp; vision</div>
+        <div class="csub">Mission, values, 3-year vision of "dangerous"</div>
+      </div>
+      <div class="card c-purple" onclick="sendPrompt('Write the Strengths & Personality section of my life guide: flow profile, strengths map, autotelic tendencies')">
+        <div class="ctitle">Strengths &amp; personality</div>
+        <div class="csub">Flow profile, strengths map, autotelic tendencies</div>
+      </div>
+      <div class="card c-purple" onclick="sendPrompt('Write the Roles & Commitments section of my life guide: life areas, relationships, non-negotiables')">
+        <div class="ctitle">Roles &amp; commitments</div>
+        <div class="csub">Life areas, relationships, non-negotiables</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">↓</div>
+
+  <div class="tier">
+    <div class="tier-label">Performance — how you think, focus, and produce</div>
+    <div class="pillar-row pillars-4">
+      <div class="card c-teal" onclick="sendPrompt('Write the Flow System section of my life guide: flow triggers, flow cycle management, flow blocks schedule')">
+        <div class="ctitle">Flow system</div>
+        <div class="csub">Triggers, cycle, blocks</div>
+      </div>
+      <div class="card c-teal" onclick="sendPrompt('Write the Productivity & Leverage section of my life guide: asymmetric work, automation, decision rules, single-tasking')">
+        <div class="ctitle">Productivity &amp; leverage</div>
+        <div class="csub">Asymmetric work, automation, decision rules</div>
+      </div>
+      <div class="card c-teal" onclick="sendPrompt('Write the Attention & Focus section of my life guide: deep work blocks, distraction elimination, ADT management')">
+        <div class="ctitle">Attention &amp; focus</div>
+        <div class="csub">Deep work, distraction elimination</div>
+      </div>
+      <div class="card c-teal" onclick="sendPrompt('Write the Goal Architecture section of my life guide: goal stacking, passion-purpose alignment, weekly reviews')">
+        <div class="ctitle">Goal architecture</div>
+        <div class="csub">Goal stacking, passion-purpose, reviews</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">↓</div>
+
+  <div class="tier">
+    <div class="tier-label">Neurobiology — your brain &amp; body as hardware</div>
+    <div class="pillar-row pillars-4">
+      <div class="card c-amber" onclick="sendPrompt('Write the Sleep & Recovery section of my life guide: sleep protocols, bedtime flow, active recovery, non-negotiables')">
+        <div class="ctitle">Sleep &amp; recovery</div>
+        <div class="csub">Protocols, bedtime flow, rest cycles</div>
+      </div>
+      <div class="card c-amber" onclick="sendPrompt('Write the Neurochemistry section of my life guide: dopamine management, norepinephrine, serotonin, flow neurotransmitters')">
+        <div class="ctitle">Neurochemistry</div>
+        <div class="csub">Dopamine, flow neurotransmitters, fuel</div>
+      </div>
+      <div class="card c-amber" onclick="sendPrompt('Write the Physical Fuel section of my life guide: exercise protocols, nutrition for performance, breathwork, movement')">
+        <div class="ctitle">Physical fuel</div>
+        <div class="csub">Exercise, nutrition, breathwork</div>
+      </div>
+      <div class="card c-amber" onclick="sendPrompt('Write the Burnout Proofing section of my life guide: Maslach triggers, psychological and physiological immunity, recovery')">
+        <div class="ctitle">Burnout proofing</div>
+        <div class="csub">Maslach triggers, immunity strategies</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">↓</div>
+
+  <div class="tier">
+    <div class="tier-label">Psychology — mindset, emotion &amp; motivation</div>
+    <div class="pillar-row pillars-4">
+      <div class="card c-coral" onclick="sendPrompt('Write the Mindset & Grit section of my life guide: growth mindset, graceful struggling, reframing anxiety as excitement')">
+        <div class="ctitle">Mindset &amp; grit</div>
+        <div class="csub">Growth mindset, graceful struggle, reframing</div>
+      </div>
+      <div class="card c-coral" onclick="sendPrompt('Write the Motivation Architecture section of my life guide: internal motivation, liberation from external validation, autonomy tools')">
+        <div class="ctitle">Motivation architecture</div>
+        <div class="csub">Internal drivers, liberation, autonomy</div>
+      </div>
+      <div class="card c-coral" onclick="sendPrompt('Write the Positive Psychology section of my life guide: PERMA model, wellbeing map, accomplishment framework')">
+        <div class="ctitle">Positive psychology</div>
+        <div class="csub">PERMA, wellbeing, accomplishment</div>
+      </div>
+      <div class="card c-coral" onclick="sendPrompt('Write the Stoicism & Emotional Mastery section of my life guide: stoic practices, emotion regulation, antifragility')">
+        <div class="ctitle">Stoicism &amp; emotional mastery</div>
+        <div class="csub">Stoic practices, antifragility</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">↓</div>
+
+  <div class="tier">
+    <div class="tier-label">Relationships &amp; environment — your outer world</div>
+    <div class="pillar-row pillars-3">
+      <div class="card c-blue" onclick="sendPrompt('Write the Relationships & Trust section of my life guide: authentic connections, accelerating trust, community, group flow')">
+        <div class="ctitle">Relationships &amp; trust</div>
+        <div class="csub">Authentic connections, trust acceleration, community</div>
+      </div>
+      <div class="card c-blue" onclick="sendPrompt('Write the Environment Design section of my life guide: physical setup for flow, context engineering, autonomy across life areas')">
+        <div class="ctitle">Environment design</div>
+        <div class="csub">Physical setup, context engineering, autonomy</div>
+      </div>
+      <div class="card c-blue" onclick="sendPrompt('Write the Boundaries & Saying No section of my life guide: boundary-setting frameworks, protecting flow time, calendar design')">
+        <div class="ctitle">Boundaries &amp; saying no</div>
+        <div class="csub">Frameworks, protecting flow time, calendar</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">↓</div>
+
+  <div class="tier">
+    <div class="tier-label">Operating system — daily &amp; weekly rhythms</div>
+    <div class="pillar-row pillars-4">
+      <div class="card c-green" onclick="sendPrompt('Write the Daily Architecture section of my life guide: morning protocol, flow blocks, recovery cycles, bedtime routine')">
+        <div class="ctitle">Daily architecture</div>
+        <div class="csub">Morning ritual, flow blocks, bedtime</div>
+      </div>
+      <div class="card c-green" onclick="sendPrompt('Write the Weekly Operating Rhythm section of my life guide: weekly review, goal assessment, planning cadence, one day month concept')">
+        <div class="ctitle">Weekly operating rhythm</div>
+        <div class="csub">Review, planning cadence, one-day month</div>
+      </div>
+      <div class="card c-green" onclick="sendPrompt('Write the Habits & Systems section of my life guide: automatizing habits, rule-based decisions, gamification, feedback loops')">
+        <div class="ctitle">Habits &amp; systems</div>
+        <div class="csub">Automation, rules, gamification, loops</div>
+      </div>
+      <div class="card c-green" onclick="sendPrompt('Write the Adaptability & VUCA section of my life guide: leveraging volatility, resilience protocols, calendar flexibility')">
+        <div class="ctitle">Adaptability &amp; VUCA</div>
+        <div class="csub">Volatility leverage, resilience, flexibility</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">↓</div>
+
+  <div class="tier">
+    <div class="tier-label">Review layer — staying calibrated over time</div>
+    <div class="wide-card" onclick="sendPrompt('Write the Review & Calibration layer of my life guide: diagnostic tools, annual review, monthly check-ins, asymmetric audit, pre-mortem')">
+      <div>
+        <div class="ctitle">Diagnostic &amp; calibration engine</div>
+        <div class="csub">Annual pre-mortem · Monthly goal review · Weekly check-in · Burnout diagnostic · Flow audit · Asymmetric warfare audit</div>
+      </div>
+    </div>
+  </div>
+</div>

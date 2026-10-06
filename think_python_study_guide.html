@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Think Python 2 — Study Guide</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232738;
+    --accent: #7c6af7;
+    --accent2: #4ef0c0;
+    --warn: #f7c06a;
+    --danger: #f76a7c;
+    --text: #e4e6f0;
+    --muted: #7c82a0;
+    --code-bg: #12151f;
+    --border: #2a2e42;
+    --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-code: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    padding-bottom: 60px;
+  }
+
+  /* ── TOP BAR ── */
+  header {
+    background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 16px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: var(--accent);
+  }
+  header p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar-wrap {
+    background: var(--surface);
+    border-radius: 4px;
+    height: 6px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    height: 100%;
+    width: 0%;
+    transition: width .4s ease;
+    border-radius: 4px;
+  }
+  .progress-label { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+
+  /* ── NAV PILLS ── */
+  nav {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav button {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    white-space: nowrap;
+    transition: all .2s;
+    font-family: var(--font-body);
+  }
+  nav button:hover, nav button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* ── MAIN CONTENT ── */
+  main { padding: 0 14px; }
+
+  .chapter {
+    display: none;
+    padding-top: 16px;
+  }
+  .chapter.active { display: block; }
+
+  .chapter-header {
+    background: linear-gradient(135deg, var(--surface2), var(--surface));
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+  .chapter-header .ch-num { font-size: 0.72rem; color: var(--accent); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .chapter-header h2 { font-size: 1.2rem; margin-top: 2px; }
+  .chapter-header .subtitle { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 12px 14px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card-head:hover { background: var(--surface2); }
+  .card-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .badge-key { background: #2a1e5e; color: var(--accent); }
+  .badge-code { background: #153028; color: var(--accent2); }
+  .badge-trap { background: #3a1a1e; color: var(--danger); }
+  .badge-tip { background: #2e2510; color: var(--warn); }
+  .badge-quiz { background: #1a2e3a; color: #6ae0f7; }
+  .card-title { font-size: 0.9rem; font-weight: 600; flex: 1; }
+  .card-arrow { font-size: 0.7rem; color: var(--muted); transition: transform .25s; }
+  .card-arrow.open { transform: rotate(90deg); }
+  .card-body { display: none; padding: 0 14px 14px; }
+  .card-body.open { display: block; }
+
+  /* ── CONTENT ELEMENTS ── */
+  .key-concept {
+    background: var(--code-bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 12px;
+    margin: 8px 0;
+    font-size: 0.85rem;
+  }
+  .key-concept strong { color: var(--accent); }
+
+  pre, code {
+    font-family: var(--font-code);
+    font-size: 0.82rem;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow-x: auto;
+    padding: 12px;
+    margin: 8px 0;
+    line-height: 1.5;
+    -webkit-overflow-scrolling: touch;
+  }
+  code {
+    background: var(--code-bg);
+    border-radius: 3px;
+    color: var(--accent2);
+    padding: 1px 5px;
+  }
+  pre code { background: none; padding: 0; color: var(--text); }
+
+  .comment { color: #5a6282; }
+  .kw { color: #c792ea; }
+  .str { color: #c3e88d; }
+  .num { color: #f78c6c; }
+  .fn { color: #82aaff; }
+  .cls { color: #ffcb6b; }
+
+  ul, ol { padding-left: 18px; margin: 6px 0; }
+  li { margin: 3px 0; font-size: 0.87rem; }
+
+  .trap-box {
+    background: #1f0d0f;
+    border: 1px solid #5a1e24;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin: 8px 0;
+    font-size: 0.85rem;
+  }
+  .trap-box::before { content: '⚠ '; color: var(--danger); }
+
+  .tip-box {
+    background: #1e1608;
+    border: 1px solid #5a4a1e;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin: 8px 0;
+    font-size: 0.85rem;
+  }
+  .tip-box::before { content: '💡 '; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    margin: 8px 0;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 7px 10px;
+    text-align: left;
+  }
+  th { background: var(--surface2); color: var(--accent); }
+  td code { font-size: 0.79rem; }
+
+  .quiz-q {
+    font-weight: 600;
+    margin: 10px 0 5px;
+    font-size: 0.88rem;
+  }
+  .quiz-a {
+    background: var(--code-bg);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.84rem;
+    display: none;
+  }
+  .quiz-a.show { display: block; }
+  .show-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    margin-top: 4px;
+    font-family: var(--font-body);
+    transition: all .2s;
+  }
+  .show-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  h3 { font-size: 0.92rem; color: var(--accent2); margin: 12px 0 6px; }
+  p { font-size: 0.87rem; margin: 5px 0; }
+
+  /* ── QUICK REFERENCE SHEET ── */
+  .ref-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 8px 0;
+  }
+  .ref-item {
+    background: var(--code-bg);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+  .ref-item .ref-title { color: var(--warn); font-weight: 700; font-size: 0.72rem; margin-bottom: 4px; }
+
+  @media (max-width: 400px) {
+    .ref-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── DONE CHECKBOX ── */
+  .done-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .done-wrap input[type=checkbox] { accent-color: var(--accent2); width: 16px; height: 16px; }
+  .done-wrap label { font-size: 0.8rem; color: var(--muted); cursor: pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🐍 Think Python 2 — 90% Study Guide</h1>
+  <p>All 19 chapters + Appendices · Tap sections to expand</p>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressFill"></div>
+  </div>
+  <div class="progress-label" id="progressLabel">0 / 19 chapters reviewed</div>
+</header>
+
+<nav id="chapNav">
+  <button class="active" onclick="showChap('ch1',this)">Ch 1</button>
+  <button onclick="showChap('ch2',this)">Ch 2</button>
+  <button onclick="showChap('ch3',this)">Ch 3</button>
+  <button onclick="showChap('ch4',this)">Ch 4</button>
+  <button onclick="showChap('ch5',this)">Ch 5</button>
+  <button onclick="showChap('ch6',this)">Ch 6</button>
+  <button onclick="showChap('ch7',this)">Ch 7</button>
+  <button onclick="showChap('ch8',this)">Ch 8</button>
+  <button onclick="showChap('ch9',this)">Ch 9</button>
+  <button onclick="showChap('ch10',this)">Ch 10</button>
+  <button onclick="showChap('ch11',this)">Ch 11</button>
+  <button onclick="showChap('ch12',this)">Ch 12</button>
+  <button onclick="showChap('ch13',this)">Ch 13</button>
+  <button onclick="showChap('ch14',this)">Ch 14</button>
+  <button onclick="showChap('ch15',this)">Ch 15</button>
+  <button onclick="showChap('ch16',this)">Ch 16</button>
+  <button onclick="showChap('ch17',this)">Ch 17</button>
+  <button onclick="showChap('ch18',this)">Ch 18</button>
+  <button onclick="showChap('ch19',this)">Ch 19</button>
+  <button onclick="showChap('app',this)">App A&B</button>
+  <button onclick="showChap('quickref',this)">⚡ Quick Ref</button>
+</nav>
+
+<main>
+
+<!-- ══════════════════════ CHAPTER 1 ══════════════════════ -->
+<div class="chapter active" id="ch1">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 1</div>
+    <h2>The Way of the Program</h2>
+    <div class="subtitle">Programs, Python basics, types of errors</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">What is a Program?</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <p>A program is a sequence of instructions that specifies a computation. All programs use these building blocks:</p>
+      <ul>
+        <li><strong>Input</strong> — get data from keyboard, file, network</li>
+        <li><strong>Output</strong> — display on screen, save to file</li>
+        <li><strong>Math</strong> — arithmetic operations</li>
+        <li><strong>Conditional execution</strong> — check conditions, run appropriate code</li>
+        <li><strong>Repetition</strong> — perform action repeatedly</li>
+      </ul>
+      <div class="done-wrap"><input type="checkbox" id="d-ch1-1" onchange="updateProgress()"><label for="d-ch1-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Values & Types</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <table>
+        <tr><th>Type</th><th>Example</th><th>Check with</th></tr>
+        <tr><td><code>int</code></td><td><code>42</code></td><td><code>type(42)</code></td></tr>
+        <tr><td><code>float</code></td><td><code>42.0</code></td><td><code>type(3.14)</code></td></tr>
+        <tr><td><code>str</code></td><td><code>'hello'</code></td><td><code>type('hi')</code></td></tr>
+      </table>
+      <div class="trap-box">1,000,000 is NOT a million in Python — it's a tuple (1,0,0)!</div>
+      <div class="done-wrap"><input type="checkbox" id="d-ch1-2" onchange="updateProgress()"><label for="d-ch1-2">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-trap">Trap</span>
+      <span class="card-title">3 Types of Errors</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Syntax error</strong> — structure is wrong; Python can't even parse it. Program won't run.</li>
+        <li><strong>Runtime error</strong> — error while running (also called exceptions). E.g., dividing by zero.</li>
+        <li><strong>Semantic error</strong> — program runs but does the <em>wrong thing</em>. Hardest to find!</li>
+      </ul>
+      <div class="done-wrap"><input type="checkbox" id="d-ch1-3" onchange="updateProgress()"><label for="d-ch1-3">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Arithmetic Operators</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="num">40</span> + <span class="num">2</span>     <span class="comment"># 42  addition</span>
+<span class="num">84</span> / <span class="num">2</span>      <span class="comment"># 42.0  division always float</span>
+<span class="num">85</span> // <span class="num">2</span>     <span class="comment"># 42  floor division</span>
+<span class="num">85</span> % <span class="num">2</span>      <span class="comment"># 1   modulo (remainder)</span>
+<span class="num">6</span>**<span class="num">2</span>        <span class="comment"># 36  exponentiation (not ^)</span>
+<span class="num">6</span> ^ <span class="num">2</span>       <span class="comment"># 4   XOR — NOT exponentiation!</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch1-4" onchange="updateProgress()"><label for="d-ch1-4">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 2 ══════════════════════ -->
+<div class="chapter" id="ch2">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 2</div>
+    <h2>Variables, Expressions & Statements</h2>
+    <div class="subtitle">Assignment, PEMDAS, string ops, comments, error types</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Variables & Assignment</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code>message = <span class="str">'hello'</span>   <span class="comment"># creates variable</span>
+n = <span class="num">17</span>
+pi = <span class="num">3.14</span></code></pre>
+      <ul>
+        <li>Variable names: letters, numbers, underscore; can't start with number</li>
+        <li>Can't use keywords: <code>False, None, True, and, as, assert, break, class, continue, def, del, elif, else, except, finally, for, from, global, if, import, in, is, lambda, nonlocal, not, or, pass, raise, return, try, while, with, yield</code></li>
+      </ul>
+      <div class="done-wrap"><input type="checkbox" id="d-ch2-1" onchange="updateProgress()"><label for="d-ch2-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Order of Operations (PEMDAS)</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <p><strong>P</strong>arentheses → <strong>E</strong>xponents → <strong>M</strong>ultiplication/<strong>D</strong>ivision → <strong>A</strong>ddition/<strong>S</strong>ubtraction</p>
+      <pre><code><span class="num">2</span> * (<span class="num">3</span>-<span class="num">1</span>)      <span class="comment"># 4</span>
+<span class="num">1</span> + <span class="num">2</span>**<span class="num">3</span>      <span class="comment"># 9, not 27</span>
+<span class="num">6</span>+<span class="num">4</span>/<span class="num">2</span>         <span class="comment"># 8.0, not 5</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch2-2" onchange="updateProgress()"><label for="d-ch2-2">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">String Operations</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="str">'throat'</span> + <span class="str">'warbler'</span>  <span class="comment"># 'throatwarbler' (concat)</span>
+<span class="str">'Spam'</span> * <span class="num">3</span>            <span class="comment"># 'SpamSpamSpam' (repeat)</span></code></pre>
+      <div class="trap-box">Can't do math on strings: <code>'eggs'/'easy'</code> → TypeError</div>
+      <div class="tip-box">Comments start with <code>#</code> and are ignored by Python.</div>
+      <div class="done-wrap"><input type="checkbox" id="d-ch2-3" onchange="updateProgress()"><label for="d-ch2-3">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 3 ══════════════════════ -->
+<div class="chapter" id="ch3">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 3</div>
+    <h2>Functions</h2>
+    <div class="subtitle">Defining, calling, parameters, scope, stack diagrams</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Defining & Calling Functions</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">def</span> <span class="fn">print_twice</span>(bruce):
+    <span class="fn">print</span>(bruce)
+    <span class="fn">print</span>(bruce)
+
+<span class="fn">print_twice</span>(<span class="str">'spam'</span>)   <span class="comment"># calls the function</span></code></pre>
+      <ul>
+        <li>Header ends with colon <code>:</code></li>
+        <li>Body is indented (4 spaces by convention)</li>
+        <li><strong>Parameter</strong> = variable inside function (<code>bruce</code>)</li>
+        <li><strong>Argument</strong> = value passed in (<code>'spam'</code>)</li>
+      </ul>
+      <div class="done-wrap"><input type="checkbox" id="d-ch3-1" onchange="updateProgress()"><label for="d-ch3-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Fruitful vs Void Functions</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Fruitful function</strong> — returns a value (e.g., <code>math.sqrt(5)</code>)</li>
+        <li><strong>Void function</strong> — does something but returns <code>None</code> (e.g., <code>print()</code>)</li>
+      </ul>
+      <div class="trap-box">If you call a void function and try to use its result, you get <code>None</code>. Example: <code>result = print('hi')</code> → result is <code>None</code>.</div>
+      <div class="done-wrap"><input type="checkbox" id="d-ch3-2" onchange="updateProgress()"><label for="d-ch3-2">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Local Variables & Stack Diagrams</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <p>Variables created inside a function are <strong>local</strong> — they only exist inside that function.</p>
+      <p>A <strong>stack diagram</strong> shows each function call as a frame with its local variables. The traceback (error message) lists frames from bottom to top.</p>
+      <pre><code><span class="kw">def</span> <span class="fn">cat_twice</span>(p1, p2):
+    cat = p1 + p2    <span class="comment"># cat is LOCAL</span>
+    <span class="fn">print_twice</span>(cat)
+
+<span class="fn">cat_twice</span>(<span class="str">'a'</span>, <span class="str">'b'</span>)
+<span class="fn">print</span>(cat)    <span class="comment"># NameError! cat is gone</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch3-3" onchange="updateProgress()"><label for="d-ch3-3">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Math Module</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">import</span> math
+
+math.<span class="fn">sqrt</span>(<span class="num">2</span>)        <span class="comment"># 1.414...</span>
+math.<span class="fn">sin</span>(<span class="num">0</span>)         <span class="comment"># 0.0</span>
+math.<span class="fn">log10</span>(<span class="num">100</span>)    <span class="comment"># 2.0</span>
+math.pi             <span class="comment"># 3.14159...</span>
+math.<span class="fn">exp</span>(<span class="num">1</span>)         <span class="comment"># e ≈ 2.718</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch3-4" onchange="updateProgress()"><label for="d-ch3-4">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 4 ══════════════════════ -->
+<div class="chapter" id="ch4">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 4</div>
+    <h2>Case Study: Interface Design</h2>
+    <div class="subtitle">Turtle graphics, for loops, encapsulation, generalization, docstrings</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">For Loop & Turtle Basics</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">import</span> turtle
+bob = turtle.<span class="fn">Turtle</span>()
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">4</span>):     <span class="comment"># draw square</span>
+    bob.<span class="fn">fd</span>(<span class="num">100</span>)
+    bob.<span class="fn">lt</span>(<span class="num">90</span>)</code></pre>
+      <p>Turtle methods: <code>fd(dist)</code> forward, <code>bk(dist)</code> backward, <code>lt(angle)</code> left, <code>rt(angle)</code> right, <code>pu()</code> pen up, <code>pd()</code> pen down.</p>
+      <div class="done-wrap"><input type="checkbox" id="d-ch4-1" onchange="updateProgress()"><label for="d-ch4-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Design Concepts</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Encapsulation</strong> — wrapping code in a function</li>
+        <li><strong>Generalization</strong> — replacing specific values with parameters</li>
+        <li><strong>Interface</strong> — parameters a function takes (what callers need to know)</li>
+        <li><strong>Refactoring</strong> — reorganizing code without changing what it does</li>
+        <li><strong>Docstring</strong> — string right after <code>def</code>, explains the function</li>
+      </ul>
+      <pre><code><span class="kw">def</span> <span class="fn">polygon</span>(t, n, length):
+    <span class="str">"""Draws a regular n-sided polygon."""</span>
+    angle = <span class="num">360</span> / n
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+        t.<span class="fn">fd</span>(length)
+        t.<span class="fn">lt</span>(angle)</code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch4-2" onchange="updateProgress()"><label for="d-ch4-2">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 5 ══════════════════════ -->
+<div class="chapter" id="ch5">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 5</div>
+    <h2>Conditionals & Recursion</h2>
+    <div class="subtitle">if/elif/else, boolean ops, recursion, base case</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Conditionals</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">if</span> x > <span class="num">0</span>:
+    <span class="fn">print</span>(<span class="str">'positive'</span>)
+<span class="kw">elif</span> x < <span class="num">0</span>:
+    <span class="fn">print</span>(<span class="str">'negative'</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">'zero'</span>)</code></pre>
+      <table>
+        <tr><th>Operator</th><th>Meaning</th></tr>
+        <tr><td><code>==</code></td><td>equal (not <code>=</code>!)</td></tr>
+        <tr><td><code>!=</code></td><td>not equal</td></tr>
+        <tr><td><code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code></td><td>comparison</td></tr>
+        <tr><td><code>and</code>, <code>or</code>, <code>not</code></td><td>logical operators</td></tr>
+      </table>
+      <div class="done-wrap"><input type="checkbox" id="d-ch5-1" onchange="updateProgress()"><label for="d-ch5-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Recursion</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <p>A function that calls itself. Must have a <strong>base case</strong> (stops recursion) and a <strong>recursive case</strong>.</p>
+      <pre><code><span class="kw">def</span> <span class="fn">countdown</span>(n):
+    <span class="kw">if</span> n <= <span class="num">0</span>:             <span class="comment"># base case</span>
+        <span class="fn">print</span>(<span class="str">'Blastoff!'</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(n)
+        <span class="fn">countdown</span>(n-<span class="num">1</span>)    <span class="comment"># recursive case</span></code></pre>
+      <div class="trap-box">Infinite recursion (no base case) → RuntimeError: maximum recursion depth exceeded.</div>
+      <p><code>n % 2</code> gives remainder: 0 if even, 1 if odd. <code>n // 2</code> is floor division.</p>
+      <div class="done-wrap"><input type="checkbox" id="d-ch5-2" onchange="updateProgress()"><label for="d-ch5-2">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-quiz">Quiz</span>
+      <span class="card-title">Quick Questions</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <div class="quiz-q">Q: What does <code>17 % 3</code> return?</div>
+      <button class="show-btn" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-a">2 (17 = 5×3 + 2)</div>
+
+      <div class="quiz-q">Q: What's wrong: <code>if x = 5:</code> ?</div>
+      <button class="show-btn" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-a">SyntaxError — assignment uses <code>=</code>, comparison uses <code>==</code>. Should be <code>if x == 5:</code></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 6 ══════════════════════ -->
+<div class="chapter" id="ch6">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 6</div>
+    <h2>Fruitful Functions</h2>
+    <div class="subtitle">return values, incremental dev, boolean functions, guardian pattern</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Return Values</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">def</span> <span class="fn">absolute_value</span>(x):
+    <span class="kw">if</span> x < <span class="num">0</span>:
+        <span class="kw">return</span> -x
+    <span class="kw">else</span>:
+        <span class="kw">return</span> x</code></pre>
+      <div class="tip-box">Once <code>return</code> is hit, the function exits immediately. Code after it doesn't run (dead code).</div>
+      <div class="done-wrap"><input type="checkbox" id="d-ch6-1" onchange="updateProgress()"><label for="d-ch6-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Boolean Functions & Guardian Pattern</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">def</span> <span class="fn">is_divisible</span>(x, y):
+    <span class="kw">return</span> x % y == <span class="num">0</span>   <span class="comment"># returns True/False</span>
+
+<span class="kw">def</span> <span class="fn">factorial</span>(n):
+    <span class="kw">if</span> <span class="kw">not</span> <span class="fn">isinstance</span>(n, <span class="cls">int</span>):   <span class="comment"># guardian</span>
+        <span class="fn">print</span>(<span class="str">'error: must be int'</span>)
+        <span class="kw">return</span>
+    <span class="kw">if</span> n == <span class="num">0</span>: <span class="kw">return</span> <span class="num">1</span>
+    <span class="kw">return</span> n * <span class="fn">factorial</span>(n-<span class="num">1</span>)</code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch6-2" onchange="updateProgress()"><label for="d-ch6-2">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 7 ══════════════════════ -->
+<div class="chapter" id="ch7">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 7</div>
+    <h2>Iteration</h2>
+    <div class="subtitle">while loops, break, reassignment, algorithms</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">while Loop & break</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code>n = <span class="num">5</span>
+<span class="kw">while</span> n > <span class="num">0</span>:
+    <span class="fn">print</span>(n)
+    n -= <span class="num">1</span>
+<span class="fn">print</span>(<span class="str">'Blastoff!'</span>)
+
+<span class="comment"># break exits loop early</span>
+<span class="kw">while</span> <span class="cls">True</span>:
+    line = <span class="fn">input</span>(<span class="str">'> '</span>)
+    <span class="kw">if</span> line == <span class="str">'done'</span>:
+        <span class="kw">break</span>
+    <span class="fn">print</span>(line)</code></pre>
+      <div class="trap-box">Infinite loop: if condition never becomes False. Use <code>break</code> or fix the update.</div>
+      <div class="done-wrap"><input type="checkbox" id="d-ch7-1" onchange="updateProgress()"><label for="d-ch7-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Algorithms vs Memorization</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <p>An <strong>algorithm</strong> is a general mechanical process for solving a category of problems (like Newton's method for square roots). It's different from memorizing specific solutions.</p>
+      <div class="tip-box">Debugging by bisection: check the middle of your code to halve the search space each time.</div>
+      <div class="done-wrap"><input type="checkbox" id="d-ch7-2" onchange="updateProgress()"><label for="d-ch7-2">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 8 ══════════════════════ -->
+<div class="chapter" id="ch8">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 8</div>
+    <h2>Strings</h2>
+    <div class="subtitle">indexing, slicing, methods, immutability, in operator</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Indexing & Slicing</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code>fruit = <span class="str">'banana'</span>
+fruit[<span class="num">0</span>]      <span class="comment"># 'b'  — zero-indexed!</span>
+fruit[-<span class="num">1</span>]     <span class="comment"># 'a'  — last char</span>
+fruit[<span class="num">0</span>:<span class="num">3</span>]    <span class="comment"># 'ban' — up to NOT including 3</span>
+fruit[<span class="num">3</span>:]     <span class="comment"># 'ana'</span>
+fruit[:<span class="num">3</span>]     <span class="comment"># 'ban'</span>
+fruit[::-<span class="num">1</span>]   <span class="comment"># 'ananab' — reversed!</span>
+<span class="fn">len</span>(fruit)    <span class="comment"># 6</span></code></pre>
+      <div class="trap-box">Strings are IMMUTABLE — you can't do <code>fruit[0] = 'J'</code>. Creates a TypeError. Make a new string instead.</div>
+      <div class="done-wrap"><input type="checkbox" id="d-ch8-1" onchange="updateProgress()"><label for="d-ch8-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">String Methods</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code>word = <span class="str">'banana'</span>
+word.<span class="fn">upper</span>()          <span class="comment"># 'BANANA'</span>
+word.<span class="fn">lower</span>()          <span class="comment"># 'banana'</span>
+word.<span class="fn">find</span>(<span class="str">'a'</span>)        <span class="comment"># 1 (first occurrence)</span>
+word.<span class="fn">find</span>(<span class="str">'na'</span>, <span class="num">3</span>)   <span class="comment"># 4 (start searching at 3)</span>
+word.<span class="fn">strip</span>()          <span class="comment"># removes whitespace</span>
+word.<span class="fn">replace</span>(<span class="str">'a'</span>,<span class="str">'o'</span>)<span class="comment"># 'bonono'</span>
+<span class="str">'a'</span> <span class="kw">in</span> <span class="str">'banana'</span>      <span class="comment"># True</span>
+word.<span class="fn">count</span>(<span class="str">'a'</span>)       <span class="comment"># 3</span>
+word.<span class="fn">isalpha</span>()        <span class="comment"># True (all letters)</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch8-2" onchange="updateProgress()"><label for="d-ch8-2">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-quiz">Quiz</span>
+      <span class="card-title">Quick Questions</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <div class="quiz-q">Q: What is <code>'banana'[1:4]</code>?</div>
+      <button class="show-btn" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-a">'ana' — characters at index 1, 2, 3 (not 4)</div>
+
+      <div class="quiz-q">Q: How do you traverse every character in a string?</div>
+      <button class="show-btn" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-a"><code>for letter in word:</code> — or while loop with index counter.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 9 ══════════════════════ -->
+<div class="chapter" id="ch9">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 9</div>
+    <h2>Case Study: Word Play</h2>
+    <div class="subtitle">File reading, search patterns, looping with indices</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Reading Files & Search Pattern</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="comment"># Read a file</span>
+fin = <span class="fn">open</span>(<span class="str">'words.txt'</span>)
+<span class="kw">for</span> line <span class="kw">in</span> fin:
+    word = line.<span class="fn">strip</span>()
+    <span class="fn">print</span>(word)
+
+<span class="comment"># Search pattern</span>
+<span class="kw">def</span> <span class="fn">has_no_e</span>(word):
+    <span class="kw">for</span> letter <span class="kw">in</span> word:
+        <span class="kw">if</span> letter == <span class="str">'e'</span>:
+            <span class="kw">return</span> <span class="cls">False</span>
+    <span class="kw">return</span> <span class="cls">True</span></code></pre>
+      <div class="tip-box">Reduction to previously solved problem: recognize your problem is an instance of something you've already solved.</div>
+      <div class="done-wrap"><input type="checkbox" id="d-ch9-1" onchange="updateProgress()"><label for="d-ch9-1">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 10 ══════════════════════ -->
+<div class="chapter" id="ch10">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 10</div>
+    <h2>Lists</h2>
+    <div class="subtitle">Mutable sequences, methods, aliasing, list arguments</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">List Basics & Methods</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code>t = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+t[<span class="num">0</span>]           <span class="comment"># 1</span>
+t[-<span class="num">1</span>]          <span class="comment"># 3</span>
+t[<span class="num">1</span>:<span class="num">3</span>]         <span class="comment"># [2, 3]</span>
+
+t.<span class="fn">append</span>(<span class="num">4</span>)   <span class="comment"># [1,2,3,4] — modifies in place</span>
+t.<span class="fn">extend</span>([<span class="num">5</span>,<span class="num">6</span>])<span class="comment"># [1,2,3,4,5,6]</span>
+t.<span class="fn">sort</span>()       <span class="comment"># sorts in place, returns None!</span>
+t.<span class="fn">pop</span>(<span class="num">1</span>)       <span class="comment"># removes+returns item at index 1</span>
+t.<span class="fn">remove</span>(<span class="num">3</span>)   <span class="comment"># removes first occurrence of 3</span>
+<span class="kw">del</span> t[<span class="num">0</span>]       <span class="comment"># removes item at index 0</span>
+<span class="fn">len</span>(t)         <span class="comment"># number of items</span>
+<span class="fn">sum</span>(t)         <span class="comment"># total (if numbers)</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch10-1" onchange="updateProgress()"><label for="d-ch10-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-trap">Trap</span>
+      <span class="card-title">Aliasing & Mutation Gotchas</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code>a = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+b = a          <span class="comment"># b is an ALIAS for a</span>
+b[<span class="num">0</span>] = <span class="num">99</span>
+<span class="fn">print</span>(a)       <span class="comment"># [99, 2, 3] !!!</span>
+
+<span class="comment"># To copy a list:</span>
+b = a[:]       <span class="comment"># slice copy</span>
+b = <span class="fn">list</span>(a)   <span class="comment"># or this</span></code></pre>
+      <div class="trap-box"><code>t = t.sort()</code> is WRONG — sort() returns None. Use <code>t.sort()</code> alone, or use <code>sorted(t)</code> to get a new sorted list.</div>
+      <pre><code><span class="comment"># Right ways to add item:</span>
+t.<span class="fn">append</span>(x)    <span class="comment"># ✓</span>
+t = t + [x]    <span class="comment"># ✓</span>
+<span class="comment"># WRONG ways:</span>
+t.<span class="fn">append</span>([x])  <span class="comment"># ✗ adds nested list</span>
+t = t.<span class="fn">append</span>(x)<span class="comment"># ✗ t becomes None</span>
+t + [x]        <span class="comment"># ✗ doesn't update t</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch10-2" onchange="updateProgress()"><label for="d-ch10-2">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Map, Filter, Reduce + split/join</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><strong>reduce</strong> — combine sequence to single value (e.g., <code>sum()</code>)</li>
+        <li><strong>map</strong> — apply operation to each element</li>
+        <li><strong>filter</strong> — select elements that match criterion</li>
+      </ul>
+      <pre><code>s = <span class="str">'a b c'</span>
+t = s.<span class="fn">split</span>()        <span class="comment"># ['a','b','c']</span>
+<span class="str">' '</span>.<span class="fn">join</span>(t)          <span class="comment"># 'a b c'</span>
+<span class="str">'-'</span>.<span class="fn">join</span>([<span class="str">'a'</span>,<span class="str">'b'</span>])  <span class="comment"># 'a-b'</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch10-3" onchange="updateProgress()"><label for="d-ch10-3">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 11 ══════════════════════ -->
+<div class="chapter" id="ch11">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 11</div>
+    <h2>Dictionaries</h2>
+    <div class="subtitle">Key-value mappings, methods, memoization, global vars</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Dictionary Basics</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code>d = {<span class="str">'one'</span>: <span class="str">'uno'</span>, <span class="str">'two'</span>: <span class="str">'dos'</span>}
+d[<span class="str">'one'</span>]            <span class="comment"># 'uno'</span>
+d[<span class="str">'three'</span>] = <span class="str">'tres'</span> <span class="comment"># add new key</span>
+<span class="str">'one'</span> <span class="kw">in</span> d           <span class="comment"># True (checks KEYS)</span>
+<span class="str">'uno'</span> <span class="kw">in</span> d           <span class="comment"># False (not a key!)</span>
+<span class="str">'uno'</span> <span class="kw">in</span> d.<span class="fn">values</span>()  <span class="comment"># True</span>
+<span class="fn">len</span>(d)               <span class="comment"># number of key-value pairs</span>
+
+<span class="comment"># Iterating</span>
+<span class="kw">for</span> key <span class="kw">in</span> d:
+    <span class="fn">print</span>(key, d[key])
+
+<span class="comment"># get() — safe lookup with default</span>
+d.<span class="fn">get</span>(<span class="str">'four'</span>, <span class="num">0</span>)     <span class="comment"># 0 (key not found)</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch11-1" onchange="updateProgress()"><label for="d-ch11-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Memoization & Global Variables</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <p><strong>Memoization</strong> — cache previously computed results to avoid redundant work.</p>
+      <pre><code>known = {<span class="num">0</span>: <span class="num">0</span>, <span class="num">1</span>: <span class="num">1</span>}
+
+<span class="kw">def</span> <span class="fn">fibonacci</span>(n):
+    <span class="kw">if</span> n <span class="kw">in</span> known:
+        <span class="kw">return</span> known[n]
+    res = <span class="fn">fibonacci</span>(n-<span class="num">1</span>) + <span class="fn">fibonacci</span>(n-<span class="num">2</span>)
+    known[n] = res
+    <span class="kw">return</span> res</code></pre>
+      <p><strong>Global variable</strong>: must declare with <code>global</code> to modify inside a function:</p>
+      <pre><code>count = <span class="num">0</span>
+<span class="kw">def</span> <span class="fn">increment</span>():
+    <span class="kw">global</span> count
+    count += <span class="num">1</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch11-2" onchange="updateProgress()"><label for="d-ch11-2">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Histogram & Counter Pattern</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">def</span> <span class="fn">histogram</span>(s):
+    d = <span class="fn">dict</span>()
+    <span class="kw">for</span> c <span class="kw">in</span> s:
+        d[c] = d.<span class="fn">get</span>(c, <span class="num">0</span>) + <span class="num">1</span>
+    <span class="kw">return</span> d
+
+<span class="fn">histogram</span>(<span class="str">'brontosaurus'</span>)
+<span class="comment"># {'b':1, 'r':2, 'o':2, 'n':1, 't':1, ...}</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch11-3" onchange="updateProgress()"><label for="d-ch11-3">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 12 ══════════════════════ -->
+<div class="chapter" id="ch12">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 12</div>
+    <h2>Tuples</h2>
+    <div class="subtitle">Immutable sequences, packing/unpacking, zip, sorted</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Tuple Basics & Unpacking</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code>t = (<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>)   <span class="comment"># tuple (immutable!)</span>
+t = <span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>     <span class="comment"># same thing, no parens needed</span>
+t[<span class="num">0</span>]             <span class="comment"># 1</span>
+
+<span class="comment"># Unpacking</span>
+a, b, c = t     <span class="comment"># a=1, b=2, c=3</span>
+x, y = <span class="num">3</span>, <span class="num">4</span>     <span class="comment"># swap trick:</span>
+x, y = y, x     <span class="comment"># x=4, y=3</span>
+
+<span class="comment"># Singleton tuple needs trailing comma</span>
+t = (<span class="num">5</span>,)         <span class="comment"># tuple with one element</span>
+t = (<span class="num">5</span>)          <span class="comment"># just the integer 5!</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch12-1" onchange="updateProgress()"><label for="d-ch12-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">zip, enumerate & *args</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="comment"># zip pairs up elements from two sequences</span>
+s = <span class="str">'abc'</span>
+t = [<span class="num">0</span>, <span class="num">1</span>, <span class="num">2</span>]
+<span class="kw">for</span> pair <span class="kw">in</span> <span class="fn">zip</span>(s, t):
+    <span class="fn">print</span>(pair)      <span class="comment"># ('a',0) ('b',1) ('c',2)</span>
+
+<span class="comment"># enumerate gives (index, value)</span>
+<span class="kw">for</span> i, v <span class="kw">in</span> <span class="fn">enumerate</span>([<span class="str">'a'</span>,<span class="str">'b'</span>]):
+    <span class="fn">print</span>(i, v)      <span class="comment"># 0 a  1 b</span>
+
+<span class="comment"># *args gathers extra args as a tuple</span>
+<span class="kw">def</span> <span class="fn">printall</span>(*args):
+    <span class="fn">print</span>(args)
+<span class="fn">printall</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>)  <span class="comment"># (1, 2, 3)</span></code></pre>
+      <p>Tuples can be dict keys (lists cannot — lists are unhashable).</p>
+      <div class="done-wrap"><input type="checkbox" id="d-ch12-2" onchange="updateProgress()"><label for="d-ch12-2">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 13 ══════════════════════ -->
+<div class="chapter" id="ch13">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 13</div>
+    <h2>Case Study: Data Structure Selection</h2>
+    <div class="subtitle">Word frequencies, random choice, Markov analysis, benchmarking</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Data Structure Choices</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><strong>List</strong> — ordered, mutable, indexed by int, allows duplicates</li>
+        <li><strong>Dictionary</strong> — key→value mapping, O(1) lookup, unordered</li>
+        <li><strong>Tuple</strong> — immutable, can be dict key</li>
+        <li><strong>Set</strong> — unique elements, fast membership test</li>
+      </ul>
+      <p><strong>Benchmarking</strong> — implement both approaches and test which is faster.</p>
+      <p><strong>5 Rs of debugging</strong>: Reading, Running, Ruminating, Rubber-ducking, Retreating.</p>
+      <div class="done-wrap"><input type="checkbox" id="d-ch13-1" onchange="updateProgress()"><label for="d-ch13-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Optional Parameters & Sorted</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">def</span> <span class="fn">histogram</span>(s, skip=[]):
+    <span class="str">"""Count letter frequencies, skip some."""</span>
+    d = {}
+    <span class="kw">for</span> c <span class="kw">in</span> s:
+        <span class="kw">if</span> c <span class="kw">not in</span> skip:
+            d[c] = d.<span class="fn">get</span>(c, <span class="num">0</span>) + <span class="num">1</span>
+    <span class="kw">return</span> d
+
+<span class="comment"># sorted() with key function</span>
+d = {<span class="str">'c'</span>:<span class="num">3</span>, <span class="str">'a'</span>:<span class="num">1</span>, <span class="str">'b'</span>:<span class="num">2</span>}
+<span class="fn">sorted</span>(d.<span class="fn">items</span>(), key=<span class="kw">lambda</span> x: x[<span class="num">1</span>])
+<span class="comment"># [('a',1), ('b',2), ('c',3)]</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch13-2" onchange="updateProgress()"><label for="d-ch13-2">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 14 ══════════════════════ -->
+<div class="chapter" id="ch14">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 14</div>
+    <h2>Files</h2>
+    <div class="subtitle">Reading/writing, os module, exceptions, pickle, dbm</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Reading & Writing Files</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="comment"># Read</span>
+fin = <span class="fn">open</span>(<span class="str">'data.txt'</span>)
+<span class="kw">for</span> line <span class="kw">in</span> fin:
+    <span class="fn">print</span>(line.<span class="fn">strip</span>())
+fin.<span class="fn">close</span>()
+
+<span class="comment"># Write (creates/overwrites!)</span>
+fout = <span class="fn">open</span>(<span class="str">'out.txt'</span>, <span class="str">'w'</span>)
+fout.<span class="fn">write</span>(<span class="str">'hello\n'</span>)
+fout.<span class="fn">close</span>()
+
+<span class="comment"># Append</span>
+fout = <span class="fn">open</span>(<span class="str">'out.txt'</span>, <span class="str">'a'</span>)</code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch14-1" onchange="updateProgress()"><label for="d-ch14-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Exception Handling & OS Module</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">try</span>:
+    fin = <span class="fn">open</span>(<span class="str">'bad_file'</span>)
+<span class="kw">except</span> <span class="cls">FileNotFoundError</span>:
+    <span class="fn">print</span>(<span class="str">'File not found!'</span>)
+
+<span class="kw">import</span> os
+os.<span class="fn">getcwd</span>()          <span class="comment"># current directory</span>
+os.path.<span class="fn">exists</span>(<span class="str">'f'</span>) <span class="comment"># True/False</span>
+os.path.<span class="fn">isfile</span>(<span class="str">'f'</span>) <span class="comment"># is it a file?</span>
+os.<span class="fn">listdir</span>(<span class="str">'.'</span>)     <span class="comment"># list directory</span></code></pre>
+      <p><strong>pickle</strong> — serialize Python objects to file. <strong>dbm</strong> — simple key-value database. <code>__name__ == '__main__'</code> — runs only when script is executed directly, not when imported.</p>
+      <div class="done-wrap"><input type="checkbox" id="d-ch14-2" onchange="updateProgress()"><label for="d-ch14-2">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 15 ══════════════════════ -->
+<div class="chapter" id="ch15">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 15</div>
+    <h2>Classes & Objects</h2>
+    <div class="subtitle">Defining classes, attributes, instances, copy module</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Class Definition & Instantiation</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">class</span> <span class="cls">Point</span>:
+    <span class="str">"""Represents a point in 2-D space."""</span>
+    <span class="comment"># class body — can be empty with pass</span>
+
+<span class="comment"># Instantiate</span>
+blank = <span class="cls">Point</span>()
+
+<span class="comment"># Set attributes</span>
+blank.x = <span class="num">3.0</span>
+blank.y = <span class="num">4.0</span>
+
+<span class="comment"># Read attributes</span>
+<span class="fn">print</span>(blank.x)    <span class="comment"># 3.0</span>
+<span class="fn">type</span>(blank)       <span class="comment"># &lt;class '__main__.Point'&gt;</span>
+<span class="fn">isinstance</span>(blank, <span class="cls">Point</span>)  <span class="comment"># True</span>
+<span class="fn">hasattr</span>(blank, <span class="str">'x'</span>)      <span class="comment"># True</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch15-1" onchange="updateProgress()"><label for="d-ch15-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Shallow vs Deep Copy</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">import</span> copy
+
+p1 = <span class="cls">Point</span>()
+p1.x, p1.y = <span class="num">3</span>, <span class="num">4</span>
+
+p2 = copy.<span class="fn">copy</span>(p1)     <span class="comment"># shallow copy</span>
+p3 = copy.<span class="fn">deepcopy</span>(p1) <span class="comment"># deep copy</span></code></pre>
+      <ul>
+        <li><strong>Shallow copy</strong> — copies object but NOT embedded objects (references shared)</li>
+        <li><strong>Deep copy</strong> — copies everything recursively (fully independent)</li>
+      </ul>
+      <div class="done-wrap"><input type="checkbox" id="d-ch15-2" onchange="updateProgress()"><label for="d-ch15-2">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 16 ══════════════════════ -->
+<div class="chapter" id="ch16">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 16</div>
+    <h2>Classes & Functions</h2>
+    <div class="subtitle">Pure functions, modifiers, prototype & patch vs designed development</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Pure Functions vs Modifiers</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Pure function</strong> — does NOT modify its arguments; returns a new value. Easier to reason about.</li>
+        <li><strong>Modifier</strong> — changes the object passed in. Side effects visible to caller.</li>
+      </ul>
+      <pre><code><span class="comment"># Pure function</span>
+<span class="kw">def</span> <span class="fn">add_time</span>(t1, t2):
+    result = <span class="cls">Time</span>()
+    result.hour = t1.hour + t2.hour
+    <span class="kw">return</span> result  <span class="comment"># new object, t1/t2 unchanged</span>
+
+<span class="comment"># Modifier</span>
+<span class="kw">def</span> <span class="fn">increment</span>(time, seconds):
+    time.second += seconds  <span class="comment"># changes time in place!</span></code></pre>
+      <p><strong>Invariant</strong>: condition that should always be true (e.g., 0 ≤ minutes &lt; 60). Use <code>assert</code> to check.</p>
+      <div class="done-wrap"><input type="checkbox" id="d-ch16-1" onchange="updateProgress()"><label for="d-ch16-1">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 17 ══════════════════════ -->
+<div class="chapter" id="ch17">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 17</div>
+    <h2>Classes & Methods</h2>
+    <div class="subtitle">self, __init__, __str__, operator overloading, polymorphism</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Methods, __init__ & __str__</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">class</span> <span class="cls">Time</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, hour=<span class="num">0</span>, minute=<span class="num">0</span>, second=<span class="num">0</span>):
+        <span class="kw">self</span>.hour = hour
+        <span class="kw">self</span>.minute = minute
+        <span class="kw">self</span>.second = second
+
+    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="kw">self</span>):
+        <span class="kw">return</span> <span class="str">'%.2d:%.2d:%.2d'</span> % (
+            <span class="kw">self</span>.hour, <span class="kw">self</span>.minute, <span class="kw">self</span>.second)
+
+    <span class="kw">def</span> <span class="fn">__add__</span>(<span class="kw">self</span>, other):   <span class="comment"># + operator</span>
+        secs = <span class="kw">self</span>.<span class="fn">to_seconds</span>() + other.<span class="fn">to_seconds</span>()
+        <span class="kw">return</span> <span class="cls">Time</span>.<span class="fn">from_seconds</span>(secs)
+
+t = <span class="cls">Time</span>(<span class="num">9</span>, <span class="num">45</span>)
+<span class="fn">print</span>(t)         <span class="comment"># 09:45:00  (calls __str__)</span>
+t2 = <span class="cls">Time</span>(<span class="num">1</span>, <span class="num">35</span>)
+<span class="fn">print</span>(t + t2)    <span class="comment"># 11:20:00  (calls __add__)</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch17-1" onchange="updateProgress()"><label for="d-ch17-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Polymorphism & Type-based Dispatch</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <p><strong>Polymorphism</strong> — same function/method works with multiple types.</p>
+      <p><strong>Type-based dispatch</strong> — use <code>isinstance()</code> to call different code based on type.</p>
+      <pre><code><span class="kw">def</span> <span class="fn">__add__</span>(<span class="kw">self</span>, other):
+    <span class="kw">if</span> <span class="fn">isinstance</span>(other, <span class="cls">Time</span>):
+        <span class="kw">return</span> <span class="kw">self</span>.<span class="fn">add_time</span>(other)
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="kw">self</span>.<span class="fn">increment</span>(other)</code></pre>
+      <p><strong>Key special methods</strong>: <code>__init__</code>, <code>__str__</code>, <code>__add__</code>, <code>__lt__</code>, <code>__len__</code>, <code>__radd__</code></p>
+      <div class="done-wrap"><input type="checkbox" id="d-ch17-2" onchange="updateProgress()"><label for="d-ch17-2">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 18 ══════════════════════ -->
+<div class="chapter" id="ch18">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 18</div>
+    <h2>Inheritance</h2>
+    <div class="subtitle">Subclasses, method overriding, class attributes, isinstance</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Inheritance Basics</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">class</span> <span class="cls">Card</span>:
+    suit_names = [<span class="str">'Clubs'</span>,<span class="str">'Diamonds'</span>,<span class="str">'Hearts'</span>,<span class="str">'Spades'</span>]
+    rank_names = [<span class="cls">None</span>,<span class="str">'Ace'</span>,<span class="str">'2'</span>,<span class="str">'3'</span>,...,<span class="str">'King'</span>]
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, suit=<span class="num">0</span>, rank=<span class="num">2</span>):
+        <span class="kw">self</span>.suit = suit
+        <span class="kw">self</span>.rank = rank
+
+    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="kw">self</span>):
+        <span class="kw">return</span> <span class="str">'%s of %s'</span> % (
+            <span class="cls">Card</span>.rank_names[<span class="kw">self</span>.rank],
+            <span class="cls">Card</span>.suit_names[<span class="kw">self</span>.suit])
+
+    <span class="kw">def</span> <span class="fn">__lt__</span>(<span class="kw">self</span>, other):
+        t1 = <span class="kw">self</span>.suit, <span class="kw">self</span>.rank
+        t2 = other.suit, other.rank
+        <span class="kw">return</span> t1 < t2
+
+<span class="kw">class</span> <span class="cls">Deck</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>):
+        <span class="kw">self</span>.cards = [<span class="cls">Card</span>(s, r)
+            <span class="kw">for</span> s <span class="kw">in</span> <span class="fn">range</span>(<span class="num">4</span>)
+            <span class="kw">for</span> r <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">14</span>)]
+
+<span class="kw">class</span> <span class="cls">Hand</span>(<span class="cls">Deck</span>):     <span class="comment"># inherits from Deck</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, label=<span class="str">''</span>):
+        <span class="kw">self</span>.cards = []
+        <span class="kw">self</span>.label = label</code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch18-1" onchange="updateProgress()"><label for="d-ch18-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Class vs Instance Attributes</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Class attribute</strong> — defined in class body, shared by all instances (e.g., <code>Card.suit_names</code>)</li>
+        <li><strong>Instance attribute</strong> — defined with <code>self.x</code>, belongs to one object</li>
+      </ul>
+      <p>Subclass inherits all parent methods. Can <strong>override</strong> by defining method with same name.</p>
+      <p><strong>Data encapsulation</strong> — discover attributes needed from functions you write, then build the class around them.</p>
+      <div class="done-wrap"><input type="checkbox" id="d-ch18-2" onchange="updateProgress()"><label for="d-ch18-2">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CHAPTER 19 ══════════════════════ -->
+<div class="chapter" id="ch19">
+  <div class="chapter-header">
+    <div class="ch-num">Chapter 19</div>
+    <h2>The Goodies</h2>
+    <div class="subtitle">Conditionals, list comprehensions, generators, sets, counters, *args/**kwargs</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Conditional Expressions & Comprehensions</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="comment"># Conditional expression (ternary)</span>
+y = <span class="fn">math.log</span>(x) <span class="kw">if</span> x > <span class="num">0</span> <span class="kw">else</span> <span class="num">0</span>
+
+<span class="comment"># List comprehension</span>
+t = [c.<span class="fn">capitalize</span>() <span class="kw">for</span> c <span class="kw">in</span> s]
+evens = [x <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>) <span class="kw">if</span> x%<span class="num">2</span>==<span class="num">0</span>]
+
+<span class="comment"># Generator expression (lazy, uses less memory)</span>
+g = (<span class="fn">len</span>(w) <span class="kw">for</span> w <span class="kw">in</span> words)</code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch19-1" onchange="updateProgress()"><label for="d-ch19-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">Sets, Counter & namedtuple</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="comment"># Sets — unique elements, fast membership</span>
+s = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>}
+s.<span class="fn">add</span>(<span class="num">4</span>)
+s.<span class="fn">remove</span>(<span class="num">1</span>)
+s1 | s2   <span class="comment"># union</span>
+s1 & s2   <span class="comment"># intersection</span>
+s1 - s2   <span class="comment"># difference</span>
+
+<span class="comment"># Counter</span>
+<span class="kw">from</span> collections <span class="kw">import</span> Counter
+c = <span class="cls">Counter</span>(<span class="str">'banana'</span>)
+c.<span class="fn">most_common</span>(<span class="num">3</span>)   <span class="comment"># [('a',3), ('n',2), ('b',1)]</span>
+
+<span class="comment"># namedtuple</span>
+<span class="kw">from</span> collections <span class="kw">import</span> namedtuple
+<span class="cls">Point</span> = <span class="fn">namedtuple</span>(<span class="str">'Point'</span>, [<span class="str">'x'</span>, <span class="str">'y'</span>])
+p = <span class="cls">Point</span>(<span class="num">1</span>, <span class="num">2</span>)
+p.x  <span class="comment"># 1</span></code></pre>
+      <pre><code><span class="comment"># **kwargs gathers keyword args as dict</span>
+<span class="kw">def</span> <span class="fn">f</span>(*args, **kwargs):
+    <span class="fn">print</span>(args, kwargs)
+<span class="fn">f</span>(<span class="num">1</span>, <span class="num">2</span>, key=<span class="str">'val'</span>)  <span class="comment"># (1,2) {'key':'val'}</span></code></pre>
+      <div class="done-wrap"><input type="checkbox" id="d-ch19-2" onchange="updateProgress()"><label for="d-ch19-2">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ APPENDICES ══════════════════════ -->
+<div class="chapter" id="app">
+  <div class="chapter-header">
+    <div class="ch-num">Appendices A & B</div>
+    <h2>Debugging & Algorithm Analysis</h2>
+    <div class="subtitle">Error types, debugging strategies, Big-O notation, hashtables</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-trap">Trap</span>
+      <span class="card-title">Debugging Strategies (Appendix A)</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <h3>Syntax Errors</h3>
+      <ul>
+        <li>Missing colon at end of <code>def</code>, <code>if</code>, <code>for</code>, <code>while</code></li>
+        <li>Using <code>=</code> instead of <code>==</code> in condition</li>
+        <li>Unclosed parentheses/brackets</li>
+        <li>Wrong indentation (mixed tabs and spaces)</li>
+        <li>Using keyword as variable name</li>
+      </ul>
+      <h3>Runtime Errors</h3>
+      <ul>
+        <li><code>NameError</code> — variable doesn't exist (wrong scope?)</li>
+        <li><code>TypeError</code> — wrong type, wrong number of args</li>
+        <li><code>KeyError</code> — dict key doesn't exist</li>
+        <li><code>AttributeError</code> — object doesn't have that attribute</li>
+        <li><code>IndexError</code> — index out of range</li>
+      </ul>
+      <h3>Semantic Errors</h3>
+      <p>Program runs but gives wrong answer. Add <code>print()</code> statements to trace values.</p>
+      <div class="done-wrap"><input type="checkbox" id="d-app-1" onchange="updateProgress()"><label for="d-app-1">Got it!</label></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Big-O Analysis (Appendix B)</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <table>
+        <tr><th>Notation</th><th>Name</th><th>Example</th></tr>
+        <tr><td><code>O(1)</code></td><td>Constant</td><td>Dict lookup, list index</td></tr>
+        <tr><td><code>O(log n)</code></td><td>Logarithmic</td><td>Binary search</td></tr>
+        <tr><td><code>O(n)</code></td><td>Linear</td><td>List search, for loop</td></tr>
+        <tr><td><code>O(n log n)</code></td><td>Linearithmic</td><td>Sort (<code>sorted()</code>)</td></tr>
+        <tr><td><code>O(n²)</code></td><td>Quadratic</td><td>Nested loops</td></tr>
+        <tr><td><code>O(cⁿ)</code></td><td>Exponential</td><td>Naive fibonacci</td></tr>
+      </table>
+      <div class="tip-box">Python dicts use hashtables → O(1) average for get/set/in. Lists use O(n) for <code>in</code>. Sort is O(n log n).</div>
+      <div class="done-wrap"><input type="checkbox" id="d-app-2" onchange="updateProgress()"><label for="d-app-2">Got it!</label></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ QUICK REFERENCE ══════════════════════ -->
+<div class="chapter" id="quickref">
+  <div class="chapter-header">
+    <div class="ch-num">⚡ Quick Reference</div>
+    <h2>Everything on One Page</h2>
+    <div class="subtitle">For last-minute review before the exam</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Built-in Functions Cheatsheet</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <div class="ref-grid">
+        <div class="ref-item"><div class="ref-title">Type Conversion</div><code>int(x)</code> <code>float(x)</code> <code>str(x)</code> <code>bool(x)</code> <code>list(x)</code> <code>tuple(x)</code></div>
+        <div class="ref-item"><div class="ref-title">Sequences</div><code>len(s)</code> <code>min(s)</code> <code>max(s)</code> <code>sum(s)</code> <code>sorted(s)</code> <code>reversed(s)</code></div>
+        <div class="ref-item"><div class="ref-title">Input/Output</div><code>print(x)</code> <code>input(prompt)</code> <code>open(f, mode)</code></div>
+        <div class="ref-item"><div class="ref-title">Inspection</div><code>type(x)</code> <code>isinstance(x,T)</code> <code>hasattr(o,n)</code> <code>vars(o)</code> <code>dir(o)</code></div>
+        <div class="ref-item"><div class="ref-title">Iteration</div><code>range(n)</code> <code>enumerate(s)</code> <code>zip(a,b)</code> <code>map(f,s)</code> <code>filter(f,s)</code></div>
+        <div class="ref-item"><div class="ref-title">Math</div><code>abs(x)</code> <code>round(x)</code> <code>divmod(a,b)</code> <code>pow(x,y)</code></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-key">Key</span>
+      <span class="card-title">Mutability Summary</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <table>
+        <tr><th>Type</th><th>Mutable?</th><th>Ordered?</th><th>Dict key?</th></tr>
+        <tr><td><code>int, float, str</code></td><td>No ✗</td><td>—</td><td>Yes ✓</td></tr>
+        <tr><td><code>tuple</code></td><td>No ✗</td><td>Yes ✓</td><td>Yes ✓</td></tr>
+        <tr><td><code>list</code></td><td>Yes ✓</td><td>Yes ✓</td><td>No ✗</td></tr>
+        <tr><td><code>dict</code></td><td>Yes ✓</td><td>Yes (3.7+)</td><td>No ✗</td></tr>
+        <tr><td><code>set</code></td><td>Yes ✓</td><td>No ✗</td><td>No ✗</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-trap">Trap</span>
+      <span class="card-title">Top 10 Classic Mistakes</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <ol>
+        <li>Using <code>=</code> instead of <code>==</code> in conditions</li>
+        <li>Forgetting colon after <code>def</code>, <code>if</code>, <code>for</code>, <code>while</code>, <code>class</code></li>
+        <li><code>t = t.sort()</code> — sort() returns None!</li>
+        <li>Off-by-one: <code>s[0:3]</code> gives chars at 0,1,2 (NOT 3)</li>
+        <li>Aliasing: <code>b = a</code> for a list — they share the same object</li>
+        <li>Modifying a list while iterating over it</li>
+        <li>Using a list as a dict key (unhashable)</li>
+        <li>Forgetting <code>self</code> as first parameter in methods</li>
+        <li>Forgetting <code>return</code> in a fruitful function</li>
+        <li>Infinite recursion — forgetting the base case</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-code">Code</span>
+      <span class="card-title">OOP Pattern Summary</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <pre><code><span class="kw">class</span> <span class="cls">Animal</span>:
+    species = <span class="str">'Unknown'</span>       <span class="comment"># class attribute</span>
+
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, name):
+        <span class="kw">self</span>.name = name        <span class="comment"># instance attribute</span>
+
+    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="kw">self</span>):
+        <span class="kw">return</span> <span class="kw">self</span>.name
+
+    <span class="kw">def</span> <span class="fn">speak</span>(<span class="kw">self</span>):
+        <span class="kw">raise</span> <span class="cls">NotImplementedError</span>
+
+<span class="kw">class</span> <span class="cls">Dog</span>(<span class="cls">Animal</span>):              <span class="comment"># inherits Animal</span>
+    species = <span class="str">'Canis lupus'</span>    <span class="comment"># override class attr</span>
+
+    <span class="kw">def</span> <span class="fn">speak</span>(<span class="kw">self</span>):            <span class="comment"># override method</span>
+        <span class="kw">return</span> <span class="str">'Woof!'</span>
+
+d = <span class="cls">Dog</span>(<span class="str">'Rex'</span>)
+<span class="fn">print</span>(d)              <span class="comment"># Rex</span>
+<span class="fn">print</span>(d.<span class="fn">speak</span>())      <span class="comment"># Woof!</span>
+<span class="fn">isinstance</span>(d, <span class="cls">Animal</span>) <span class="comment"># True</span></code></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head" onclick="toggleCard(this)">
+      <span class="card-badge badge-quiz">Quiz</span>
+      <span class="card-title">Final Exam Practice Questions</span>
+      <span class="card-arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <div class="quiz-q">Q: What does <code>list(zip([1,2],[3,4]))</code> return?</div>
+      <button class="show-btn" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-a">[(1, 3), (2, 4)]</div>
+
+      <div class="quiz-q">Q: What is the difference between <code>==</code> and <code>is</code>?</div>
+      <button class="show-btn" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-a"><code>==</code> checks if values are equal. <code>is</code> checks if two variables refer to the exact same object in memory.</div>
+
+      <div class="quiz-q">Q: What does <code>[x**2 for x in range(5)]</code> return?</div>
+      <button class="show-btn" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-a">[0, 1, 4, 9, 16]</div>
+
+      <div class="quiz-q">Q: Why can't you use a list as a dictionary key?</div>
+      <button class="show-btn" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-a">Lists are mutable and unhashable. Dict keys must be hashable (immutable). Use a tuple instead.</div>
+
+      <div class="quiz-q">Q: What does shallow copy vs deep copy mean?</div>
+      <button class="show-btn" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-a">Shallow (<code>copy.copy()</code>) copies the object but embedded objects are still shared (same references). Deep (<code>copy.deepcopy()</code>) copies everything recursively — fully independent.</div>
+
+      <div class="quiz-q">Q: What is __init__ for?</div>
+      <button class="show-btn" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-a">It's the constructor/initializer method called automatically when you create a new instance with <code>MyClass()</code>. Sets up instance attributes.</div>
+
+      <div class="quiz-q">Q: What is the output? <code>d = {'a':1}; d.get('b', 99)</code></div>
+      <button class="show-btn" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-a">99 — key 'b' doesn't exist, so get() returns the default value 99.</div>
+
+      <div class="quiz-q">Q: What's the Big-O of searching a sorted list with bisect?</div>
+      <button class="show-btn" onclick="showAns(this)">Show Answer</button>
+      <div class="quiz-a">O(log n) — bisection search halves the search space each step.</div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+function showChap(id, btn) {
+  document.querySelectorAll('.chapter').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function toggleCard(head) {
+  const body = head.nextElementSibling;
+  const arrow = head.querySelector('.card-arrow');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.classList.toggle('open', !isOpen);
+}
+
+function showAns(btn) {
+  const ans = btn.nextElementSibling;
+  ans.classList.toggle('show');
+  btn.textContent = ans.classList.contains('show') ? 'Hide Answer' : 'Show Answer';
+}
+
+function updateProgress() {
+  const total = document.querySelectorAll('input[type=checkbox]').length;
+  const checked = document.querySelectorAll('input[type=checkbox]:checked').length;
+  const pct = Math.round((checked / total) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = checked + ' / ' + total + ' topics reviewed (' + pct + '%)';
+}
+
+// Restore saved state
+document.querySelectorAll('input[type=checkbox]').forEach(cb => {
+  const saved = localStorage.getItem(cb.id);
+  if (saved === 'true') cb.checked = true;
+  cb.addEventListener('change', () => localStorage.setItem(cb.id, cb.checked));
+});
+updateProgress();
+</script>
+</body>
+</html>

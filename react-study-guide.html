@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>React Design Patterns — Study Guide</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --card: #1c2128;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --warn: #f78166;
+    --yellow: #e3b341;
+    --purple: #bc8cff;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --code-bg: #0d1117;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #1a2332 0%, #0d1b2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 20px 20px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.3px;
+  }
+  .header p {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .timer-bar {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent2);
+  }
+  .badge.warn { color: var(--warn); }
+  .badge.yellow { color: var(--yellow); }
+
+  /* NAV TABS */
+  .nav-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0d1117;
+  }
+  .tab-btn:hover:not(.active) {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  /* SECTIONS */
+  .section { display: none; padding: 16px; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .icon { font-size: 1rem; }
+
+  /* CONCEPTS */
+  .concept {
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    background: rgba(88,166,255,0.05);
+    border-radius: 0 6px 6px 0;
+  }
+  .concept.green { border-color: var(--accent2); background: rgba(63,185,80,0.05); }
+  .concept.red { border-color: var(--warn); background: rgba(247,129,102,0.05); }
+  .concept.yellow { border-color: var(--yellow); background: rgba(227,179,65,0.05); }
+  .concept.purple { border-color: var(--purple); background: rgba(188,140,255,0.05); }
+  .concept-title {
+    font-weight: 700;
+    font-size: 0.88rem;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+  .concept-body {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* CODE */
+  code {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    color: var(--yellow);
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+    overflow-x: auto;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.78rem;
+    color: #c9d1d9;
+    line-height: 1.6;
+    margin: 8px 0;
+  }
+  pre .kw { color: #ff7b72; }
+  pre .fn { color: #d2a8ff; }
+  pre .str { color: #a5d6ff; }
+  pre .cm { color: #8b949e; }
+
+  /* QUIZ */
+  .quiz-q {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .quiz-q p {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  .quiz-options { display: flex; flex-direction: column; gap: 6px; }
+  .quiz-opt {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .quiz-opt:hover { border-color: var(--accent); color: var(--accent); }
+  .quiz-opt.correct { border-color: var(--accent2); background: rgba(63,185,80,0.12); color: var(--accent2); }
+  .quiz-opt.wrong { border-color: var(--warn); background: rgba(247,129,102,0.12); color: var(--warn); }
+  .quiz-explain {
+    display: none;
+    margin-top: 8px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    padding: 8px 10px;
+    background: var(--bg);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+  .quiz-explain.show { display: block; }
+
+  /* CHEATSHEET TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+  th {
+    background: var(--surface);
+    color: var(--accent);
+    font-weight: 700;
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: top;
+  }
+  td:first-child { color: var(--text); font-weight: 600; }
+  tr:hover td { background: rgba(88,166,255,0.04); }
+
+  /* FLASHCARD */
+  .flashcard {
+    perspective: 1000px;
+    cursor: pointer;
+    margin-bottom: 12px;
+  }
+  .flashcard-inner {
+    position: relative;
+    width: 100%;
+    min-height: 110px;
+    transition: transform 0.5s;
+    transform-style: preserve-3d;
+  }
+  .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+  .flashcard-front, .flashcard-back {
+    position: absolute;
+    width: 100%;
+    min-height: 110px;
+    backface-visibility: hidden;
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .flashcard-front {
+    background: var(--card);
+    border: 1px solid var(--accent);
+  }
+  .flashcard-back {
+    background: var(--surface);
+    border: 1px solid var(--accent2);
+    transform: rotateY(180deg);
+  }
+  .flashcard-front .label {
+    font-size: 0.68rem;
+    color: var(--accent);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .flashcard-back .label {
+    font-size: 0.68rem;
+    color: var(--accent2);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .flashcard-front .q { font-size: 0.88rem; font-weight: 600; }
+  .flashcard-back .a { font-size: 0.82rem; color: var(--muted); }
+  .flashcard-hint { font-size: 0.68rem; color: var(--muted); margin-top: 8px; }
+
+  /* PROGRESS */
+  .progress-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .progress-title { font-size: 0.78rem; color: var(--muted); margin-bottom: 8px; }
+  .progress-bar-wrap { background: var(--bg); border-radius: 10px; height: 8px; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 10px; transition: width 0.3s; }
+  .progress-label { font-size: 0.72rem; color: var(--accent2); text-align: right; margin-top: 4px; font-weight: 600; }
+
+  /* TAG */
+  .tag {
+    display: inline-block;
+    background: rgba(88,166,255,0.12);
+    border: 1px solid rgba(88,166,255,0.3);
+    color: var(--accent);
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    margin-right: 4px;
+    margin-bottom: 2px;
+  }
+  .tag.g { background: rgba(63,185,80,0.12); border-color: rgba(63,185,80,0.3); color: var(--accent2); }
+  .tag.r { background: rgba(247,129,102,0.12); border-color: rgba(247,129,102,0.3); color: var(--warn); }
+  .tag.y { background: rgba(227,179,65,0.12); border-color: rgba(227,179,65,0.3); color: var(--yellow); }
+  .tag.p { background: rgba(188,140,255,0.12); border-color: rgba(188,140,255,0.3); color: var(--purple); }
+
+  h2 { font-size: 1rem; margin-bottom: 12px; color: var(--text); }
+  h3 { font-size: 0.88rem; font-weight: 700; color: var(--accent); margin: 12px 0 6px; }
+  ul { padding-left: 16px; }
+  li { font-size: 0.82rem; color: var(--muted); margin-bottom: 4px; line-height: 1.5; }
+  li strong { color: var(--text); }
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media(max-width: 480px) { .two-col { grid-template-columns: 1fr; } }
+  .score-box {
+    text-align: center;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-top: 14px;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .score-num { font-size: 2rem; font-weight: 700; color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚛️ React Design Patterns &amp; Best Practices</h1>
+  <p>Complete Study Guide · Michele Bertoli · 12 Chapters</p>
+  <div class="timer-bar">
+    <span class="badge">📚 308 Pages</span>
+    <span class="badge warn">⏰ 2 Hours</span>
+    <span class="badge yellow">🎯 Target: 90%</span>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
+  <button class="tab-btn" onclick="showTab('ch1')">Ch 1–2</button>
+  <button class="tab-btn" onclick="showTab('ch3')">Ch 3–4</button>
+  <button class="tab-btn" onclick="showTab('ch5')">Ch 5–6</button>
+  <button class="tab-btn" onclick="showTab('ch7')">Ch 7–8</button>
+  <button class="tab-btn" onclick="showTab('ch9')">Ch 9–10</button>
+  <button class="tab-btn" onclick="showTab('ch11')">Ch 11–12</button>
+  <button class="tab-btn" onclick="showTab('cheatsheet')">Cheatsheet</button>
+  <button class="tab-btn" onclick="showTab('flashcards')">Flashcards</button>
+  <button class="tab-btn" onclick="showTab('quiz')">Practice Quiz</button>
+</div>
+
+<!-- ═══════ OVERVIEW ═══════ -->
+<div id="overview" class="section active">
+  <div class="progress-section">
+    <div class="progress-title">Study Progress Tracker</div>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;">Ch 1–2: Basics, JSX, FP</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="p1" style="width:0%"></div></div>
+      </div>
+      <div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;">Ch 3–4: Components, Composition</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="p2" style="width:0%"></div></div>
+      </div>
+      <div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;">Ch 5–6: Data Fetching, Browser</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="p3" style="width:0%"></div></div>
+      </div>
+      <div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;">Ch 7–8: CSS, SSR</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="p4" style="width:0%"></div></div>
+      </div>
+      <div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px;">Ch 9–12: Performance, Testing, Anti-Patterns</div>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="p5" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="progress-label" id="overall-progress">0% Complete</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🗺️</span> Book at a Glance</div>
+    <table>
+      <tr><th>Chapter</th><th>Topic</th><th>Key Patterns</th></tr>
+      <tr><td>1</td><td>React Fundamentals</td><td>Declarative, Elements, Reconciliation</td></tr>
+      <tr><td>2</td><td>Clean Code &amp; JSX</td><td>JSX, ESLint, FP basics</td></tr>
+      <tr><td>3</td><td>Reusable Components</td><td>PropTypes, State, Storybook</td></tr>
+      <tr><td>4</td><td>Composition</td><td>HoC, Mixins, Context, Function as Child</td></tr>
+      <tr><td>5</td><td>Data Fetching</td><td>Callbacks, Common Parent, HoC fetch</td></tr>
+      <tr><td>6</td><td>Browser APIs</td><td>Forms, Events, Refs, Animations, SVG</td></tr>
+      <tr><td>7</td><td>Styling</td><td>Inline styles, Radium, CSS Modules, Styled Components</td></tr>
+      <tr><td>8</td><td>Server-Side Rendering</td><td>Universal apps, renderToString, Next.js</td></tr>
+      <tr><td>9</td><td>Performance</td><td>shouldComponentUpdate, Keys, Immutability</td></tr>
+      <tr><td>10</td><td>Testing &amp; Debugging</td><td>Jest, Enzyme, Snapshots, DevTools</td></tr>
+      <tr><td>11</td><td>Anti-Patterns</td><td>State from props, mutation, index keys</td></tr>
+      <tr><td>12</td><td>Next Steps</td><td>npm publishing, Contributing</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">⚡</span> Critical Concepts for 90%</div>
+    <div class="concept"><div class="concept-title">🔵 Declarative vs Imperative</div><div class="concept-body">React is <strong>declarative</strong> — you describe WHAT you want; React figures out HOW. Imperative = step-by-step instructions. Declarative = outcome-driven.</div></div>
+    <div class="concept green"><div class="concept-title">🟢 Container vs Presentational Pattern</div><div class="concept-body">Container = logic, API calls, state. Presentational = pure UI from props. Separates concerns, improves reusability.</div></div>
+    <div class="concept yellow"><div class="concept-title">🟡 Higher-Order Components (HoC)</div><div class="concept-body">Function that takes a Component and returns an <em>enhanced</em> Component. Pattern: <code>const Enhanced = withSomething(MyComponent)</code></div></div>
+    <div class="concept red"><div class="concept-title">🔴 Anti-Patterns to Avoid</div><div class="concept-body">1) Init state from props 2) Mutate state directly 3) Use array index as key 4) Spread props to DOM elements</div></div>
+    <div class="concept purple"><div class="concept-title">🟣 Reconciliation</div><div class="concept-body">React's process of diffing the virtual DOM tree and updating only what changed in the real DOM. Uses element type + key to decide.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🏆</span> Top 10 Must-Know Facts</div>
+    <ul>
+      <li><strong>JSX is syntactic sugar</strong> — compiled to <code>React.createElement()</code> by Babel</li>
+      <li><strong>Elements are immutable objects</strong> — type + props describe what to render</li>
+      <li><strong>setState is asynchronous</strong> — don't rely on immediate state after calling it</li>
+      <li><strong>Stateless functional components</strong> — no state, no lifecycle, no <code>this</code></li>
+      <li><strong>PropTypes</strong> — runtime type-checking, disabled in production</li>
+      <li><strong>Keys in lists</strong> — must be stable, unique, not array index</li>
+      <li><strong>componentDidMount</strong> — use for data fetching (not componentWillMount)</li>
+      <li><strong>Controlled components</strong> — React controls form field value via state</li>
+      <li><strong>Event delegation</strong> — React attaches one handler to root, not each DOM node</li>
+      <li><strong>renderToString</strong> — server-side rendering, returns HTML string</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════ CH 1-2 ═══════ -->
+<div id="ch1" class="section">
+  <h2>Chapter 1: React Fundamentals</h2>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">📖</span> Declarative vs Imperative</div>
+    <div class="two-col">
+      <div class="concept red">
+        <div class="concept-title">Imperative (HOW)</div>
+        <div class="concept-body">Step-by-step DOM manipulation. Tell browser exactly what to do each step.<br><br>Like: "Get a glass → fill with beer → hand it over"</div>
+      </div>
+      <div class="concept green">
+        <div class="concept-title">Declarative (WHAT)</div>
+        <div class="concept-body">Describe the desired state. React figures out the steps.<br><br>Like: "Beer please."</div>
+      </div>
+    </div>
+    <pre><code class="cm">// Imperative</code>
+const map = new google.maps.Map(...)
+const marker = new google.maps.Marker(...)
+marker.setMap(map)
+
+<code class="cm">// Declarative (React)</code>
+&lt;Gmaps zoom={4} center={myLatLng}&gt;
+  &lt;Marker position={myLatLng} /&gt;
+&lt;/Gmaps&gt;</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🧱</span> React Elements vs Components</div>
+    <div class="concept">
+      <div class="concept-title">Element</div>
+      <div class="concept-body">Plain JS object describing what to render. <strong>Immutable</strong>. Has <code>type</code> and <code>props</code>. If type is a string → DOM node. If type is a function → Component.</div>
+    </div>
+    <div class="concept green">
+      <div class="concept-title">Component</div>
+      <div class="concept-body">Created via <code>createClass</code>, <code>extends React.Component</code>, or stateless function. React manages instances at runtime. Multiple instances possible.</div>
+    </div>
+    <div class="concept yellow">
+      <div class="concept-title">Reconciliation</div>
+      <div class="concept-body">React's diffing process. Recursively resolves component types until it has a pure DOM tree. Powers both React DOM and React Native.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">⚠️</span> JavaScript Fatigue</div>
+    <ul>
+      <li>React is <strong>just a small library</strong> — can use with just a script tag</li>
+      <li><code>create-react-app</code> scaffolds everything with one command</li>
+      <li>Start minimal, add tools only as needed</li>
+      <li>Two packages: <code>react</code> (core) + <code>react-dom</code> (browser)</li>
+    </ul>
+  </div>
+
+  <div class="divider"></div>
+  <h2>Chapter 2: Clean Up Your Code</h2>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">📝</span> JSX Essentials</div>
+    <div class="concept"><div class="concept-title">What is JSX?</div><div class="concept-body">XML-like syntax that compiles to <code>React.createElement()</code>. NOT HTML. Requires Babel to transpile.</div></div>
+    <pre><code class="cm">// JSX</code>
+<span class="kw">&lt;button</span> <span class="fn">className</span>=<span class="str">"btn"</span><span class="kw">&gt;</span>Click<span class="kw">&lt;/button&gt;</span>
+
+<code class="cm">// Compiled JS</code>
+<span class="fn">React.createElement</span>(<span class="str">'button'</span>, {<span class="fn">className</span>: <span class="str">'btn'</span>}, <span class="str">'Click'</span>)</pre>
+    <div class="concept yellow">
+      <div class="concept-title">JSX vs HTML Differences</div>
+      <div class="concept-body">
+        • <code>class</code> → <code>className</code>, <code>for</code> → <code>htmlFor</code><br>
+        • Style = JS object with camelCase: <code>style={{ backgroundColor: 'red' }}</code><br>
+        • All elements must be wrapped in one root<br>
+        • Boolean attribute: <code>&lt;button disabled /&gt;</code> = <code>disabled: true</code><br>
+        • Spaces between elements: use <code>{' '}</code><br>
+        • Capital letter = Component, lowercase = DOM element
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🔀</span> JSX Patterns</div>
+    <div class="concept green"><div class="concept-title">Conditionals</div>
+<pre>&lt;div&gt;{isLoggedIn &amp;&amp; &lt;LogoutButton /&gt;}&lt;/div&gt;
+{isLoggedIn ? &lt;LogoutButton /&gt; : &lt;LoginButton /&gt;}</pre></div>
+    <div class="concept"><div class="concept-title">Loops</div>
+<pre>&lt;ul&gt;{users.map(u =&gt; &lt;li key={u.id}&gt;{u.name}&lt;/li&gt;)}&lt;/ul&gt;</pre></div>
+    <div class="concept yellow"><div class="concept-title">Spread attributes</div>
+<pre>const foo = { id: 'bar' }
+return &lt;div {...foo} /&gt;  <span class="cm">// passes id="bar"</span></pre></div>
+    <div class="concept purple"><div class="concept-title">Multi-line (always wrap in parens!)</div>
+<pre>return (
+  &lt;div&gt;
+    &lt;Child /&gt;
+  &lt;/div&gt;
+)</pre></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🧹</span> ESLint</div>
+    <ul>
+      <li>Error levels: <strong>0</strong>=off, <strong>1</strong>=warn, <strong>2</strong>=error</li>
+      <li>Config in <code>.eslintrc</code> file</li>
+      <li>Plugins: <code>eslint-plugin-react</code> for React rules</li>
+      <li><strong>Airbnb config</strong>: most popular React style guide</li>
+      <li>Enforce: indentation, prop sorting, no duplicate props, no unused vars</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">λ</span> Functional Programming Basics</div>
+    <div class="two-col">
+      <div class="concept"><div class="concept-title">Pure Functions</div><div class="concept-body">No side effects. Same input → same output. Easy to test.</div></div>
+      <div class="concept green"><div class="concept-title">Immutability</div><div class="concept-body">Never mutate data. Create new copies instead. Use <code>concat</code> not <code>push</code>.</div></div>
+      <div class="concept yellow"><div class="concept-title">Currying</div><div class="concept-body">Convert multi-arg function into chain of single-arg functions.</div></div>
+      <div class="concept purple"><div class="concept-title">Composition</div><div class="concept-body">Combine functions to create new ones. Foundation of HoCs.</div></div>
+    </div>
+    <div class="concept">
+      <div class="concept-title">UI as a Function</div>
+      <div class="concept-body"><code>UI = f(state)</code> — same state always produces same UI</div>
+    </div>
+    <button class="tab-btn" style="margin-top:8px" onclick="markDone('p1')">✅ Mark Ch 1-2 Done</button>
+  </div>
+</div>
+
+<!-- ═══════ CH 3-4 ═══════ -->
+<div id="ch3" class="section">
+  <h2>Chapter 3: Create Truly Reusable Components</h2>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🏗️</span> Three Ways to Create Components</div>
+    <div class="concept"><div class="concept-title">1. createClass (legacy)</div>
+<pre>const Button = React.createClass({
+  getDefaultProps() { return { text: 'Click' } },
+  getInitialState() { return { clicked: false } },
+  render() { return &lt;button&gt;{this.props.text}&lt;/button&gt; }
+})</pre></div>
+    <div class="concept green"><div class="concept-title">2. ES6 Class (standard)</div>
+<pre>class Button extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { clicked: false }
+    this.handleClick = this.handleClick.bind(this) <span class="cm">// bind in constructor!</span>
+  }
+  render() { return &lt;button&gt;{this.props.text}&lt;/button&gt; }
+}
+Button.propTypes = { text: React.PropTypes.string }
+Button.defaultProps = { text: 'Click me!' }</pre></div>
+    <div class="concept yellow"><div class="concept-title">3. Stateless Functional Component (preferred when possible)</div>
+<pre>const Button = ({ text }) =&gt; &lt;button&gt;{text}&lt;/button&gt;
+Button.propTypes = { text: React.PropTypes.string }</pre></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🔑</span> Autobinding Gotcha</div>
+    <div class="concept red"><div class="concept-title">Problem with arrow functions in render</div>
+<pre><span class="cm">// Creates new function on every render — bad for perf</span>
+onClick={() =&gt; this.handleClick()}</pre></div>
+    <div class="concept green"><div class="concept-title">✅ Best: Bind in constructor</div>
+<pre>constructor(props) {
+  super(props)
+  this.handleClick = this.handleClick.bind(this) <span class="cm">// ✅</span>
+}</pre></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🧪</span> State Rules</div>
+    <ul>
+      <li><strong>Minimal state</strong>: only what's needed, nothing derivable</li>
+      <li><strong>Don't put in state</strong>: values that don't affect render</li>
+      <li><strong>Don't put in state</strong>: values computable from props</li>
+      <li><strong>setState is async</strong>: use callback <code>setState({}, () =&gt; {})</code></li>
+      <li><strong>Merge, not replace</strong>: setState merges with current state</li>
+      <li>Store API subscriptions/timers as <code>this.request</code>, not in state</li>
+    </ul>
+    <div class="concept red"><div class="concept-title">❌ Bad: Derivable value in state</div>
+<pre>this.state = { price: `${props.currency}${props.value}` }
+<span class="cm">// Won't update when props change!</span></pre></div>
+    <div class="concept green"><div class="concept-title">✅ Good: Compute in render</div>
+<pre>getPrice() { return `${this.props.currency}${this.props.value}` }
+render() { return &lt;div&gt;{this.getPrice()}&lt;/div&gt; }</pre></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">📋</span> PropTypes</div>
+    <pre>Button.propTypes = {
+  text: React.PropTypes.string.isRequired,
+  onClick: React.PropTypes.func,
+  count: React.PropTypes.number,
+  style: React.PropTypes.object,
+  children: React.PropTypes.oneOfType([
+    React.PropTypes.array,
+    React.PropTypes.element,
+  ]),
+  user: React.PropTypes.shape({
+    name: React.PropTypes.string.isRequired,
+    age: (props, propName) =&gt; { <span class="cm">// custom validator</span>
+      if (props[propName] &lt; 0) return new Error('age must be positive')
+    }
+  })
+}</pre>
+    <div class="concept"><div class="concept-title">react-docgen</div><div class="concept-body">Auto-generate JSON documentation from propTypes + JSDoc comments. Run: <code>react-docgen button.js</code></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">📚</span> Living Style Guides with Storybook</div>
+    <ul>
+      <li>Visual catalog of component states</li>
+      <li>Write "stories" per component state</li>
+      <li>Run independently from main app</li>
+      <li>Share with designers and PMs</li>
+    </ul>
+  </div>
+
+  <div class="divider"></div>
+  <h2>Chapter 4: Compose All the Things</h2>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🐋</span> Container & Presentational Pattern</div>
+    <div class="two-col">
+      <div class="concept">
+        <div class="concept-title">Container (Smart)</div>
+        <div class="concept-body">• Makes API calls<br>• Holds state<br>• Has event handlers<br>• Written as class<br>• Named: GeolocationContainer</div>
+      </div>
+      <div class="concept green">
+        <div class="concept-title">Presentational (Dumb)</div>
+        <div class="concept-body">• Only renders UI<br>• Gets data via props<br>• Stateless function<br>• Reusable in Storybook<br>• Named: Geolocation</div>
+      </div>
+    </div>
+    <pre>render() {
+  return &lt;Geolocation {...this.state} /&gt; <span class="cm">// spread state as props</span>
+}</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🚫</span> Mixins (Avoid!)</div>
+    <div class="concept red">
+      <div class="concept-title">Problems with Mixins</div>
+      <div class="concept-body">
+        • Only work with <code>createClass</code>, not ES6 classes<br>
+        • Namespace clashing between mixins<br>
+        • Implicit dependencies — unclear what a mixin requires<br>
+        • Pollutes component state<br>
+        • Mixins depending on other mixins = tight coupling
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🔮</span> Higher-Order Components (HoC)</div>
+    <div class="concept"><div class="concept-title">Definition</div><div class="concept-body"><code>const HoC = Component =&gt; EnhancedComponent</code><br>Takes a component, returns enhanced one. Named with <code>with</code> prefix.</div></div>
+    <pre><span class="cm">// withClassName HoC</span>
+const withClassName = Component =&gt; props =&gt; (
+  &lt;Component {...props} className=<span class="str">"my-class"</span> /&gt;
+)
+
+<span class="cm">// Usage</span>
+const EnhancedButton = withClassName(Button)</pre>
+    <div class="concept green"><div class="concept-title">Key HoC Rules</div>
+    <div class="concept-body">
+      • Always spread <code>{...this.props}</code> to stay transparent<br>
+      • Use <code>with*</code> naming convention (withInnerWidth, withData)<br>
+      • Use partial application for parameterized HoCs<br>
+      • Compose with <code>compose(hoc1, hoc2)(Component)</code><br>
+      • Don't overuse — adds render/lifecycle overhead
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🎯</span> recompose Library</div>
+    <ul>
+      <li><code>flattenProp('user')</code> — spread object prop into individual props</li>
+      <li><code>renameProp('username', 'name')</code> — rename a prop</li>
+      <li><code>getContext({ currency: PropTypes.string })</code> — extract from context</li>
+      <li><code>compose(hoc1, hoc2, hoc3)(Component)</code> — chain HoCs cleanly</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">👶</span> Function as Child Pattern</div>
+    <pre><span class="cm">// Component receives a function as children</span>
+const FunctionAsChild = ({ children }) =&gt; children()
+
+<span class="cm">// Usage</span>
+&lt;FunctionAsChild&gt;
+  {() =&gt; &lt;div&gt;Hello!&lt;/div&gt;}
+&lt;/FunctionAsChild&gt;
+
+<span class="cm">// With parameters</span>
+&lt;Fetch url=<span class="str">"..."</span>&gt;
+  {data =&gt; &lt;List data={data} /&gt;}
+&lt;/Fetch&gt;</pre>
+    <div class="concept green"><div class="concept-title">Benefits</div><div class="concept-body">• Variables at runtime (not fixed props)<br>• Consumer chooses variable names<br>• Highly reusable wrapper<br>• Used by react-motion</div></div>
+    <button class="tab-btn" style="margin-top:8px" onclick="markDone('p2')">✅ Mark Ch 3-4 Done</button>
+  </div>
+</div>
+
+<!-- ═══════ CH 5-6 ═══════ -->
+<div id="ch5" class="section">
+  <h2>Chapter 5: Proper Data Fetching</h2>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🔄</span> Unidirectional Data Flow</div>
+    <div class="concept"><div class="concept-title">Core Rules</div><div class="concept-body">
+      • Data flows <strong>top → bottom</strong> only, via props<br>
+      • Props are <strong>read-only</strong> — never modify them<br>
+      • Children notify parents via <strong>callbacks</strong><br>
+      • Siblings share via <strong>common parent</strong> state
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">📞</span> Communication Patterns</div>
+    <div class="concept green"><div class="concept-title">Child → Parent (Callbacks)</div>
+<pre>const Buttons = ({ onDecrement, onIncrement }) =&gt; (
+  &lt;div&gt;
+    &lt;button onClick={onDecrement}&gt;-&lt;/button&gt;
+    &lt;button onClick={onIncrement}&gt;+&lt;/button&gt;
+  &lt;/div&gt;
+)</pre></div>
+    <div class="concept yellow"><div class="concept-title">Sibling → Sibling (Common Parent)</div>
+<pre><span class="cm">// Parent holds state, passes to both siblings</span>
+&lt;Display counter={this.state.counter} /&gt;
+&lt;Buttons onIncrement={this.handleIncrement} /&gt;</pre></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🌐</span> Data Fetching Best Practices</div>
+    <ul>
+      <li>Use <code>componentDidMount</code> for data fetching (runs client-side only)</li>
+      <li><strong>Not</strong> <code>componentWillMount</code> — runs on server too, async issues</li>
+      <li>Initialize state with empty data: <code>this.state = { gists: [] }</code></li>
+      <li>Show spinner during loading (conditional rendering)</li>
+    </ul>
+    <pre>componentDidMount() {
+  fetch(<span class="str">'https://api.github.com/users/gaearon/gists'</span>)
+    .then(response =&gt; response.json())
+    .then(gists =&gt; this.setState({ gists }))
+}</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">♻️</span> withData HoC Pattern</div>
+    <pre>const withData = url =&gt; Component =&gt; (
+  class extends React.Component {
+    constructor(props) {
+      super(props)
+      this.state = { data: [] }
+    }
+    componentDidMount() {
+      const endpoint = typeof url === <span class="str">'function'</span>
+        ? url(this.props) <span class="cm">// dynamic URL from props</span>
+        : url
+      fetch(endpoint)
+        .then(r =&gt; r.json())
+        .then(data =&gt; this.setState({ data }))
+    }
+    render() {
+      return &lt;Component {...this.props} {...this.state} /&gt;
+    }
+  }
+)
+
+<span class="cm">// Usage</span>
+const withGists = withData(
+  props =&gt; `https://api.github.com/users/${props.username}/gists`
+)
+const ListWithGists = withGists(List)</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🔃</span> react-refetch</div>
+    <ul>
+      <li>Library by Heroku — simplifies data fetching with HoCs</li>
+      <li>Returns <strong>PromiseState</strong> object (pending, fulfilled, rejected)</li>
+      <li>Lazy loading: use function value → injected as callable</li>
+    </ul>
+    <pre>const connectWithGists = connect(({ username }) =&gt; ({
+  gists: `https://api.github.com/users/${username}/gists`
+}))
+
+const List = ({ gists }) =&gt; (
+  gists.fulfilled &amp;&amp; (
+    &lt;ul&gt;{gists.value.map(g =&gt; &lt;li key={g.id}&gt;{g.description}&lt;/li&gt;)}&lt;/ul&gt;
+  )
+)</pre>
+  </div>
+
+  <div class="divider"></div>
+  <h2>Chapter 6: Write Code for the Browser</h2>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">📋</span> Forms: Controlled vs Uncontrolled</div>
+    <div class="two-col">
+      <div class="concept red">
+        <div class="concept-title">Uncontrolled</div>
+        <div class="concept-body">DOM manages state internally. Access with <code>ref</code> or <code>defaultValue</code>. Less React-like.</div>
+      </div>
+      <div class="concept green">
+        <div class="concept-title">Controlled ✅</div>
+        <div class="concept-body">React controls value via state. onChange → setState → re-render with new value.</div>
+      </div>
+    </div>
+    <pre><span class="cm">// Controlled Component</span>
+&lt;input
+  type=<span class="str">"text"</span>
+  name=<span class="str">"firstName"</span>
+  value={this.state.firstName}
+  onChange={this.handleChange}
+/&gt;
+
+<span class="cm">// Single handler for all fields using name attribute</span>
+handleChange({ target }) {
+  this.setState({ [target.name]: target.value })
+}</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">⚡</span> Events</div>
+    <div class="concept"><div class="concept-title">Synthetic Events</div><div class="concept-body">
+      • React wraps native events in SyntheticEvent<br>
+      • Consistent API across all browsers<br>
+      • <strong>Pooled</strong> — become null after event handler (use <code>e.persist()</code> to keep)<br>
+      • Single global handler via event delegation (performance optimization)<br>
+      • Naming: <code>onClick</code>, <code>onChange</code>, <code>onDoubleClick</code>
+    </div></div>
+    <pre><span class="cm">// Generic event handler pattern</span>
+handleEvent(event) {
+  switch (event.type) {
+    case <span class="str">'click'</span>: console.log(<span class="str">'clicked'</span>); break
+    case <span class="str">'dblclick'</span>: console.log(<span class="str">'double clicked'</span>); break
+  }
+}</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🔗</span> Refs</div>
+    <div class="concept yellow"><div class="concept-title">Use Refs Sparingly!</div><div class="concept-body">Breaks declarative nature. Use for: DOM focus, integrating imperative libraries, measuring layout.</div></div>
+    <pre><span class="cm">// Access DOM node</span>
+&lt;input ref={element =&gt; (this.element = element)} /&gt;
+handleClick() { this.element.focus() }
+
+<span class="cm">// Access component instance (avoid)</span>
+&lt;Input ref={element =&gt; (this.element = element)} /&gt;
+handleClick() { this.element.reset() } <span class="cm">// calls instance method</span></pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🎬</span> Animations</div>
+    <div class="two-col">
+      <div class="concept"><div class="concept-title">CSSTransitionGroup</div><div class="concept-body">React add-on. Applies CSS classes (*-appear, *-enter, *-leave). Simple transitions.</div></div>
+      <div class="concept green"><div class="concept-title">react-motion</div><div class="concept-body">Physics-based animations. Uses Function as Child pattern. Spring interpolation.</div></div>
+    </div>
+    <pre><span class="cm">// react-motion</span>
+&lt;Motion defaultStyle={{ opacity: 0 }} style={{ opacity: spring(1) }}&gt;
+  {style =&gt; &lt;h1 style={style}&gt;Hello&lt;/h1&gt;}
+&lt;/Motion&gt;</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🔷</span> SVG in React</div>
+    <pre>const Circle = ({ x, y, radius, fill }) =&gt; (
+  &lt;svg&gt;
+    &lt;circle cx={x} cy={y} r={radius} fill={fill} /&gt;
+  &lt;/svg&gt;
+)
+Circle.defaultProps = { fill: 'red' }
+
+<span class="cm">// Composable: RedCircle, SmallCircle, etc.</span></pre>
+    <button class="tab-btn" style="margin-top:8px" onclick="markDone('p3')">✅ Mark Ch 5-6 Done</button>
+  </div>
+</div>
+
+<!-- ═══════ CH 7-8 ═══════ -->
+<div id="ch7" class="section">
+  <h2>Chapter 7: Make Your Components Look Beautiful</h2>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">💅</span> 7 Problems with CSS at Scale</div>
+    <ul>
+      <li>1. <strong>Global namespace</strong> — all selectors pollute global scope</li>
+      <li>2. <strong>Dependencies</strong> — hard to know what CSS a component needs</li>
+      <li>3. <strong>Dead code</strong> — can't safely delete unused CSS</li>
+      <li>4. <strong>Minification</strong> — can't safely minify class names</li>
+      <li>5. <strong>Sharing constants</strong> — CSS and JS can't share values</li>
+      <li>6. <strong>Non-deterministic resolution</strong> — load order affects styles</li>
+      <li>7. <strong>Isolation</strong> — styles from one component leak into others</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">💻</span> Solution 1: Inline Styles</div>
+    <pre>const style = {
+  backgroundColor: <span class="str">'red'</span>, <span class="cm">// camelCase, no hyphens</span>
+  width: 320,            <span class="cm">// numbers = pixels</span>
+  WebkitTransition: <span class="str">'all'</span>, <span class="cm">// vendor prefix: capitalize</span>
+  msTransition: <span class="str">'all'</span>  <span class="cm">// ms is lowercase exception</span>
+}</pre>
+    <div class="concept red"><div class="concept-title">Inline Style Limitations</div><div class="concept-body">
+      ❌ No pseudo-selectors (:hover)<br>
+      ❌ No media queries<br>
+      ❌ No style fallbacks<br>
+      ❌ No CSS animations<br>
+      ❌ Hard to debug<br>
+      ❌ Larger server-rendered HTML
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">⚡</span> Solution 2: Radium</div>
+    <ul>
+      <li>HoC that wraps component: <code>export default radium(Button)</code></li>
+      <li>Adds JS-based :hover, :active, :focus</li>
+      <li>Supports media queries (requires <code>&lt;StyleRoot&gt;</code> wrapper)</li>
+      <li>Injects <code>!important</code> media query styles into <code>&lt;style&gt;</code> tag</li>
+    </ul>
+    <pre>const styles = {
+  color: <span class="str">'red'</span>,
+  <span class="str">':hover'</span>: { color: <span class="str">'white'</span> },
+  <span class="str">'@media (max-width: 480px)'</span>: { width: 160 }
+}</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🎭</span> Solution 3: CSS Modules</div>
+    <div class="concept green"><div class="concept-title">How It Works</div><div class="concept-body">
+      1. Import CSS: <code>import styles from './button.css'</code><br>
+      2. Use: <code>&lt;button className={styles.button}&gt;</code><br>
+      3. Webpack transforms class names to unique hashes<br>
+      4. Locally scoped — no global pollution!
+    </div></div>
+    <div class="concept"><div class="concept-title">Key Features</div><div class="concept-body">
+      • <code>:global .button</code> — opt-out of scoping<br>
+      • <code>composes: background-red</code> — inherit rules from another class<br>
+      • Supports all CSS (pseudo-classes, media queries, animations)<br>
+      • Debug: <code>localIdentName=[local]--[hash:base64:5]</code>
+    </div></div>
+    <div class="concept yellow"><div class="concept-title">Atomic CSS Modules</div><div class="concept-body">Single-rule utility classes + CSS Modules composes = fast prototyping + locally scoped.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">💎</span> Solution 4: Styled Components</div>
+    <pre>const Button = styled.button`
+  background-color: #ff0000;
+  width: 320px;
+  &:hover { color: white; }
+  @media (max-width: 480px) { width: 160px; }
+`</pre>
+    <ul>
+      <li>Uses ES2015 Tagged Template Literals</li>
+      <li>Generates unique class names, injects into <code>&lt;head&gt;</code></li>
+      <li>Supports all CSS including pseudo-classes + media queries</li>
+      <li>Props in templates: dynamic styling</li>
+      <li>Theming via <code>ThemeProvider</code></li>
+    </ul>
+  </div>
+
+  <div class="divider"></div>
+  <h2>Chapter 8: Server-Side Rendering (SSR)</h2>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🌍</span> Universal Applications</div>
+    <div class="concept"><div class="concept-title">What Is It?</div><div class="concept-body">Same code runs on both server AND client. Also called "isomorphic" though "Universal" is preferred.</div></div>
+    <div class="concept green"><div class="concept-title">3 Reasons to Use SSR</div><div class="concept-body">
+      1. <strong>SEO</strong> — crawlers get real HTML, not empty shell<br>
+      2. <strong>Common code base</strong> — share logic, models, components<br>
+      3. <strong>Better perceived performance</strong> — users see content immediately
+    </div></div>
+    <div class="concept yellow"><div class="concept-title">Don't Underestimate Complexity</div><div class="concept-body">Server routes, data fetching, caching. Only add SSR when truly needed (SEO, social sharing, performance budget).</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">⚙️</span> SSR Key API</div>
+    <pre><span class="cm">// Server (Express)</span>
+import ReactDOM from <span class="str">'react-dom/server'</span>
+
+app.get(<span class="str">'/'</span>, (req, res) =&gt; {
+  const body = ReactDOM.renderToString(&lt;App /&gt;)
+  res.send(`&lt;html&gt;&lt;body&gt;
+    &lt;div id=<span class="str">"app"</span>&gt;${body}&lt;/div&gt;
+    &lt;script src=<span class="str">"/bundle.js"</span>&gt;&lt;/script&gt;
+  &lt;/body&gt;&lt;/html&gt;`)
+})
+
+<span class="cm">// Client still renders normally — hydrates the SSR output</span>
+ReactDOM.render(&lt;App /&gt;, document.getElementById(<span class="str">'app'</span>))</pre>
+    <div class="concept"><div class="concept-title">renderToString Output</div><div class="concept-body">Returns HTML string with React data attributes: <code>data-reactroot</code>, <code>data-reactid</code>, <code>data-reactchecksum</code> — used for client hydration.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">📦</span> Data Fetching with SSR</div>
+    <ul>
+      <li>componentDidMount <strong>doesn't run</strong> on server</li>
+      <li>componentWillMount <strong>runs on server</strong> but renderToString is sync</li>
+      <li>Solution: fetch data BEFORE rendering, pass as props</li>
+      <li>Use <code>isomorphic-fetch</code> for fetch on both client and server</li>
+    </ul>
+    <pre>app.get(<span class="str">'/'</span>, (req, res) =&gt; {
+  fetch(<span class="str">'https://api.github.com/...'</span>)
+    .then(r =&gt; r.json())
+    .then(gists =&gt; {
+      const body = ReactDOM.renderToString(&lt;App gists={gists} /&gt;)
+      res.send(template(body))
+    })
+})</pre>
+    <div class="concept yellow"><div class="concept-title">Next.js</div><div class="concept-body">Framework by Zeit that handles SSR, routing, and code splitting automatically. Zero config.</div></div>
+    <button class="tab-btn" style="margin-top:8px" onclick="markDone('p4')">✅ Mark Ch 7-8 Done</button>
+  </div>
+</div>
+
+<!-- ═══════ CH 9-10 ═══════ -->
+<div id="ch9" class="section">
+  <h2>Chapter 9: Performance Optimization</h2>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">⚡</span> Reconciliation & Keys</div>
+    <div class="concept"><div class="concept-title">How Reconciliation Works</div><div class="concept-body">React diffs virtual DOM trees. If type changed → destroy + create new. If type same → update props.</div></div>
+    <div class="concept green"><div class="concept-title">Keys in Lists</div><div class="concept-body">Help React identify which items changed. Must be: <strong>stable</strong>, <strong>unique among siblings</strong>, <strong>not array index</strong>.</div></div>
+    <div class="concept red"><div class="concept-title">❌ Never use index as key</div>
+<pre>items.map((item, i) =&gt; &lt;li key={i}&gt;{item}&lt;/li&gt;) <span class="cm">// ❌ BAD</span>
+items.map(item =&gt; &lt;li key={item.id}&gt;{item.name}&lt;/li&gt;) <span class="cm">// ✅ GOOD</span></pre></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🚀</span> Optimization Techniques</div>
+    <div class="concept green"><div class="concept-title">shouldComponentUpdate</div>
+<pre>shouldComponentUpdate(nextProps, nextState) {
+  return nextProps.value !== this.props.value
+  <span class="cm">// Return false to skip re-render</span>
+}</pre></div>
+    <div class="concept"><div class="concept-title">When to Re-render Rules</div><div class="concept-body">
+      • Stateless functional components: no <code>shouldComponentUpdate</code> — always re-render<br>
+      • Pure components (<code>React.PureComponent</code>): shallow comparison automatically<br>
+      • Avoid creating functions in render — new reference every time
+    </div></div>
+    <div class="concept yellow"><div class="concept-title">Constant Props Optimization</div>
+<pre><span class="cm">// ❌ New function reference on every render</span>
+&lt;Button onClick={() =&gt; this.handleClick()} /&gt;
+
+<span class="cm">// ✅ Stable reference</span>
+&lt;Button onClick={this.handleClick} /&gt;</pre></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🔧</span> Performance Tools</div>
+    <ul>
+      <li><strong>why-did-you-update</strong>: logs unnecessary re-renders to console</li>
+      <li><strong>React DevTools</strong>: profiler, component tree inspection</li>
+      <li><strong>Immutable.js</strong>: enforces immutability, enables fast equality checks</li>
+      <li><strong>Babel plugins</strong>: compile-time optimizations (inline constants, etc.)</li>
+    </ul>
+  </div>
+
+  <div class="divider"></div>
+  <h2>Chapter 10: Testing & Debugging</h2>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🧪</span> Testing Tools</div>
+    <div class="concept"><div class="concept-title">Jest</div><div class="concept-body">Facebook's test runner. Zero config. Built-in mocking. Snapshot testing. Fast parallel execution.</div></div>
+    <div class="concept green"><div class="concept-title">Enzyme (Airbnb)</div><div class="concept-body">React-specific testing utilities. <code>shallow()</code>, <code>mount()</code>, <code>render()</code> methods.</div></div>
+    <div class="concept yellow"><div class="concept-title">Shallow vs Mount</div><div class="concept-body">
+      • <code>shallow()</code>: renders only one level deep. Fast. No DOM. Good for unit tests.<br>
+      • <code>mount()</code>: full DOM rendering. Tests integration with DOM. Slower.
+    </div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">📸</span> Snapshot Testing</div>
+    <pre>it(<span class="str">'renders correctly'</span>, () =&gt; {
+  const tree = renderer
+    .create(&lt;Button text=<span class="str">"Click me!"</span> /&gt;)
+    .toJSON()
+  expect(tree).toMatchSnapshot()
+})</pre>
+    <ul>
+      <li>First run: creates snapshot file</li>
+      <li>Subsequent runs: compares to saved snapshot</li>
+      <li>Update with <code>jest --updateSnapshot</code> (-u)</li>
+      <li>Great for catching unintended UI changes</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🔍</span> Testing HoCs & Page Object Pattern</div>
+    <div class="concept"><div class="concept-title">Testing HoCs</div><div class="concept-body">Export both enhanced AND original component. Test original without HoC wrapping for simpler unit tests.</div></div>
+    <div class="concept green"><div class="concept-title">Page Object Pattern</div><div class="concept-body">Abstraction layer over UI elements. Encapsulates selectors. Tests describe behavior, not implementation. Makes tests maintainable.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🐛</span> Debugging</div>
+    <ul>
+      <li><strong>React DevTools</strong> browser extension: inspect component tree, state, props</li>
+      <li><strong>Error boundaries</strong>: catch errors in component subtrees (React 16)</li>
+      <li>Use <code>console.log(this.state)</code> in render for quick debugging</li>
+      <li>Why-did-you-update package for performance debugging</li>
+      <li>react-lumberjack: time-travel debugging (experimental)</li>
+    </ul>
+    <button class="tab-btn" style="margin-top:8px" onclick="markDone('p5')">✅ Mark Ch 9-12 Done</button>
+  </div>
+</div>
+
+<!-- ═══════ CH 11-12 ═══════ -->
+<div id="ch11" class="section">
+  <h2>Chapter 11: Anti-Patterns to AVOID</h2>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🚨</span> Anti-Pattern 1: Initializing State from Props</div>
+    <div class="concept red"><div class="concept-title">❌ The Problem</div>
+<pre>constructor(props) {
+  super(props)
+  this.state = {
+    price: `${props.currency}${props.value}` <span class="cm">// ❌</span>
+  }
+}
+<span class="cm">// State never updates when props change!</span>
+<span class="cm">// Constructor only runs once.</span></pre></div>
+    <div class="concept green"><div class="concept-title">✅ The Fix</div>
+<pre>getPrice() {
+  return `${this.props.currency}${this.props.value}`
+}
+render() { return &lt;div&gt;{this.getPrice()}&lt;/div&gt; }</pre></div>
+    <div class="concept yellow"><div class="concept-title">Exception</div><div class="concept-body">OK to init from props <strong>only</strong> if prop is explicitly named "initial" or "default" and you never expect it to update.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🚨</span> Anti-Pattern 2: Mutating State</div>
+    <div class="concept red"><div class="concept-title">❌ Never Mutate State Directly</div>
+<pre>this.state.items.push(newItem) <span class="cm">// ❌ Direct mutation</span>
+this.state.count++ <span class="cm">// ❌ Direct mutation</span></pre></div>
+    <div class="concept green"><div class="concept-title">✅ Always Use setState</div>
+<pre>this.setState({
+  items: [...this.state.items, newItem], <span class="cm">// ✅ New array</span>
+  count: this.state.count + 1 <span class="cm">// ✅</span>
+})</pre></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🚨</span> Anti-Pattern 3: Using Index as Key</div>
+    <div class="concept red"><div class="concept-title">❌ Index as Key</div>
+<pre>items.map((item, i) =&gt; &lt;Item key={i} /&gt;)
+<span class="cm">// When list is reordered → wrong components update</span>
+<span class="cm">// State gets mixed between items</span></pre></div>
+    <div class="concept green"><div class="concept-title">✅ Stable Unique Key</div>
+<pre>items.map(item =&gt; &lt;Item key={item.id} /&gt;)
+<span class="cm">// Use ID from data, or generate stable UUID</span></pre></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🚨</span> Anti-Pattern 4: Spreading Props on DOM Elements</div>
+    <div class="concept red"><div class="concept-title">❌ Spreading Unknown Props onto DOM Elements</div>
+<pre>const MyComponent = (props) =&gt; &lt;div {...props} /&gt;
+<span class="cm">// Passes unknown/custom props to div</span>
+<span class="cm">// React warns: Unknown props: 'isLoggedIn', etc.</span></pre></div>
+    <div class="concept green"><div class="concept-title">✅ Destructure and only pass known HTML attributes</div>
+<pre>const MyComponent = ({ className, children, ...rest }) =&gt; (
+  &lt;div className={className}&gt;{children}&lt;/div&gt;
+  <span class="cm">// rest is consumed, not passed to DOM</span>
+)</pre></div>
+  </div>
+
+  <div class="divider"></div>
+  <h2>Chapter 12: Next Steps</h2>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">📦</span> Publishing npm Packages</div>
+    <ul>
+      <li>Point <code>package.json</code> main to compiled output (not src)</li>
+      <li>Use Babel to compile before publishing</li>
+      <li>List React as <code>peerDependency</code>, not dependency</li>
+      <li>Command: <code>npm publish</code></li>
+      <li>Semantic versioning: MAJOR.MINOR.PATCH</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="icon">🤝</span> Contributing to React</div>
+    <ul>
+      <li>React core is on GitHub: facebook/react</li>
+      <li>File issues with minimal reproduction case</li>
+      <li>Sign CLA (Contributor License Agreement)</li>
+      <li>Run tests before submitting PR: <code>npm test</code></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════ CHEATSHEET ═══════ -->
+<div id="cheatsheet" class="section">
+  <h2>📄 Quick Reference Cheatsheet</h2>
+
+  <div class="card">
+    <div class="card-title">Component Types</div>
+    <table>
+      <tr><th>Type</th><th>State</th><th>Lifecycle</th><th>When to Use</th></tr>
+      <tr><td>Stateless Function</td><td>❌</td><td>❌</td><td>Pure UI, preferred</td></tr>
+      <tr><td>ES6 Class</td><td>✅</td><td>✅</td><td>State + lifecycle needed</td></tr>
+      <tr><td>createClass</td><td>✅</td><td>✅</td><td>Legacy code only</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Lifecycle Methods</div>
+    <table>
+      <tr><th>Method</th><th>When</th><th>Use For</th></tr>
+      <tr><td>constructor</td><td>Before mount</td><td>Init state, bind handlers</td></tr>
+      <tr><td>componentDidMount</td><td>After first render</td><td>Data fetching, DOM setup</td></tr>
+      <tr><td>componentDidUpdate</td><td>After re-render</td><td>React to prop/state changes</td></tr>
+      <tr><td>componentWillUnmount</td><td>Before unmount</td><td>Cleanup: listeners, timers</td></tr>
+      <tr><td>shouldComponentUpdate</td><td>Before re-render</td><td>Performance optimization</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">JSX Rules</div>
+    <table>
+      <tr><th>HTML</th><th>JSX</th></tr>
+      <tr><td>class</td><td>className</td></tr>
+      <tr><td>for</td><td>htmlFor</td></tr>
+      <tr><td>style="color:red"</td><td>style={{ color: 'red' }}</td></tr>
+      <tr><td>&lt;br&gt;</td><td>&lt;br /&gt;</td></tr>
+      <tr><td>onclick</td><td>onClick</td></tr>
+      <tr><td>onchange</td><td>onChange</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Patterns Summary</div>
+    <table>
+      <tr><th>Pattern</th><th>Purpose</th><th>Key Point</th></tr>
+      <tr><td>Container/Presentational</td><td>Separation of concerns</td><td>Logic vs UI</td></tr>
+      <tr><td>Higher-Order Component</td><td>Share behavior</td><td>Wraps component, adds props</td></tr>
+      <tr><td>Function as Child</td><td>Dynamic children</td><td>Children is a function</td></tr>
+      <tr><td>Controlled Components</td><td>Forms</td><td>React owns value via state</td></tr>
+      <tr><td>Unidirectional Flow</td><td>Data management</td><td>Props down, callbacks up</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Styling Comparison</div>
+    <table>
+      <tr><th>Approach</th><th>Pseudo-class</th><th>Media Query</th><th>Performance</th></tr>
+      <tr><td>Inline Styles</td><td>❌</td><td>❌</td><td>Larger HTML</td></tr>
+      <tr><td>Radium</td><td>✅ (JS)</td><td>✅ (StyleRoot)</td><td>Good</td></tr>
+      <tr><td>CSS Modules</td><td>✅</td><td>✅</td><td>Great</td></tr>
+      <tr><td>Styled Components</td><td>✅</td><td>✅</td><td>Great</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Common PropTypes</div>
+    <pre>PropTypes.string
+PropTypes.number
+PropTypes.bool
+PropTypes.func
+PropTypes.array
+PropTypes.object
+PropTypes.element        <span class="cm">// React element</span>
+PropTypes.node           <span class="cm">// anything renderable</span>
+PropTypes.oneOf(['a','b'])
+PropTypes.arrayOf(PropTypes.string)
+PropTypes.shape({ name: PropTypes.string })
+PropTypes.string.isRequired <span class="cm">// make required</span></pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Critical Anti-Patterns</div>
+    <table>
+      <tr><th>Anti-Pattern</th><th>Problem</th><th>Fix</th></tr>
+      <tr><td>State from props</td><td>State doesn't update</td><td>Compute in render</td></tr>
+      <tr><td>Mutate state</td><td>No re-render triggered</td><td>Always use setState</td></tr>
+      <tr><td>Index as key</td><td>Wrong elements update</td><td>Use stable unique ID</td></tr>
+      <tr><td>Spread to DOM</td><td>Unknown prop warnings</td><td>Destructure first</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════ FLASHCARDS ═══════ -->
+<div id="flashcards" class="section">
+  <h2>🃏 Flashcards <span style="font-size:0.75rem;color:var(--muted)">(tap to flip)</span></h2>
+
+  <div class="flashcard" onclick="this.classList.toggle('flipped')" style="height:130px">
+    <div class="flashcard-inner">
+      <div class="flashcard-front"><div class="label">CONCEPT</div><div class="q">What is a Higher-Order Component?</div><div class="flashcard-hint">Tap to reveal answer</div></div>
+      <div class="flashcard-back"><div class="label">ANSWER</div><div class="a">A function that takes a component and returns a new enhanced component. Pattern: <code>const Enhanced = withX(Component)</code>. Used to share behavior without mixins.</div></div>
+    </div>
+  </div>
+
+  <div class="flashcard" onclick="this.classList.toggle('flipped')" style="height:130px">
+    <div class="flashcard-inner">
+      <div class="flashcard-front"><div class="label">CONCEPT</div><div class="q">What's the difference between controlled and uncontrolled components?</div></div>
+      <div class="flashcard-back"><div class="label">ANSWER</div><div class="a"><strong>Controlled</strong>: React owns value via state + onChange. <strong>Uncontrolled</strong>: DOM manages its own state internally. Controlled is preferred in React.</div></div>
+    </div>
+  </div>
+
+  <div class="flashcard" onclick="this.classList.toggle('flipped')" style="height:130px">
+    <div class="flashcard-inner">
+      <div class="flashcard-front"><div class="label">CONCEPT</div><div class="q">Why should you NOT use array index as a key?</div></div>
+      <div class="flashcard-back"><div class="label">ANSWER</div><div class="a">When list reorders/items are added/removed, index changes → React maps wrong state to wrong components. Use stable IDs from data.</div></div>
+    </div>
+  </div>
+
+  <div class="flashcard" onclick="this.classList.toggle('flipped')" style="height:130px">
+    <div class="flashcard-inner">
+      <div class="flashcard-front"><div class="label">CONCEPT</div><div class="q">Where should data fetching happen and why?</div></div>
+      <div class="flashcard-back"><div class="label">ANSWER</div><div class="a"><code>componentDidMount</code> — it only runs on the client, not during server-side rendering. <code>componentWillMount</code> runs on server too and renderToString is synchronous.</div></div>
+    </div>
+  </div>
+
+  <div class="flashcard" onclick="this.classList.toggle('flipped')" style="height:130px">
+    <div class="flashcard-inner">
+      <div class="flashcard-front"><div class="label">CONCEPT</div><div class="q">What is reconciliation in React?</div></div>
+      <div class="flashcard-back"><div class="label">ANSWER</div><div class="a">The diffing process that compares old and new virtual DOM trees. If element type changes → rebuild subtree. If type same → update props. Keys help identify list items.</div></div>
+    </div>
+  </div>
+
+  <div class="flashcard" onclick="this.classList.toggle('flipped')" style="height:130px">
+    <div class="flashcard-inner">
+      <div class="flashcard-front"><div class="label">CONCEPT</div><div class="q">What is the Container/Presentational pattern?</div></div>
+      <div class="flashcard-back"><div class="label">ANSWER</div><div class="a"><strong>Container</strong>: logic, API calls, state, handlers (class component). <strong>Presentational</strong>: pure UI from props (stateless function). Separates concerns for better reusability.</div></div>
+    </div>
+  </div>
+
+  <div class="flashcard" onclick="this.classList.toggle('flipped')" style="height:130px">
+    <div class="flashcard-inner">
+      <div class="flashcard-front"><div class="label">CONCEPT</div><div class="q">What does renderToString do and what is it used for?</div></div>
+      <div class="flashcard-back"><div class="label">ANSWER</div><div class="a">Returns HTML string of component's rendered output. Used in Server-Side Rendering. Includes React data attributes (<code>data-reactroot</code>) for client hydration.</div></div>
+    </div>
+  </div>
+
+  <div class="flashcard" onclick="this.classList.toggle('flipped')" style="height:130px">
+    <div class="flashcard-inner">
+      <div class="flashcard-front"><div class="label">CONCEPT</div><div class="q">What's wrong with initializing state from props?</div></div>
+      <div class="flashcard-back"><div class="label">ANSWER</div><div class="a">Constructor runs only once. If props change later, state won't update. Fix: compute derived values in render method instead.</div></div>
+    </div>
+  </div>
+
+  <div class="flashcard" onclick="this.classList.toggle('flipped')" style="height:130px">
+    <div class="flashcard-inner">
+      <div class="flashcard-front"><div class="label">CONCEPT</div><div class="q">What is the Function as Child pattern?</div></div>
+      <div class="flashcard-back"><div class="label">ANSWER</div><div class="a">children prop is a function instead of JSX. Component calls <code>children(params)</code> passing values at runtime. Used by react-motion. Flexible — consumer chooses variable names.</div></div>
+    </div>
+  </div>
+
+  <div class="flashcard" onclick="this.classList.toggle('flipped')" style="height:130px">
+    <div class="flashcard-inner">
+      <div class="flashcard-front"><div class="label">CONCEPT</div><div class="q">What are 3 main benefits of CSS Modules?</div></div>
+      <div class="flashcard-back"><div class="label">ANSWER</div><div class="a">1. Locally scoped class names (no global pollution) 2. Explicit dependencies (import CSS per component) 3. Dead code elimination (know which CSS each component uses)</div></div>
+    </div>
+  </div>
+
+  <div class="flashcard" onclick="this.classList.toggle('flipped')" style="height:130px">
+    <div class="flashcard-inner">
+      <div class="flashcard-front"><div class="label">CONCEPT</div><div class="q">How does event delegation work in React?</div></div>
+      <div class="flashcard-back"><div class="label">ANSWER</div><div class="a">React attaches a <em>single</em> event handler to the root element. When events bubble up, React dispatches to the right component. More memory efficient than per-element handlers.</div></div>
+    </div>
+  </div>
+
+  <div class="flashcard" onclick="this.classList.toggle('flipped')" style="height:130px">
+    <div class="flashcard-inner">
+      <div class="flashcard-front"><div class="label">CONCEPT</div><div class="q">When should you use shouldComponentUpdate?</div></div>
+      <div class="flashcard-back"><div class="label">ANSWER</div><div class="a">When a component re-renders too often with same props/state. Return <code>false</code> to skip re-render. <code>PureComponent</code> does shallow comparison automatically. Don't use prematurely.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ QUIZ ═══════ -->
+<div id="quiz" class="section">
+  <h2>🎯 Practice Quiz</h2>
+  <div id="quiz-score-display" style="display:none;" class="score-box">
+    <div class="score-num" id="score-num">0/0</div>
+    <div>questions correct</div>
+    <button class="tab-btn" style="margin-top:12px" onclick="resetQuiz()">🔄 Retry Quiz</button>
+  </div>
+
+  <div id="quiz-container">
+
+  <div class="quiz-q" data-answered="false">
+    <p>1. JSX expression <code>&lt;Button /&gt;</code> compiles to what JavaScript?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">document.createElement('Button')</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">React.createElement(Button)</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">React.createElement('button')</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">new Button()</button>
+    </div>
+    <div class="quiz-explain">Capital B = Component reference. Lowercase <code>&lt;button&gt;</code> → string 'button'. Capital <code>&lt;Button&gt;</code> → the Button variable itself.</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>2. Which lifecycle method is best for data fetching in React?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">componentWillMount</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">componentDidMount</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">constructor</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">render</button>
+    </div>
+    <div class="quiz-explain">componentDidMount runs only on client after first render. componentWillMount runs on server too, causing issues with async SSR.</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>3. What is the main problem with using array index as a key?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">It's slower than using IDs</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">It causes memory leaks</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">When list reorders, React maps state to wrong components</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">React doesn't accept numbers as keys</button>
+    </div>
+    <div class="quiz-explain">Index changes when items are added/removed/reordered. React uses the key to match components across renders, so wrong keys cause wrong state assignments.</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>4. What distinguishes a Container component from a Presentational component?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">Containers are always functional; Presentational are classes</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">Containers handle logic/API calls; Presentational renders UI from props</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Containers use JSX; Presentational use createElement</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Containers are smaller; Presentational are larger</button>
+    </div>
+    <div class="quiz-explain">Container = logic, state, API calls. Presentational = pure UI from props, usually stateless function. Separation makes both more reusable and testable.</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>5. What does a Higher-Order Component (HoC) return?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">An HTML element</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">A React element</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">A new enhanced component</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">A JavaScript class</button>
+    </div>
+    <div class="quiz-explain">HoC = Component => EnhancedComponent. It's a function that takes a component and returns a new one with added behavior.</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>6. What is renderToString used for?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">Convert props to a string for debugging</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">Server-side rendering — returns HTML string of the component</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Serialize component state to localStorage</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Convert JSX to a readable format</button>
+    </div>
+    <div class="quiz-explain">ReactDOM.renderToString() is the core SSR API. Returns an HTML string with data-reactroot attributes for client hydration.</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>7. Which CSS-in-JS approach requires wrapping the app in &lt;StyleRoot&gt;?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">CSS Modules</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">Radium</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Styled Components</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Inline Styles</button>
+    </div>
+    <div class="quiz-explain">Radium requires StyleRoot for media queries to work correctly, especially with SSR. It injects !important media query styles into a style element.</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>8. Why should you bind event handlers in the constructor instead of in render?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,true)">Arrow functions in render create new function references on every render, causing child re-renders</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Constructor binding makes the code more readable</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Render methods don't have access to this</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">React requires it for synthetic events</button>
+    </div>
+    <div class="quiz-explain">New arrow function in render = new reference each render = child component sees a "new" prop every time = unnecessary re-renders. Constructor binding is stable.</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>9. What happens when you call setState inside an event handler?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">State updates immediately and synchronously</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">State update is batched and asynchronous for performance</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">setState throws an error in event handlers</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">The component unmounts and remounts</button>
+    </div>
+    <div class="quiz-explain">React batches setState calls in event handlers for performance. Logging this.state immediately after setState shows the old value. Use callback: setState({}, () => console.log(this.state))</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>10. What is the Function as Child pattern?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">Passing a child component that renders a function call</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">A stateless component that renders children as a function</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">The children prop is a function that receives params from the parent component</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Using arrow functions for all event handlers</button>
+    </div>
+    <div class="quiz-explain">FaC: children is a function called by the component with runtime values. Example: &lt;Fetch url="..."&gt;{data =&gt; &lt;List data={data} /&gt;}&lt;/Fetch&gt;</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>11. Which is an anti-pattern when using props?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">Passing primitive values as props</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">Spreading all props onto a DOM element (&lt;div {...this.props} /&gt;)</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Using PropTypes to validate props</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Defining defaultProps on a component</button>
+    </div>
+    <div class="quiz-explain">Spreading unknown props on DOM elements passes non-HTML attributes to the DOM, causing React warnings. Destructure and only pass known HTML attributes.</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>12. What does CSS Modules' "composes" feature do?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">Creates a new CSS class by duplicating rules</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">Applies multiple class names to an element (like @extend but more efficient)</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Combines two CSS modules into one file</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Generates vendor-prefixed CSS automatically</button>
+    </div>
+    <div class="quiz-explain">Unlike SASS @extend, composes applies multiple scoped class names to the element in the DOM without duplicating CSS rules. Efficient and maintainable.</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>13. In unidirectional data flow, how does a child communicate with its parent?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">By directly modifying parent's state</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Through global event bus</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">By calling callback functions passed down as props</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">By using refs to access parent component</button>
+    </div>
+    <div class="quiz-explain">Data flows down via props. Communication goes up via callbacks. Parent passes onSomething function, child calls it when needed. Parent owns the state.</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>14. What is a Synthetic Event in React?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">A custom event type created by the developer</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">A cross-browser wrapper around native browser events with consistent API</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">An event that fires automatically without user interaction</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">A delayed event handled in the next render cycle</button>
+    </div>
+    <div class="quiz-explain">SyntheticEvent wraps the native event, normalizing differences between browsers. It's pooled (reused) for performance — becomes null after handler unless you call e.persist().</div>
+  </div>
+
+  <div class="quiz-q" data-answered="false">
+    <p>15. What does propTypes.isRequired do?</p>
+    <div class="quiz-options">
+      <button class="quiz-opt" onclick="answerQ(this,false)">Throws a runtime error if prop is missing</button>
+      <button class="quiz-opt" onclick="answerQ(this,true)">Shows a console warning in development if prop is missing</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Prevents the component from rendering without the prop</button>
+      <button class="quiz-opt" onclick="answerQ(this,false)">Validates the prop in both development and production</button>
+    </div>
+    <div class="quiz-explain">PropTypes validation only runs in development mode (disabled in production for performance). Shows warning but doesn't throw or prevent rendering.</div>
+  </div>
+
+  <div id="quiz-submit-btn" style="text-align:center; margin-top:16px">
+    <button class="tab-btn" onclick="submitQuiz()" style="background:var(--accent2);border-color:var(--accent2);color:#0d1117;padding:10px 24px;font-size:0.85rem">Check Score</button>
+  </div>
+
+  </div><!-- end quiz-container -->
+</div>
+
+<script>
+// TAB NAVIGATION
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'))
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
+  document.getElementById(id).classList.add('active')
+  event.target.classList.add('active')
+}
+
+// PROGRESS TRACKING
+const progress = { p1: false, p2: false, p3: false, p4: false, p5: false }
+function markDone(id) {
+  progress[id] = true
+  const bar = document.getElementById(id)
+  if (bar) { bar.style.width = '100%' }
+  const done = Object.values(progress).filter(Boolean).length
+  const pct = Math.round((done / 5) * 100)
+  const el = document.getElementById('overall-progress')
+  if (el) el.textContent = `${pct}% Complete`
+}
+
+// QUIZ
+let quizAnswers = {}
+let totalAnswered = 0
+let totalCorrect = 0
+
+function answerQ(btn, correct) {
+  const qDiv = btn.closest('.quiz-q')
+  if (qDiv.dataset.answered === 'true') return
+  qDiv.dataset.answered = 'true'
+  
+  const opts = qDiv.querySelectorAll('.quiz-opt')
+  opts.forEach(o => o.disabled = true)
+  
+  if (correct) {
+    btn.classList.add('correct')
+    totalCorrect++
+  } else {
+    btn.classList.add('wrong')
+    opts.forEach(o => {
+      if (o.onclick.toString().includes('true')) o.classList.add('correct')
+    })
+  }
+  totalAnswered++
+  const explain = qDiv.querySelector('.quiz-explain')
+  if (explain) explain.classList.add('show')
+}
+
+function submitQuiz() {
+  const total = document.querySelectorAll('.quiz-q').length
+  const answered = document.querySelectorAll('.quiz-q[data-answered="true"]').length
+  const correct = document.querySelectorAll('.quiz-opt.correct').length
+  
+  document.getElementById('score-num').textContent = `${correct}/${total}`
+  document.getElementById('quiz-score-display').style.display = 'block'
+  document.getElementById('quiz-submit-btn').style.display = 'none'
+  window.scrollTo(0, 0)
+}
+
+function resetQuiz() {
+  document.querySelectorAll('.quiz-q').forEach(q => {
+    q.dataset.answered = 'false'
+    q.querySelectorAll('.quiz-opt').forEach(o => {
+      o.disabled = false
+      o.classList.remove('correct', 'wrong')
+    })
+    const ex = q.querySelector('.quiz-explain')
+    if (ex) ex.classList.remove('show')
+  })
+  document.getElementById('quiz-score-display').style.display = 'none'
+  document.getElementById('quiz-submit-btn').style.display = 'block'
+  totalCorrect = 0
+  totalAnswered = 0
+}
+</script>
+</body>
+</html>

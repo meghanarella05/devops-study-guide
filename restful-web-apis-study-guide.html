@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RESTful Web APIs — Exam Study Guide</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d2e;
+    --surface2: #252840;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --accent3: #43e97b;
+    --text: #e2e4f0;
+    --muted: #8b90b4;
+    --border: #2e3254;
+    --highlight: #ffe06633;
+    --code-bg: #0d1117;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    padding: 0 0 80px 0;
+  }
+
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #1a1d2e 0%, #0f1117 50%, #1a1d2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 20px 24px;
+    text-align: center;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .hero h1 { font-size: 1.4rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  .hero .sub { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
+  .progress-bar { height: 3px; background: var(--border); border-radius: 2px; margin: 16px auto 0; max-width: 400px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.3s; }
+
+  /* NAV TABS */
+  .tabs {
+    display: flex; overflow-x: auto; gap: 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 12px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* CONTENT PANELS */
+  .panel { display: none; padding: 16px; max-width: 900px; margin: 0 auto; }
+  .panel.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .badge {
+    font-size: 0.68rem; padding: 2px 7px; border-radius: 20px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .badge-purple { background: #6c63ff22; color: var(--accent); border: 1px solid #6c63ff44; }
+  .badge-red { background: #ff658422; color: var(--accent2); border: 1px solid #ff658444; }
+  .badge-green { background: #43e97b22; color: var(--accent3); border: 1px solid #43e97b44; }
+  .badge-yellow { background: #ffe06622; color: #ffe066; border: 1px solid #ffe06644; }
+
+  .concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media(max-width: 600px) { .concept-grid { grid-template-columns: 1fr; } }
+
+  .mini-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .mini-card .term { font-weight: 700; color: var(--accent); font-size: 0.88rem; }
+  .mini-card .def { color: var(--text); font-size: 0.82rem; margin-top: 4px; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th { background: var(--surface2); color: var(--accent); text-align: left; padding: 8px 10px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+
+  /* CODE */
+  code {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.82rem;
+    color: #a8d8ea;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    overflow-x: auto;
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: #a8d8ea;
+    margin-top: 8px;
+  }
+
+  /* QUIZ */
+  .quiz-q { margin-bottom: 20px; }
+  .quiz-q .q { font-weight: 600; color: #fff; margin-bottom: 10px; font-size: 0.9rem; }
+  .quiz-option {
+    display: block; width: 100%;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+    margin-bottom: 6px; cursor: pointer; text-align: left;
+    font-size: 0.85rem; color: var(--text); transition: all 0.15s;
+  }
+  .quiz-option:hover { border-color: var(--accent); color: #fff; }
+  .quiz-option.correct { background: #43e97b22; border-color: var(--accent3); color: var(--accent3); }
+  .quiz-option.wrong { background: #ff658422; border-color: var(--accent2); color: var(--accent2); }
+  .quiz-option:disabled { cursor: default; }
+  .quiz-feedback {
+    display: none; padding: 10px 14px; border-radius: 8px;
+    font-size: 0.82rem; margin-top: 4px;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: #43e97b18; border: 1px solid #43e97b44; color: var(--accent3); }
+  .quiz-feedback.wrong { background: #ff658418; border: 1px solid #ff658444; color: #ff8fab; }
+
+  .quiz-score {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px; text-align: center;
+    display: none; margin-bottom: 20px;
+  }
+  .quiz-score .score-num { font-size: 2.5rem; font-weight: 900; color: var(--accent); }
+  .quiz-score .score-label { color: var(--muted); font-size: 0.85rem; }
+  #reset-quiz {
+    display: none;
+    margin: 0 auto 20px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 8px; padding: 10px 24px;
+    font-size: 0.88rem; font-weight: 700; cursor: pointer;
+  }
+
+  ul { padding-left: 18px; }
+  ul li { margin-bottom: 4px; font-size: 0.88rem; }
+  p { margin-bottom: 8px; font-size: 0.88rem; }
+
+  .section-title {
+    font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--muted); margin: 20px 0 10px;
+  }
+
+  .highlight-box {
+    background: var(--highlight);
+    border: 1px solid #ffe06644;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+  }
+  .highlight-box strong { color: #ffe066; }
+
+  .method-pill {
+    display: inline-block;
+    font-size: 0.72rem; font-weight: 800;
+    padding: 2px 8px; border-radius: 4px;
+    font-family: monospace; letter-spacing: 0.5px;
+  }
+  .GET { background: #43e97b22; color: #43e97b; border: 1px solid #43e97b44; }
+  .POST { background: #6c63ff22; color: #a78bfa; border: 1px solid #6c63ff44; }
+  .PUT { background: #ffe06622; color: #ffe066; border: 1px solid #ffe06644; }
+  .PATCH { background: #fb923c22; color: #fb923c; border: 1px solid #fb923c44; }
+  .DELETE { background: #ff658422; color: #ff6584; border: 1px solid #ff658444; }
+  .HEAD { background: #38bdf822; color: #38bdf8; border: 1px solid #38bdf844; }
+  .OPTIONS { background: #a78bfa22; color: #c4b5fd; border: 1px solid #a78bfa44; }
+
+  .status-2xx { color: var(--accent3); font-weight: 700; }
+  .status-3xx { color: #ffe066; font-weight: 700; }
+  .status-4xx { color: var(--accent2); font-weight: 700; }
+  .status-5xx { color: #f87171; font-weight: 700; }
+
+  .constraint-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .constraint-item:last-child { border-bottom: none; }
+  .constraint-num {
+    flex-shrink: 0; width: 28px; height: 28px;
+    background: var(--accent); color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 900;
+  }
+
+  .timeline {
+    position: relative; padding-left: 20px;
+  }
+  .timeline::before {
+    content: ''; position: absolute; left: 6px; top: 8px; bottom: 8px;
+    width: 2px; background: var(--border);
+  }
+  .timeline-step {
+    position: relative; margin-bottom: 14px;
+  }
+  .timeline-step::before {
+    content: ''; position: absolute; left: -17px; top: 5px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--bg);
+  }
+  .timeline-step .step-title { font-weight: 700; color: var(--accent); font-size: 0.85rem; }
+  .timeline-step .step-body { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>📡 RESTful Web APIs — Study Guide</h1>
+  <div class="sub">Richardson & Amundsen · 404 pages · 90% target</div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<div class="tabs" id="tabBar">
+  <div class="tab active" onclick="switchTab('foundations')">Foundations</div>
+  <div class="tab" onclick="switchTab('http')">HTTP Methods</div>
+  <div class="tab" onclick="switchTab('hypermedia')">Hypermedia</div>
+  <div class="tab" onclick="switchTab('formats')">Formats</div>
+  <div class="tab" onclick="switchTab('design')">Design</div>
+  <div class="tab" onclick="switchTab('security')">Security</div>
+  <div class="tab" onclick="switchTab('status')">Status Codes</div>
+  <div class="tab" onclick="switchTab('quiz')">🎯 Quiz</div>
+</div>
+
+<!-- ===== FOUNDATIONS ===== -->
+<div class="panel active" id="panel-foundations">
+
+  <div class="highlight-box">
+    <strong>🎯 Core Thesis:</strong> REST is an architectural style for distributed hypermedia systems. A truly RESTful API behaves like the Web itself — navigable via hyperlinks, self-describing, stateless.
+  </div>
+
+  <div class="section-title">Key Definitions</div>
+  <div class="concept-grid">
+    <div class="mini-card">
+      <div class="term">Resource</div>
+      <div class="def">Any thing identified by a URL. The <em>concept</em> behind the URL — a product, user, document, or any named entity. Clients never see the resource directly.</div>
+    </div>
+    <div class="mini-card">
+      <div class="term">Representation</div>
+      <div class="def">A machine-readable snapshot of a resource's current state (JSON, XML, HTML). A resource can have multiple representations in different formats.</div>
+    </div>
+    <div class="mini-card">
+      <div class="term">Addressability</div>
+      <div class="def">Every resource has its own unique URL. If something is important to your application, it should have a unique name so it can be referred to unambiguously.</div>
+    </div>
+    <div class="mini-card">
+      <div class="term">Statelessness</div>
+      <div class="def">HTTP sessions last for one request. The server forgets the client after each response. All state needed to process a request must be included in the request itself.</div>
+    </div>
+    <div class="mini-card">
+      <div class="term">Application State</div>
+      <div class="def">Where the client is in its journey through the API (like page navigation). Kept by the CLIENT, not the server.</div>
+    </div>
+    <div class="mini-card">
+      <div class="term">Resource State</div>
+      <div class="def">The current data/condition of a resource on the server (e.g. a user's profile data). Kept by the SERVER.</div>
+    </div>
+    <div class="mini-card">
+      <div class="term">Semantic Gap</div>
+      <div class="def">The gap between what HTTP/media types tell you (protocol semantics) and what an API actually means for its domain (application semantics). APIs must bridge this.</div>
+    </div>
+    <div class="mini-card">
+      <div class="term">Connectedness</div>
+      <div class="def">Resources link to related resources. A client should be able to discover everything by following links, not by out-of-band knowledge.</div>
+    </div>
+  </div>
+
+  <div class="section-title">The 6 Fielding Constraints (REST Architecture)</div>
+  <div class="card">
+    <div class="constraint-item">
+      <div class="constraint-num">1</div>
+      <div><strong>Client-Server</strong> — Separate UI concerns from data storage. Client and server evolve independently.</div>
+    </div>
+    <div class="constraint-item">
+      <div class="constraint-num">2</div>
+      <div><strong>Stateless</strong> — Each request contains all needed info. No session state on server between requests. Improves scalability.</div>
+    </div>
+    <div class="constraint-item">
+      <div class="constraint-num">3</div>
+      <div><strong>Cacheable</strong> — Responses must label themselves as cacheable or not. Clients/intermediaries can cache responses to improve performance.</div>
+    </div>
+    <div class="constraint-item">
+      <div class="constraint-num">4</div>
+      <div><strong>Uniform Interface</strong> — The central REST constraint. Identification of resources, manipulation through representations, self-descriptive messages, HATEOAS.</div>
+    </div>
+    <div class="constraint-item">
+      <div class="constraint-num">5</div>
+      <div><strong>Layered System</strong> — Client can't tell if it's connected to the end server or an intermediary (proxy, CDN, load balancer).</div>
+    </div>
+    <div class="constraint-item">
+      <div class="constraint-num">6</div>
+      <div><strong>Code on Demand</strong> (optional) — Servers can send executable code to clients (e.g., JavaScript). Extends client functionality.</div>
+    </div>
+  </div>
+
+  <div class="section-title">Uniform Interface (4 Sub-Constraints)</div>
+  <div class="card">
+    <table>
+      <tr><th>Sub-Constraint</th><th>Meaning</th></tr>
+      <tr><td><strong>Identification of resources</strong></td><td>Use URIs to name resources. Each resource has a stable, unique URL.</td></tr>
+      <tr><td><strong>Manipulation through representations</strong></td><td>Clients interact with resources by exchanging representations (not resources directly).</td></tr>
+      <tr><td><strong>Self-descriptive messages</strong></td><td>Every message carries enough info to describe how to process it (Content-Type header, etc.).</td></tr>
+      <tr><td><strong>HATEOAS</strong></td><td>Hypermedia As The Engine Of Application State — links in responses drive state transitions. No hardcoded URLs in clients.</td></tr>
+    </table>
+  </div>
+
+  <div class="section-title">Protocol vs. Application Semantics</div>
+  <div class="card">
+    <div class="concept-grid">
+      <div class="mini-card">
+        <div class="term">Protocol Semantics</div>
+        <div class="def">What HTTP methods and status codes mean universally. GET is always safe/idempotent. POST always creates. These don't change.</div>
+      </div>
+      <div class="mini-card">
+        <div class="term">Application Semantics</div>
+        <div class="def">What a specific API's resources and operations mean. "What does <code>rel="flip"</code> do?" You need a profile/documentation to know this.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== HTTP METHODS ===== -->
+<div class="panel" id="panel-http">
+
+  <div class="highlight-box">
+    <strong>Key principle:</strong> Safe = no side effects. Idempotent = calling it multiple times = same result as calling it once. Safe methods are always idempotent.
+  </div>
+
+  <div class="card">
+    <table>
+      <tr><th>Method</th><th>Safe?</th><th>Idempotent?</th><th>Use</th><th>Body?</th></tr>
+      <tr>
+        <td><span class="method-pill GET">GET</span></td>
+        <td>✅ Yes</td><td>✅ Yes</td>
+        <td>Retrieve a representation. Never modify state.</td><td>No</td>
+      </tr>
+      <tr>
+        <td><span class="method-pill HEAD">HEAD</span></td>
+        <td>✅ Yes</td><td>✅ Yes</td>
+        <td>Same as GET but no body. Check metadata, existence.</td><td>No</td>
+      </tr>
+      <tr>
+        <td><span class="method-pill OPTIONS">OPTIONS</span></td>
+        <td>✅ Yes</td><td>✅ Yes</td>
+        <td>What methods does this URL support? Returns Allow header.</td><td>No</td>
+      </tr>
+      <tr>
+        <td><span class="method-pill DELETE">DELETE</span></td>
+        <td>❌ No</td><td>✅ Yes</td>
+        <td>Delete a resource. Deleting twice = same as once (already gone).</td><td>No</td>
+      </tr>
+      <tr>
+        <td><span class="method-pill PUT">PUT</span></td>
+        <td>❌ No</td><td>✅ Yes</td>
+        <td>Replace entire resource state. Client sends complete representation.</td><td>Yes</td>
+      </tr>
+      <tr>
+        <td><span class="method-pill PATCH">PATCH</span></td>
+        <td>❌ No</td><td>❌ No*</td>
+        <td>Partial update. Client sends only changes. *Not idempotent by spec.</td><td>Yes</td>
+      </tr>
+      <tr>
+        <td><span class="method-pill POST">POST</span></td>
+        <td>❌ No</td><td>❌ No</td>
+        <td>Create resource (POST-to-Append) or overloaded POST for anything.</td><td>Yes</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section-title">POST Variants</div>
+  <div class="concept-grid">
+    <div class="mini-card">
+      <div class="term">POST-to-Append</div>
+      <div class="def">POST to a collection URL to create a new resource. Server decides the new URL. Response: <code>201 Created</code> + <code>Location</code> header.</div>
+    </div>
+    <div class="mini-card">
+      <div class="term">Overloaded POST</div>
+      <div class="def">Using POST for any action that doesn't fit GET/PUT/DELETE. Common in older APIs. Books calls this a design smell but acknowledges it's sometimes necessary.</div>
+    </div>
+  </div>
+
+  <div class="section-title">LINK / UNLINK (HTTP Extensions)</div>
+  <div class="card">
+    <p>Non-standard methods that establish or remove relationships between resources without modifying the resources themselves. Used to link two existing resources together.</p>
+    <pre>LINK /users/alice HTTP/1.1
+Link: &lt;/groups/admins&gt;; rel="collection"</pre>
+  </div>
+
+  <div class="section-title">Content Negotiation</div>
+  <div class="card">
+    <p>Client tells server what formats it can accept. Server responds in the best matching format.</p>
+    <pre>GET /user/42 HTTP/1.1
+Accept: application/json, application/xml;q=0.9</pre>
+    <p style="margin-top:10px;">Use <code>Vary: Accept</code> in responses so caches know different representations exist for the same URL.</p>
+  </div>
+
+  <div class="section-title">Conditional Requests</div>
+  <div class="card">
+    <table>
+      <tr><th>Header</th><th>Use</th></tr>
+      <tr><td><code>ETag</code></td><td>Response: a version tag (hash) for the current representation.</td></tr>
+      <tr><td><code>If-None-Match</code></td><td>GET: only send if resource changed. Returns 304 if unchanged.</td></tr>
+      <tr><td><code>If-Match</code></td><td>PUT/PATCH/DELETE: only apply if ETag matches (optimistic locking).</td></tr>
+      <tr><td><code>Last-Modified</code></td><td>Response: when the resource last changed.</td></tr>
+      <tr><td><code>If-Modified-Since</code></td><td>GET: only send if newer than date.</td></tr>
+      <tr><td><code>If-Unmodified-Since</code></td><td>PUT: only apply if not changed since date.</td></tr>
+    </table>
+    <div class="highlight-box" style="margin-top:12px;">
+      <strong>Lost Update Problem:</strong> Two clients GET the same resource, both modify it, both PUT back. Second PUT overwrites first. Fix: use <code>If-Match</code> with the ETag. If ETag changed, server returns <code>412 Precondition Failed</code>.
+    </div>
+  </div>
+</div>
+
+<!-- ===== HYPERMEDIA ===== -->
+<div class="panel" id="panel-hypermedia">
+
+  <div class="highlight-box">
+    <strong>HATEOAS:</strong> Hypermedia As The Engine Of Application State. The server drives state transitions by embedding links in responses. Clients follow links — they don't construct URLs or have hardcoded endpoints.
+  </div>
+
+  <div class="section-title">What Hypermedia Is For</div>
+  <div class="card">
+    <div class="concept-grid">
+      <div class="mini-card">
+        <div class="term">Guiding Requests</div>
+        <div class="def">Out of infinite possible HTTP requests, hypermedia controls list only the ones that are useful <em>right now</em> in the current state.</div>
+      </div>
+      <div class="mini-card">
+        <div class="term">Promises About Response</div>
+        <div class="def">A link's <code>rel</code> attribute promises what kind of resource is at the other end (e.g., <code>rel="edit"</code> → resource you can modify).</div>
+      </div>
+      <div class="mini-card">
+        <div class="term">Workflow Control</div>
+        <div class="def">Links appear/disappear based on current state. A "Cancel Order" link only appears when the order is pending, not when shipped.</div>
+      </div>
+      <div class="mini-card">
+        <div class="term">Decoupling</div>
+        <div class="def">Clients don't need to know URLs in advance. Server can change URL structure without breaking clients that follow links.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Types of Hypermedia Controls in HTML</div>
+  <div class="card">
+    <table>
+      <tr><th>Control</th><th>Type</th><th>HTTP Method</th><th>Effect</th></tr>
+      <tr><td><code>&lt;a href&gt;</code></td><td>Outbound link</td><td>GET</td><td>Navigate to new resource, replaces current view</td></tr>
+      <tr><td><code>&lt;link rel&gt;</code></td><td>Outbound link</td><td>GET</td><td>Metadata link, usually not shown directly</td></tr>
+      <tr><td><code>&lt;img src&gt;</code></td><td>Embedding link</td><td>GET</td><td>Fetched automatically, embedded in current page</td></tr>
+      <tr><td><code>&lt;script src&gt;</code></td><td>Embedding link</td><td>GET</td><td>Fetched and executed as code</td></tr>
+      <tr><td><code>&lt;form method="GET"&gt;</code></td><td>Templated link</td><td>GET</td><td>Client provides values, builds URL query string</td></tr>
+      <tr><td><code>&lt;form method="POST"&gt;</code></td><td>Action</td><td>POST</td><td>Submits entity-body, unsafe state transition</td></tr>
+    </table>
+  </div>
+
+  <div class="section-title">Link Relations</div>
+  <div class="card">
+    <p>A link relation (<code>rel</code>) explains the relationship between the current resource and the linked resource.</p>
+    <div class="concept-grid" style="margin-top:10px;">
+      <div class="mini-card">
+        <div class="term">Registered (IANA)</div>
+        <div class="def">Short keywords like <code>self</code>, <code>edit</code>, <code>next</code>, <code>prev</code>, <code>first</code>, <code>last</code>, <code>collection</code>, <code>item</code>. Anyone can use these — no ownership.</div>
+      </div>
+      <div class="mini-card">
+        <div class="term">Extension (URI-based)</div>
+        <div class="def">A URL that documents the relation type: <code>http://alps.io/example/maze/#east</code>. Used for custom domain semantics.</div>
+      </div>
+    </div>
+    <p style="margin-top:10px;"><strong>Key IANA relations to know:</strong> <code>self</code>, <code>edit</code>, <code>edit-media</code>, <code>collection</code>, <code>item</code>, <code>next</code>, <code>prev</code>, <code>first</code>, <code>last</code>, <code>profile</code>, <code>replies</code></p>
+  </div>
+
+  <div class="section-title">URI Templates</div>
+  <div class="card">
+    <p>A URL with placeholders that the client fills in. Defined by RFC 6570.</p>
+    <pre>http://api.example.com/users{?name,age}</pre>
+    <p>Client substitutes variables to construct the actual URL. These are "outbound links" that require client participation.</p>
+  </div>
+
+  <div class="section-title">⚠️ Fake Hypermedia</div>
+  <div class="card">
+    <div class="highlight-box">
+      <strong>Warning:</strong> A JSON field that contains a URL is NOT hypermedia. <code>application/json</code> has no hypermedia controls. A string that looks like a URL is still just a string.
+    </div>
+    <p>To have real hypermedia in JSON, you must use a media type that defines hypermedia: <code>application/vnd.collection+json</code>, <code>application/hal+json</code>, <code>application/vnd.siren+json</code>, or JSON-LD.</p>
+  </div>
+
+  <div class="section-title">Profiles</div>
+  <div class="card">
+    <p>A profile adds application semantics on top of a media type without changing the media type itself. RFC 6906.</p>
+    <p><em>Three ways to link a document to its profile:</em></p>
+    <ul style="margin-top:8px;">
+      <li>The <code>profile</code> link relation in <code>&lt;link&gt;</code> tag or <code>Link</code> header</li>
+      <li>The <code>profile</code> media type parameter: <code>application/collection+json;profile="..."</code></li>
+      <li>JSON-LD's <code>@context</code> property</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===== FORMATS ===== -->
+<div class="panel" id="panel-formats">
+
+  <div class="section-title">Media Types — Quick Reference</div>
+  <div class="card">
+    <table>
+      <tr><th>Media Type</th><th>Type</th><th>Hypermedia?</th><th>Key Features</th></tr>
+      <tr><td><code>application/json</code></td><td>Generic</td><td>❌ No</td><td>Just data. No built-in links. Fake hypermedia risk.</td></tr>
+      <tr><td><code>text/html</code></td><td>Pure hypermedia</td><td>✅ Yes</td><td>Full hypermedia: &lt;a&gt;, &lt;form&gt;, &lt;link&gt;, &lt;img&gt;. Best for human + machine.</td></tr>
+      <tr><td><code>application/vnd.collection+json</code></td><td>Collection</td><td>✅ Yes</td><td>CRUD collections. Items, templates, links, queries. Good default choice.</td></tr>
+      <tr><td><code>application/hal+json</code></td><td>Pure hypermedia</td><td>✅ Links only</td><td>_links + _embedded. Simple, popular, but only GET links (no forms/unsafe).</td></tr>
+      <tr><td><code>application/vnd.siren+json</code></td><td>Pure hypermedia</td><td>✅ Full</td><td>Links + Actions (unsafe transitions). More complete than HAL.</td></tr>
+      <tr><td><code>application/atom+xml</code></td><td>Collection</td><td>✅ Yes</td><td>Feeds/blogs. AtomPub for publishing protocol.</td></tr>
+      <tr><td><code>application/vnd.amundsen.maze+xml</code></td><td>Domain-specific</td><td>✅ Yes</td><td>Example in book. Maze navigation — shows domain-specific design.</td></tr>
+      <tr><td><code>application/ld+json</code></td><td>Linked Data</td><td>✅ Partial</td><td>JSON-LD. Uses @context, @id, @type. RDF underneath.</td></tr>
+      <tr><td><code>text/vcard</code></td><td>Domain-specific</td><td>❌ No</td><td>Personal contact info. Good semantics but no links (dead end).</td></tr>
+    </table>
+  </div>
+
+  <div class="section-title">Collection+JSON Deep Dive</div>
+  <div class="card">
+    <p>A hypermedia type designed for collections of items. Key elements:</p>
+    <pre>{
+  "collection": {
+    "version": "1.0",
+    "href": "http://api.example.com/users/",
+    "links": [...],      // links to other resources
+    "items": [           // list of collection members
+      {
+        "href": "http://api.example.com/users/42",
+        "data": [        // key-value pairs
+          {"name": "name", "value": "Alice", "prompt": "Full Name"}
+        ],
+        "links": [...]   // item-level links
+      }
+    ],
+    "queries": [...],    // search forms (safe GET)
+    "template": {        // form for creating new items
+      "data": [
+        {"name": "name", "value": "", "prompt": "Full Name"}
+      ]
+    },
+    "error": {...}       // error info (optional)
+  }
+}</pre>
+  </div>
+
+  <div class="section-title">HAL (Hypertext Application Language)</div>
+  <div class="card">
+    <pre>{
+  "_links": {
+    "self":   { "href": "/orders/523" },
+    "next":   { "href": "/orders/524" },
+    "ea:basket": { "href": "/baskets/98712" }
+  },
+  "_embedded": {
+    "ea:items": [ { ... } ]
+  },
+  "total": 30,
+  "currency": "USD"
+}</pre>
+    <p style="margin-top:8px;">HAL only supports GET links. For unsafe transitions (POST/PUT/DELETE), use Siren instead.</p>
+  </div>
+
+  <div class="section-title">HTML as an API Format — Microformats & Microdata</div>
+  <div class="card">
+    <div class="concept-grid">
+      <div class="mini-card">
+        <div class="term">Microformats</div>
+        <div class="def">Add semantics to HTML via class names. <code>class="vcard"</code>, <code>class="fn"</code>. Defined at microformats.org. Example: hCard (person), hCalendar (event).</div>
+      </div>
+      <div class="mini-card">
+        <div class="term">Microdata</div>
+        <div class="def">HTML5 attributes: <code>itemscope</code>, <code>itemtype</code>, <code>itemprop</code>. Links to schema.org vocabulary. More structured than microformats.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">ALPS (Application-Level Profile Semantics)</div>
+  <div class="card">
+    <p>A profile format that is <strong>media-type agnostic</strong>. Define your API's application semantics once, reuse across any format (Collection+JSON, HAL, Siren, HTML).</p>
+    <p style="margin-top:8px;">Defines two things: <strong>Semantic descriptors</strong> (what data fields mean) and <strong>Link relations</strong> (what transitions mean).</p>
+  </div>
+</div>
+
+<!-- ===== DESIGN ===== -->
+<div class="panel" id="panel-design">
+
+  <div class="section-title">7-Step Design Procedure</div>
+  <div class="card">
+    <div class="timeline">
+      <div class="timeline-step">
+        <div class="step-title">Step 1: List Semantic Descriptors</div>
+        <div class="step-body">What data does your API expose? List all fields and properties from business requirements. These are your semantic descriptors (e.g., <code>title</code>, <code>date_posted</code>, <code>author</code>).</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-title">Step 2: Draw a State Diagram</div>
+        <div class="step-body">Boxes = resource states (representations). Arrows = state transitions (links/actions). Label arrows with link relations. This becomes your API's navigation map.</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-title">Step 3: Reconcile Names</div>
+        <div class="step-body">Look up IANA link relations and schema.org/microformats vocabulary. Reuse existing names whenever possible. Don't invent names that already exist (e.g., use <code>edit</code> not <code>update</code>).</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-title">Step 4: Choose a Media Type</div>
+        <div class="step-body">Look for domain-specific format first. If none, use Collection+JSON (CRUD collections), Siren (complex workflows), HAL (read-heavy APIs), or HTML (human + machine). Register custom media types if needed.</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-title">Step 5: Write a Profile</div>
+        <div class="step-body">Document your semantic descriptors and link relations. Use ALPS for media-type-agnostic profiles. Publish the profile at a stable URL. This bridges the semantic gap.</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-title">Step 6: Implement</div>
+        <div class="step-body">Write server code. Each representation should include only the hypermedia controls relevant to the current state. Don't put all controls in a single service document.</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-title">Step 7: Publish</div>
+        <div class="step-body">Define a "billboard URL" (a single well-known entry point). Clients start here and discover everything else via hypermedia. Register your media type with IANA if it's general enough.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">The Collection Pattern</div>
+  <div class="card">
+    <p>Most APIs are collections of items. Standard CRUD operations:</p>
+    <table style="margin-top:8px;">
+      <tr><th>Operation</th><th>Method</th><th>URL</th><th>Response</th></tr>
+      <tr><td>List all</td><td><span class="method-pill GET">GET</span></td><td><code>/items/</code></td><td>200 + collection representation</td></tr>
+      <tr><td>Create new</td><td><span class="method-pill POST">POST</span></td><td><code>/items/</code></td><td>201 + Location header with new URL</td></tr>
+      <tr><td>Get one</td><td><span class="method-pill GET">GET</span></td><td><code>/items/42</code></td><td>200 + item representation</td></tr>
+      <tr><td>Replace</td><td><span class="method-pill PUT">PUT</span></td><td><code>/items/42</code></td><td>200 or 204</td></tr>
+      <tr><td>Update</td><td><span class="method-pill PATCH">PATCH</span></td><td><code>/items/42</code></td><td>200 or 204</td></tr>
+      <tr><td>Delete</td><td><span class="method-pill DELETE">DELETE</span></td><td><code>/items/42</code></td><td>200 or 204</td></tr>
+    </table>
+  </div>
+
+  <div class="section-title">Versioning APIs</div>
+  <div class="card">
+    <div class="concept-grid">
+      <div class="mini-card">
+        <div class="term">Media Type Versioning</div>
+        <div class="def"><code>application/vnd.myapi.v2+json</code>. Clean, but can proliferate media types. Book's preferred approach.</div>
+      </div>
+      <div class="mini-card">
+        <div class="term">Profile Versioning</div>
+        <div class="def">Version the profile URL: <code>http://api.example.com/profiles/v2/user</code>. Change profile, not media type.</div>
+      </div>
+      <div class="mini-card">
+        <div class="term">URL Versioning</div>
+        <div class="def"><code>/v2/users/</code>. Simple but violates REST (URL should name resource, not API version).</div>
+      </div>
+      <div class="mini-card">
+        <div class="term">Header Versioning</div>
+        <div class="def"><code>API-Version: 2</code> custom header. Works but not standard. Same issues as URL versioning.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Adding Hypermedia to Existing APIs</div>
+  <div class="card">
+    <ul>
+      <li>Can't rename existing fields (breaks clients) — add new names alongside old</li>
+      <li>Add links to existing JSON representations (use Link header if can't change body)</li>
+      <li>Use JSON-LD <code>@context</code> to add semantics without changing structure</li>
+      <li>For unsafe transitions: JSON-LD + Hydra operations</li>
+      <li>For XML APIs: XLink for links, XForms for forms</li>
+    </ul>
+  </div>
+
+  <div class="section-title">Anti-Patterns to Avoid</div>
+  <div class="card">
+    <ul>
+      <li><strong>Service description document:</strong> One giant document describing all API URLs up front (WSDL-style). Encourages tight coupling. Breaks when API changes.</li>
+      <li><strong>Autogenerating semantic names from database fields:</strong> Creates software dependency. Renaming DB fields breaks API clients.</li>
+      <li><strong>Duplicating IANA link relations:</strong> Don't make up <code>next-item</code> when <code>next</code> already exists.</li>
+      <li><strong>Plain JSON with URLs in fields:</strong> Fake hypermedia. URLs in JSON are just strings without a format that defines them as links.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===== SECURITY ===== -->
+<div class="panel" id="panel-security">
+
+  <div class="section-title">Authentication Methods</div>
+
+  <div class="card">
+    <h3>HTTP Basic Auth <span class="badge badge-red">Avoid without HTTPS</span></h3>
+    <p>Username + password encoded with Base64, sent in <code>Authorization</code> header. <strong>Base64 is reversible</strong> — not encryption! Anyone intercepting the request can decode it immediately.</p>
+    <pre>Authorization: Basic YWxpY2U6cGFzc3dvcmQ=
+// Decodes to: alice:password</pre>
+    <p style="margin-top:8px;"><strong>Problems:</strong> Not secure over HTTP (must use HTTPS). Sharing one password across many clients — if one goes rogue, you must change the password everywhere.</p>
+  </div>
+
+  <div class="card">
+    <h3>HTTP Digest <span class="badge badge-yellow">Better than Basic</span></h3>
+    <p>Server sends a nonce, client hashes credentials + nonce. Password never sent in plaintext. Safer than Basic without HTTPS, but has same "one password for all clients" problem.</p>
+  </div>
+
+  <div class="card">
+    <h3>OAuth 1.0 <span class="badge badge-green">Per-client credentials</span></h3>
+    <p><strong>Solves the "shared password" problem.</strong> Each client gets its own credentials (token). Revoking one client doesn't affect others.</p>
+    <div class="section-title" style="margin-top:12px;">OAuth 1.0 Flow</div>
+    <div class="timeline">
+      <div class="timeline-step">
+        <div class="step-title">1. Server gets temporary credentials</div>
+        <div class="step-body">API consumer (website) requests temporary credentials from API provider — no user involved yet.</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-title">2. User redirected to API provider</div>
+        <div class="step-body">User leaves your site, lands on API provider's login page. User enters password on <em>provider's</em> site — not yours.</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-title">3. User authorizes</div>
+        <div class="step-body">User reviews permissions and approves (or denies) access for your client.</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-title">4. User redirected back</div>
+        <div class="step-body">User returns to your site with an authorization code.</div>
+      </div>
+      <div class="timeline-step">
+        <div class="step-title">5. Exchange for token credentials</div>
+        <div class="step-body">Your server exchanges temp credentials for permanent token credentials. Used to sign future API requests with HMAC-SHA1.</div>
+      </div>
+    </div>
+    <div class="highlight-box" style="margin-top:12px;">
+      <strong>Key OAuth benefits:</strong> Per-client revocation · Provider can revoke rogue clients globally · <code>oauth_timestamp</code> + <code>oauth_nonce</code> prevent replay attacks · Works over HTTP without exposing credentials
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>OAuth 2.0 <span class="badge badge-green">Modern standard</span></h3>
+    <p>Extends OAuth 1.0 to handle desktop, mobile, and in-browser apps. Multiple "grant types" for different client types. More flexible but more complex. Requires HTTPS (no built-in signing like 1.0).</p>
+  </div>
+
+  <div class="section-title">HTTP Status Codes for Auth</div>
+  <div class="card">
+    <table>
+      <tr><th>Code</th><th>Meaning</th></tr>
+      <tr><td><span class="status-4xx">401 Unauthorized</span></td><td>Client must authenticate. Response includes <code>WWW-Authenticate</code> header telling client what auth method to use.</td></tr>
+      <tr><td><span class="status-4xx">403 Forbidden</span></td><td>Authenticated but not authorized. You are who you say you are, but you're not allowed to do this.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== STATUS CODES ===== -->
+<div class="panel" id="panel-status">
+
+  <div class="section-title">2xx — Success</div>
+  <div class="card">
+    <table>
+      <tr><th>Code</th><th>Name</th><th>Use</th></tr>
+      <tr><td><span class="status-2xx">200</span></td><td>OK</td><td>Generic success. Request fulfilled. Includes response body.</td></tr>
+      <tr><td><span class="status-2xx">201</span></td><td>Created</td><td>POST created a resource. Must include <code>Location</code> header with new URL.</td></tr>
+      <tr><td><span class="status-2xx">202</span></td><td>Accepted</td><td>Request received but processing not done yet (async). Not a guarantee of completion.</td></tr>
+      <tr><td><span class="status-2xx">204</span></td><td>No Content</td><td>Success but no body. Common for PUT/PATCH/DELETE when client doesn't need updated representation.</td></tr>
+    </table>
+  </div>
+
+  <div class="section-title">3xx — Redirection</div>
+  <div class="card">
+    <table>
+      <tr><th>Code</th><th>Name</th><th>Use</th></tr>
+      <tr><td><span class="status-3xx">301</span></td><td>Moved Permanently</td><td>Resource has a new permanent URL. Update bookmarks. Safe to cache.</td></tr>
+      <tr><td><span class="status-3xx">302</span></td><td>Found</td><td>Temporary redirect. Don't update bookmarks.</td></tr>
+      <tr><td><span class="status-3xx">303</span></td><td>See Other</td><td>After POST: redirect to GET the result. Prevents double-submit on refresh.</td></tr>
+      <tr><td><span class="status-3xx">304</span></td><td>Not Modified</td><td>Conditional GET: resource hasn't changed since cached version. Client uses cache.</td></tr>
+    </table>
+  </div>
+
+  <div class="section-title">4xx — Client Error</div>
+  <div class="card">
+    <table>
+      <tr><th>Code</th><th>Name</th><th>Use</th></tr>
+      <tr><td><span class="status-4xx">400</span></td><td>Bad Request</td><td>Malformed request syntax. Client should not repeat without modification.</td></tr>
+      <tr><td><span class="status-4xx">401</span></td><td>Unauthorized</td><td>Must authenticate. Response includes <code>WWW-Authenticate</code> header.</td></tr>
+      <tr><td><span class="status-4xx">403</span></td><td>Forbidden</td><td>Authenticated but not authorized. No credentials will help.</td></tr>
+      <tr><td><span class="status-4xx">404</span></td><td>Not Found</td><td>Resource doesn't exist at this URL. Or server is hiding that it exists.</td></tr>
+      <tr><td><span class="status-4xx">405</span></td><td>Method Not Allowed</td><td>HTTP method not supported here. Response includes <code>Allow</code> header listing valid methods.</td></tr>
+      <tr><td><span class="status-4xx">406</span></td><td>Not Acceptable</td><td>Can't serve in any format the client's <code>Accept</code> header allows.</td></tr>
+      <tr><td><span class="status-4xx">409</span></td><td>Conflict</td><td>Impossible/inconsistent state. E.g., deleting a non-empty collection that requires empty.</td></tr>
+      <tr><td><span class="status-4xx">410</span></td><td>Gone</td><td>Used to exist, now gone. Client should remove URL from vocabulary.</td></tr>
+      <tr><td><span class="status-4xx">412</span></td><td>Precondition Failed</td><td>Conditional request failed. If-Match or If-Unmodified-Since header condition not met.</td></tr>
+      <tr><td><span class="status-4xx">415</span></td><td>Unsupported Media Type</td><td>Client sent a representation in a format the server doesn't understand.</td></tr>
+      <tr><td><span class="status-4xx">422</span></td><td>Unprocessable Entity</td><td>Syntactically valid but semantically wrong. E.g., correct JSON but violates business rules.</td></tr>
+      <tr><td><span class="status-4xx">428</span></td><td>Precondition Required</td><td>Server requires conditional request (If-Match) but client didn't send one. Prevents lost updates.</td></tr>
+      <tr><td><span class="status-4xx">429</span></td><td>Too Many Requests</td><td>Rate limit exceeded. Response may include <code>Retry-After</code> header.</td></tr>
+    </table>
+  </div>
+
+  <div class="section-title">5xx — Server Error</div>
+  <div class="card">
+    <table>
+      <tr><th>Code</th><th>Name</th><th>Use</th></tr>
+      <tr><td><span class="status-5xx">500</span></td><td>Internal Server Error</td><td>Something went wrong on the server. Generic catch-all.</td></tr>
+      <tr><td><span class="status-5xx">503</span></td><td>Service Unavailable</td><td>Server temporarily down (maintenance, overload). Use <code>Retry-After</code> header.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="panel" id="panel-quiz">
+
+  <div class="quiz-score" id="quizScore">
+    <div class="score-num" id="scoreNum">-</div>
+    <div class="score-label">Final Score</div>
+  </div>
+  <button id="reset-quiz" onclick="resetQuiz()">↺ Retry Quiz</button>
+
+  <div id="quizContainer"></div>
+</div>
+
+<script>
+// ===== TAB SWITCHING =====
+let visitedTabs = new Set(['foundations']);
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const ids = ['foundations','http','hypermedia','formats','design','security','status','quiz'];
+    t.classList.toggle('active', ids[i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  visitedTabs.add(name);
+  const total = 8;
+  document.getElementById('progressFill').style.width = (visitedTabs.size / total * 100) + '%';
+}
+
+// ===== QUIZ =====
+const questions = [
+  {
+    q: "Which HTTP method is both SAFE and IDEMPOTENT?",
+    opts: ["POST", "PUT", "GET", "PATCH"],
+    answer: 2,
+    explain: "GET is safe (no side effects) and idempotent (calling multiple times = same result). POST is neither. PUT is idempotent but not safe. PATCH is neither."
+  },
+  {
+    q: "What does HATEOAS stand for?",
+    opts: [
+      "HTTP And Text Engine Of Application States",
+      "Hypermedia As The Engine Of Application State",
+      "Hyperlinks And Text Encoding Of API Standards",
+      "Hypermedia API Template Engine Of Application Semantics"
+    ],
+    answer: 1,
+    explain: "HATEOAS = Hypermedia As The Engine Of Application State. It means the server drives state transitions by embedding links in responses."
+  },
+  {
+    q: "A client sends a PUT request with an If-Match header. The resource was modified by someone else since the client last fetched it. What status code should the server return?",
+    opts: ["409 Conflict", "400 Bad Request", "412 Precondition Failed", "304 Not Modified"],
+    answer: 2,
+    explain: "412 Precondition Failed is returned when a conditional request's precondition (like If-Match) is not met. This prevents the lost update problem."
+  },
+  {
+    q: "Which of the following is TRUE about a JSON field containing a URL?",
+    opts: [
+      "It is automatically a hypermedia link",
+      "It is just a string — application/json has no hypermedia controls",
+      "It becomes a link if the field name ends in '_url'",
+      "It is a link if the URL is valid and resolvable"
+    ],
+    answer: 1,
+    explain: "application/json defines no hypermedia controls. A URL in a JSON field is just a string. This is 'fake hypermedia.' You need a media type that explicitly defines links (like Collection+JSON, HAL, Siren)."
+  },
+  {
+    q: "What is the difference between application state and resource state?",
+    opts: [
+      "Application state is on the server; resource state is on the client",
+      "They are the same thing in REST",
+      "Application state is on the client (where you are); resource state is on the server (the data)",
+      "Application state is HTTP state; resource state is database state"
+    ],
+    answer: 2,
+    explain: "Application state = where the client is in the API (kept by CLIENT). Resource state = the actual data/condition of a server-side resource (kept by SERVER). REST = REpresentational State Transfer."
+  },
+  {
+    q: "A server responds to a successful POST request that creates a new resource. Which response code + header combination is correct?",
+    opts: [
+      "200 OK with the new resource in the body",
+      "201 Created with a Location header pointing to the new resource URL",
+      "202 Accepted with a Content-Location header",
+      "204 No Content with the new resource URL in ETag"
+    ],
+    answer: 1,
+    explain: "POST-to-Append should return 201 Created with a Location header containing the URL of the newly created resource."
+  },
+  {
+    q: "What is a 'profile' in the context of RESTful APIs (RFC 6906)?",
+    opts: [
+      "A user's account settings endpoint",
+      "A performance benchmark document for an API",
+      "A document that adds application semantics without altering the media type's semantics",
+      "A WADL-style complete description of all API endpoints"
+    ],
+    answer: 2,
+    explain: "Per RFC 6906: a profile allows clients to learn additional semantics associated with a representation, without altering the media type's core semantics. It bridges the semantic gap."
+  },
+  {
+    q: "Which HTTP method should you use to PARTIALLY update a resource?",
+    opts: ["PUT", "POST", "PATCH", "UPDATE"],
+    answer: 2,
+    explain: "PATCH is for partial updates — client sends only the changes. PUT replaces the entire resource. POST creates. UPDATE is not an HTTP method."
+  },
+  {
+    q: "In OAuth 1.0, what problem does giving each client separate credentials solve?",
+    opts: [
+      "It makes authentication faster",
+      "If one client is compromised, you revoke only that client's credentials without affecting others",
+      "It allows login without a password",
+      "It prevents replay attacks completely"
+    ],
+    answer: 1,
+    explain: "With shared passwords (Basic Auth), a rogue client forces you to change the password everywhere. OAuth 1.0 gives each client unique token credentials — revoking one doesn't touch others."
+  },
+  {
+    q: "What Fielding constraint says each request must contain all information needed to process it?",
+    opts: ["Client-Server", "Cacheable", "Statelessness", "Uniform Interface"],
+    answer: 2,
+    explain: "Statelessness: the server holds no client session state between requests. Each HTTP request must be self-contained with all needed information."
+  },
+  {
+    q: "A GET request returns Vary: Accept in the response. What does this tell a cache?",
+    opts: [
+      "Don't cache this response at all",
+      "Cache responses separately based on the Accept header (different formats are separate cache entries)",
+      "The Accept header is required in all future requests",
+      "The response content may be inaccurate"
+    ],
+    answer: 1,
+    explain: "Vary: Accept tells caches that the response may differ based on the Accept request header. A JSON representation and an XML representation of the same URL should be cached separately."
+  },
+  {
+    q: "What does 'idempotent' mean for an HTTP method?",
+    opts: [
+      "The method has no side effects on the server",
+      "The method can be safely cached",
+      "Calling the method N times produces the same result as calling it once",
+      "The method must include a request body"
+    ],
+    answer: 2,
+    explain: "Idempotent = calling it 1 time or 100 times leaves the server in the same state. DELETE and PUT are idempotent. Safe methods (GET, HEAD) are always idempotent too. POST and PATCH are not."
+  },
+  {
+    q: "Which media type has NO built-in hypermedia controls?",
+    opts: ["text/html", "application/vnd.collection+json", "application/json", "application/hal+json"],
+    answer: 2,
+    explain: "application/json is just a data format with no defined hypermedia controls. URLs in JSON fields are just strings. HTML, Collection+JSON, and HAL all have defined hypermedia link mechanisms."
+  },
+  {
+    q: "When should you use 410 Gone instead of 404 Not Found?",
+    opts: [
+      "When the resource requires authentication",
+      "When the server knows the resource existed but was permanently deleted",
+      "When the URL is malformed",
+      "When the resource is temporarily unavailable"
+    ],
+    answer: 1,
+    explain: "410 Gone signals that the resource existed before but no longer does, and the server doesn't know a new URL. 404 is used when the server doesn't know if the resource ever existed."
+  },
+  {
+    q: "What are the two types of link relations in REST APIs?",
+    opts: [
+      "Absolute and relative link relations",
+      "Registered (IANA short keywords) and extension (URI-based) link relations",
+      "Safe and unsafe link relations",
+      "Outbound and embedding link relations"
+    ],
+    answer: 1,
+    explain: "Registered link relations are short keywords registered with IANA (e.g., 'next', 'edit', 'self'). Extension link relations are URIs that document a custom relationship type."
+  }
+];
+
+let answered = new Array(questions.length).fill(null);
+let questionOrder = questions.map((_,i)=>i);
+
+function buildQuiz() {
+  const c = document.getElementById('quizContainer');
+  c.innerHTML = '';
+  questionOrder.forEach((qi, idx) => {
+    const q = questions[qi];
+    const div = document.createElement('div');
+    div.className = 'quiz-q card';
+    div.id = 'qq-' + idx;
+
+    let optsHtml = q.opts.map((o, oi) =>
+      `<button class="quiz-option" onclick="answer(${idx}, ${oi}, ${q.answer})">${String.fromCharCode(65+oi)}. ${o}</button>`
+    ).join('');
+
+    div.innerHTML = `
+      <div class="q">Q${idx+1}. ${q.q}</div>
+      ${optsHtml}
+      <div class="quiz-feedback" id="qf-${idx}"></div>
+    `;
+    c.appendChild(div);
+  });
+}
+
+function answer(idx, chosen, correct) {
+  if (answered[idx] !== null) return;
+  answered[idx] = chosen;
+
+  const qi = questionOrder[idx];
+  const q = questions[qi];
+  const buttons = document.querySelectorAll(`#qq-${idx} .quiz-option`);
+  buttons.forEach((btn, bi) => {
+    btn.disabled = true;
+    if (bi === correct) btn.classList.add('correct');
+    else if (bi === chosen && chosen !== correct) btn.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('qf-' + idx);
+  fb.textContent = (chosen === correct ? '✅ Correct! ' : '❌ Wrong. ') + q.explain;
+  fb.className = 'quiz-feedback show ' + (chosen === correct ? 'correct' : 'wrong');
+
+  if (answered.every(a => a !== null)) showScore();
+}
+
+function showScore() {
+  let correct = 0;
+  answered.forEach((a, i) => {
+    if (a === questions[questionOrder[i]].answer) correct++;
+  });
+  const pct = Math.round(correct / questions.length * 100);
+  document.getElementById('scoreNum').textContent = `${correct}/${questions.length} (${pct}%)`;
+  document.getElementById('quizScore').style.display = 'block';
+  document.getElementById('reset-quiz').style.display = 'block';
+  document.getElementById('quizScore').scrollIntoView({behavior:'smooth'});
+}
+
+function resetQuiz() {
+  answered = new Array(questions.length).fill(null);
+  questionOrder = questions.map((_,i)=>i).sort(() => Math.random()-0.5);
+  document.getElementById('quizScore').style.display = 'none';
+  document.getElementById('reset-quiz').style.display = 'none';
+  buildQuiz();
+  window.scrollTo(0, 0);
+}
+
+buildQuiz();
+</script>
+</body>
+</html>

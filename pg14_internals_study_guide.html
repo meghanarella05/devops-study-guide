@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PostgreSQL 14 Internals — Study Guide</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222638;
+    --accent: #5b8cff;
+    --accent2: #38d9a9;
+    --accent3: #ff7c5b;
+    --text: #e4e8f0;
+    --muted: #8892a8;
+    --border: #2e3347;
+    --warn: #ffd166;
+    --tag-bg: #1e2a45;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    padding: 0 0 60px;
+  }
+
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #101524 0%, #1a2848 50%, #0d1f3c 100%);
+    padding: 32px 20px 28px;
+    border-bottom: 2px solid var(--accent);
+    text-align: center;
+  }
+  .hero-tag {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .hero h1 {
+    font-size: clamp(22px, 5vw, 34px);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .progress-bar {
+    margin: 18px auto 0;
+    max-width: 320px;
+    background: var(--border);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.3s;
+  }
+  .progress-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    text-align: center;
+  }
+
+  /* NAV */
+  .toc {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+  .toc::-webkit-scrollbar { display: none; }
+  .toc a {
+    display: inline-block;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 5px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    margin-right: 8px;
+    transition: all 0.2s;
+  }
+  .toc a:hover { color: var(--accent); border-color: var(--accent); background: var(--tag-bg); }
+
+  /* SECTIONS */
+  .section {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+  .chapter {
+    margin-top: 36px;
+    scroll-margin-top: 60px;
+  }
+  .chapter-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+  }
+  .ch-num {
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .ch-num.green { background: var(--accent2); }
+  .ch-num.orange { background: var(--accent3); }
+  .ch-num.yellow { background: var(--warn); color: #222; }
+  .chapter-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .chapter-header .ch-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .card-head:hover { background: var(--surface2); }
+  .card-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+  }
+  .card-arrow {
+    color: var(--muted);
+    font-size: 12px;
+    transition: transform 0.25s;
+  }
+  .card.open .card-arrow { transform: rotate(180deg); }
+  .card-body {
+    display: none;
+    padding: 0 16px 16px;
+  }
+  .card.open .card-body { display: block; }
+
+  /* CONTENT */
+  p { color: var(--text); margin-bottom: 10px; }
+  ul, ol { padding-left: 20px; margin-bottom: 10px; }
+  li { margin-bottom: 5px; color: var(--text); }
+  strong { color: var(--accent2); }
+  em { color: var(--warn); font-style: normal; font-weight: 600; }
+
+  /* KEY FACT */
+  .fact {
+    background: var(--tag-bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 13px;
+  }
+  .fact.orange { border-left-color: var(--accent3); }
+  .fact.green { border-left-color: var(--accent2); }
+  .fact.yellow { border-left-color: var(--warn); }
+
+  /* TABLE */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 12px;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--accent);
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+  td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  .yes { color: var(--accent3); font-weight: 700; }
+  .no { color: var(--accent2); font-weight: 700; }
+
+  /* QUIZ */
+  .quiz-section {
+    background: linear-gradient(135deg, #1a1f30, #151c2e);
+    border: 1px solid var(--accent);
+    border-radius: 14px;
+    padding: 20px 16px;
+    margin: 24px 0 0;
+  }
+  .quiz-section h3 {
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .quiz-item {
+    margin-bottom: 16px;
+    padding: 14px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .quiz-q {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .quiz-a {
+    display: none;
+    font-size: 13px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    margin-top: 4px;
+    line-height: 1.6;
+  }
+  .quiz-a.show { display: block; }
+  .quiz-btn {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--accent);
+    background: none;
+    color: var(--accent);
+    cursor: pointer;
+    margin-top: 6px;
+    font-weight: 600;
+  }
+  .quiz-btn:hover { background: var(--tag-bg); }
+
+  /* CODE */
+  code {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+  }
+
+  /* CHEATSHEET */
+  .param-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  @media (max-width: 480px) {
+    .param-grid { grid-template-columns: 1fr; }
+  }
+  .param-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+  .param-name {
+    color: var(--accent2);
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 3px;
+  }
+  .param-default {
+    color: var(--warn);
+    font-size: 10px;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    padding: 30px 16px 10px;
+    color: var(--muted);
+    font-size: 11px;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  /* Animate in */
+  .chapter { animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">📘 Study Guide · Part I</div>
+  <h1>PostgreSQL 14<br><span>Internals</span></h1>
+  <div class="hero-sub">by Egor Rogov &nbsp;|&nbsp; Chapters 1–8 &nbsp;|&nbsp; MVCC &amp; Isolation</div>
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="progress-label" id="progressLabel">0 / 0 cards opened</div>
+</div>
+
+<div class="toc">
+  <a href="#ch1">1 · Data Organization</a>
+  <a href="#ch2">2 · Isolation</a>
+  <a href="#ch3">3 · Pages &amp; Tuples</a>
+  <a href="#ch4">4 · Snapshots</a>
+  <a href="#ch5">5 · HOT Updates</a>
+  <a href="#ch6">6 · Vacuum</a>
+  <a href="#ch7">7 · Freezing</a>
+  <a href="#ch8">8 · Rebuilding</a>
+  <a href="#quiz">⚡ Quiz</a>
+</div>
+
+<div class="section">
+
+<!-- ============ CHAPTER 1 ============ -->
+<div class="chapter" id="ch1">
+  <div class="chapter-header">
+    <div class="ch-num">1</div>
+    <div>
+      <h2>Data Organization, Processes &amp; Memory</h2>
+      <div class="ch-sub">Databases · Schemas · Tablespaces · Files · TOAST · Processes</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🗄️</span>
+      <span class="card-title">Cluster, Databases &amp; System Catalog</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>A <strong>PostgreSQL instance</strong> (server) manages a <strong>database cluster</strong> — a collection of databases sharing the same data directory (<code>PGDATA</code>).</p>
+      <p>After initialization, PGDATA contains three databases:</p>
+      <ul>
+        <li><strong>template0</strong> — never modified; used for restores or new DBs with different encoding</li>
+        <li><strong>template1</strong> — template for <code>CREATE DATABASE</code></li>
+        <li><strong>postgres</strong> — default user database</li>
+      </ul>
+      <p>The <strong>system catalog</strong> stores metadata (tables, indexes, types, functions) in tables named <code>pg_*</code>. Each database has its own catalog; some tables are cluster-wide. The primary key column is always called <code>oid</code> (a 32-bit integer object identifier).</p>
+      <div class="fact">Column names use 3-letter prefixes matching the table name (e.g., <code>datname</code> in <code>pg_database</code>).</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">📁</span>
+      <span class="card-title">Schemas &amp; Tablespaces</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p><strong>Schemas</strong> are logical namespaces within a database. Predefined schemas:</p>
+      <ul>
+        <li><code>public</code> — default for user objects</li>
+        <li><code>pg_catalog</code> — system catalog tables</li>
+        <li><code>information_schema</code> — SQL-standard view of catalog</li>
+        <li><code>pg_toast</code> — TOAST objects</li>
+        <li><code>pg_temp</code> — alias for current session's temp tables (<code>pg_temp_N</code>)</li>
+      </ul>
+      <p><strong>Tablespaces</strong> define <em>physical</em> layout (a directory on disk). Logical and physical structures are independent. Default tablespaces:</p>
+      <ul>
+        <li><code>pg_default</code> → <code>PGDATA/base</code></li>
+        <li><code>pg_global</code> → <code>PGDATA/global</code> (cluster-wide catalog)</li>
+      </ul>
+      <div class="fact green">Custom tablespaces are symlinked from <code>PGDATA/pg_tblspc</code>. All paths are relative to PGDATA.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">📂</span>
+      <span class="card-title">Files, Forks &amp; Pages</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>Each <strong>relation</strong> (tables, indexes, sequences, materialized views) is stored in <strong>forks</strong>:</p>
+      <ul>
+        <li><strong>Main fork</strong> — actual row/index data (named by <code>relfilenode</code>)</li>
+        <li><strong>Free space map (FSM)</strong> — tracks available space within pages (<code>_fsm</code> suffix)</li>
+        <li><strong>Visibility map (VM)</strong> — two bits per page: all-visible &amp; all-frozen (<code>_vm</code> suffix)</li>
+        <li><strong>Initialization fork</strong> — for unlogged tables only (<code>_init</code>); replaces main fork on crash recovery</li>
+      </ul>
+      <div class="fact orange">Files grow in 1 GB segments. Small table with TOAST = at least 8 files (3 main + 3 TOAST table + 2 TOAST index).</div>
+      <p><strong>Pages (blocks)</strong> are the unit of I/O — default <strong>8 kB</strong>, configurable only at build time (<code>--with-blocksize</code>, up to 32 kB).</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🍞</span>
+      <span class="card-title">TOAST (Oversized Attribute Storage)</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>Rows must fit a single page. For large values, TOAST applies:</p>
+      <ul>
+        <li><strong>plain</strong> — no TOAST (small fixed types like integer)</li>
+        <li><strong>extended</strong> — compress first, then move to TOAST table if still too big (default for text/json)</li>
+        <li><strong>external</strong> — move to TOAST table uncompressed</li>
+        <li><strong>main</strong> — compress first, only move as last resort (numeric)</li>
+      </ul>
+      <p>TOAST algorithm triggers when row exceeds <strong>~2000 bytes</strong> (¼ of page). Threshold can be changed with <code>toast_tuple_target</code>.</p>
+      <div class="fact">For indexes, TOAST supports compression only — no separate table. Avoid bulk binary data in PG if not needing transactional logic.</div>
+      <p>Access to columns NOT in the query means TOAST table is never read — avoid <code>SELECT *</code>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">⚙️</span>
+      <span class="card-title">Processes &amp; Memory</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p><strong>postmaster</strong> — the first process; spawns all others, handles incoming connections by forking a new <strong>backend process</strong> per client.</p>
+      <p>Key background processes:</p>
+      <ul>
+        <li><code>startup</code> — crash recovery</li>
+        <li><code>autovacuum launcher/worker</code> — dead tuple cleanup</li>
+        <li><code>wal writer</code> — flushes WAL to disk</li>
+        <li><code>checkpointer</code> — periodic checkpoints</li>
+        <li><code>writer</code> (bgwriter) — flushes dirty pages</li>
+        <li><code>stats collector</code> — usage statistics</li>
+        <li><code>wal sender/receiver</code> — replication</li>
+      </ul>
+      <p>All processes share <strong>shared memory</strong>. The <strong>buffer cache</strong> takes the largest portion — caches recently read pages.</p>
+      <div class="fact orange">Connection pooling (PgBouncer, Odyssey) is needed because each client = 1 backend process with its own memory.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHAPTER 2 ============ -->
+<div class="chapter" id="ch2">
+  <div class="chapter-header">
+    <div class="ch-num green">2</div>
+    <div>
+      <h2>Isolation</h2>
+      <div class="ch-sub">ACID · Anomalies · Isolation Levels · MVCC</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">⚠️</span>
+      <span class="card-title">Concurrency Anomalies</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Lost Update</strong> — T1 and T2 read same row; T1 updates; T2 updates based on stale read → T1's change is lost</li>
+        <li><strong>Dirty Read</strong> — reading uncommitted changes of another transaction</li>
+        <li><strong>Non-Repeatable Read</strong> — same row read twice; another transaction updates/deletes it between reads → different results</li>
+        <li><strong>Phantom Read</strong> — same query run twice; another transaction inserts/deletes rows matching the condition → different row sets</li>
+        <li><strong>Read Skew</strong> — reading different rows from different snapshots within one transaction (PG-specific)</li>
+        <li><strong>Write Skew</strong> — two transactions read overlapping data, each decides it's safe to update different parts → consistency broken</li>
+        <li><strong>Read-Only Transaction Anomaly</strong> — read-only transaction sees inconsistent state due to ordering of concurrent writers</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">📊</span>
+      <span class="card-title">SQL Standard vs PostgreSQL Isolation Levels</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p><strong>SQL Standard allows:</strong></p>
+      <table>
+        <tr><th>Level</th><th>Dirty Read</th><th>Non-Rep</th><th>Phantom</th></tr>
+        <tr><td>Read Uncommitted</td><td class="yes">yes</td><td class="yes">yes</td><td class="yes">yes</td></tr>
+        <tr><td>Read Committed</td><td class="no">—</td><td class="yes">yes</td><td class="yes">yes</td></tr>
+        <tr><td>Repeatable Read</td><td class="no">—</td><td class="no">—</td><td class="yes">yes</td></tr>
+        <tr><td>Serializable</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+      </table>
+      <p style="margin-top:10px"><strong>PostgreSQL (MVCC-based, stricter):</strong></p>
+      <table>
+        <tr><th>Level</th><th>Lost Update</th><th>Non-Rep/Phantom</th><th>Write Skew</th></tr>
+        <tr><td>Read Committed (default)</td><td class="yes">yes*</td><td class="yes">yes</td><td class="yes">yes</td></tr>
+        <tr><td>Repeatable Read</td><td class="no">serialize fail</td><td class="no">—</td><td class="yes">yes</td></tr>
+        <tr><td>Serializable</td><td class="no">—</td><td class="no">—</td><td class="no">—</td></tr>
+      </table>
+      <div class="fact">Read Uncommitted in PG behaves identically to Read Committed — dirty reads are impossible by design with MVCC.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🔵</span>
+      <span class="card-title">Read Committed — Details</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>Default level (<code>default_transaction_isolation</code>). Snapshot taken <em>per statement</em>.</p>
+      <ul>
+        <li>No dirty reads ✓</li>
+        <li>Non-repeatable reads allowed</li>
+        <li>Classic anti-pattern: <code>IF SELECT >= X THEN UPDATE</code> — the check is useless because state can change between operators</li>
+      </ul>
+      <p><strong>Read Skew at RC:</strong> reading Bob's two accounts in two statements while a transfer commits in between → wrong total.</p>
+      <p><strong>Fix patterns:</strong></p>
+      <ul>
+        <li>Single SQL operator (<code>SELECT sum(amount) FROM accounts WHERE client='bob'</code>)</li>
+        <li>Declarative <code>CHECK</code> constraint instead of procedural logic</li>
+        <li>Explicit locking (<code>SELECT FOR UPDATE</code>, <code>LOCK TABLE</code>) — last resort</li>
+      </ul>
+      <div class="fact orange"><code>VOLATILE</code> functions in RC can see different data from the main query — a subtle trap since both are PG defaults.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🟡</span>
+      <span class="card-title">Repeatable Read — Details</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>Snapshot taken at first statement of transaction; held for the whole transaction. Eliminates non-repeatable reads AND phantom reads.</p>
+      <p><strong>Serialization failures</strong> replace anomalies: if a concurrent update would create a read skew, the transaction aborts with <code>ERROR: could not serialize access due to concurrent update</code>.</p>
+      <div class="fact yellow">⚠️ Applications MUST retry transactions on serialization failures at Repeatable Read (and Serializable) levels.</div>
+      <p><strong>Still allows:</strong> Write Skew and Read-Only Transaction Anomaly.</p>
+      <p><strong>Use case:</strong> Read-only multi-query reports — perfect complement to RC.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🔴</span>
+      <span class="card-title">Serializable — Details</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>Prevents ALL anomalies. Built on top of Snapshot Isolation + SSI (Serializable Snapshot Isolation).</p>
+      <ul>
+        <li>Write skew and read-only anomalies are <strong>detected</strong> and cause serialization failures</li>
+        <li>False positives possible — safe transactions may be aborted due to lack of index info or RAM</li>
+        <li>All transactions in the app must use Serializable for it to work properly</li>
+        <li><strong>Not supported on replicas</strong></li>
+        <li>Cannot be mixed with other levels (behaves as RR if mixed)</li>
+      </ul>
+      <p><strong>DEFERRABLE</strong> option: <code>BEGIN ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE</code> — blocks until safe to execute without any anomaly risk. Only case where SELECT can block.</p>
+      <div class="fact green">Modify <code>default_transaction_isolation</code> to ensure all transactions use Serializable if you adopt this level.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🎯</span>
+      <span class="card-title">Which Level to Use?</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><strong>Read Committed</strong> — default, no retries needed, but developer must prevent anomalies via careful SQL design</li>
+        <li><strong>Repeatable Read</strong> — great for read-only transactions (reports); requires retry logic for write transactions</li>
+        <li><strong>Serializable</strong> — simplest logic for developers; requires retry logic, not on replicas, may reduce throughput</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHAPTER 3 ============ -->
+<div class="chapter" id="ch3">
+  <div class="chapter-header">
+    <div class="ch-num orange">3</div>
+    <div>
+      <h2>Pages &amp; Tuples</h2>
+      <div class="ch-sub">Page Layout · Row Version Headers · MVCC Mechanics · Subtransactions</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">📄</span>
+      <span class="card-title">Page Structure</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>Each 8 kB page contains (low → high address):</p>
+      <ol>
+        <li><strong>Page header</strong> — checksum, sizes, free space boundaries (<code>lower</code>/<code>upper</code>)</li>
+        <li><strong>Item pointer array</strong> — 4-byte pointers (offset + length + status bits); grows downward</li>
+        <li><strong>Free space</strong> — between pointers and tuples</li>
+        <li><strong>Tuples</strong> — actual row data; grow upward from high address</li>
+        <li><strong>Special space</strong> — for indexes (B-tree metadata, etc.); zero size in table pages</li>
+      </ol>
+      <div class="fact">No fragmentation — free space is always one contiguous chunk. Tuples can be moved within the page; the pointer is updated, but the TID (page#, pointer#) stays the same.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🔖</span>
+      <span class="card-title">Row Version (Tuple) Header</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>Each tuple has a header (minimum <strong>23 bytes</strong>, often more due to NULL bitmap and alignment):</p>
+      <ul>
+        <li><strong>xmin</strong> — XID of the INSERT transaction that created this version</li>
+        <li><strong>xmax</strong> — XID of the DELETE/UPDATE transaction that obsoleted this version (0 = alive)</li>
+        <li><strong>infomask</strong> — hint bits including <em>xmin_committed</em>, <em>xmin_aborted</em>, <em>xmax_committed</em>, <em>xmax_aborted</em></li>
+        <li><strong>ctid</strong> — pointer to the next version of this row (for updates)</li>
+        <li><strong>cmin/cmax</strong> — command sequence within current transaction (for cursor visibility)</li>
+        <li><strong>null bitmap</strong> — marks NULL columns</li>
+      </ul>
+      <div class="fact orange">Indexes do NOT have xmin/xmax — they point to ALL versions; visibility is checked by accessing the heap (or visibility map for index-only scans).</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">✏️</span>
+      <span class="card-title">Tuple Operations (INSERT/UPDATE/DELETE)</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p><strong>INSERT:</strong> New tuple written with <code>xmin = current_txid</code>, <code>xmax = 0</code> (with xmax_aborted bit set). xmin_committed bit set later by first reader after commit.</p>
+      <p><strong>DELETE:</strong> <code>xmax</code> set to deleting XID. No data physically removed. xmax_aborted bit cleared. When DELETE commits → xmax_committed set by next reader.</p>
+      <p><strong>UPDATE:</strong> = DELETE old version + INSERT new version. Old tuple gets <code>xmax</code> = updating XID. New tuple has same <code>xmin</code> = that XID. Old tuple's <code>ctid</code> → new tuple.</p>
+      <p><strong>ROLLBACK:</strong> Does NOT reverse changes in data pages — just marks transaction as aborted in CLOG. Next reader sees aborted status and ignores the tuple.</p>
+      <div class="fact green"><strong>Hint bits</strong> cache the commit/abort status in the tuple header to avoid re-reading CLOG on every access. SET by any transaction, even read-only ones (making them "dirty" pages).</div>
+      <div class="fact">CLOG (commit log) lives in <code>PGDATA/pg_xact</code>. It stores 2 bits per XID: committed + aborted.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🌀</span>
+      <span class="card-title">Virtual Transactions &amp; Subtransactions</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p><strong>Virtual XIDs</strong>: read-only transactions get a virtual ID (backend PID + sequence) to avoid consuming real XIDs. Real XID assigned only on first write.</p>
+      <p><strong>Subtransactions (Savepoints):</strong></p>
+      <ul>
+        <li>Each savepoint creates a subtransaction with its own XID (larger than parent's)</li>
+        <li>Status stored in <code>PGDATA/pg_subtrans</code></li>
+        <li>If parent aborts → all subtransactions considered aborted</li>
+        <li>Committed subtransactions get BOTH committed AND aborted bits set in CLOG — final decision depends on parent</li>
+      </ul>
+      <div class="fact yellow">psql's <code>\set ON_ERROR_ROLLBACK on</code> adds implicit savepoints before each command — useful but adds overhead even when not needed.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHAPTER 4 ============ -->
+<div class="chapter" id="ch4">
+  <div class="chapter-header">
+    <div class="ch-num yellow">4</div>
+    <div>
+      <h2>Snapshots</h2>
+      <div class="ch-sub">Snapshot Structure · Visibility Rules · Transaction Horizon</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">📸</span>
+      <span class="card-title">What is a Snapshot?</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>A snapshot defines which row versions are <strong>visible</strong> to a transaction. It is NOT a physical copy — it's a set of numbers that determine visibility rules.</p>
+      <p><strong>When taken:</strong></p>
+      <ul>
+        <li><em>Read Committed</em>: at the start of each statement</li>
+        <li><em>Repeatable Read / Serializable</em>: at the start of the first statement of the transaction</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🔢</span>
+      <span class="card-title">Snapshot Structure: xmin, xmax, xip_list</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>A snapshot consists of three values (visible as <code>pg_current_snapshot()</code> → <code>xmin:xmax:xip_list</code>):</p>
+      <ul>
+        <li><strong>xmin</strong> — XID of oldest active transaction at snapshot creation. All XIDs &lt; xmin are committed (visible) or aborted (ignored).</li>
+        <li><strong>xmax</strong> — one past the XID of the latest committed transaction. All XIDs ≥ xmax are not visible (future or running).</li>
+        <li><strong>xip_list</strong> — list of XIDs of transactions that were active at snapshot creation (except virtual ones)</li>
+      </ul>
+      <p><strong>Visibility rule:</strong> A tuple is visible if:</p>
+      <ul>
+        <li><code>xmin &lt; snapshot.xmin</code> → always visible (if committed)</li>
+        <li><code>snapshot.xmin ≤ xmin &lt; snapshot.xmax</code> → visible only if NOT in xip_list (and committed)</li>
+        <li><code>xmin ≥ snapshot.xmax</code> → not visible</li>
+      </ul>
+      <div class="fact orange">PG cannot do "flashback" queries — commit times are not tracked in a way that allows recreating past snapshots.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🌅</span>
+      <span class="card-title">Transaction Horizon &amp; Vacuuming</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>The <strong>horizon</strong> of a transaction = its snapshot's <code>xmin</code>. Tuples with <code>xmax &lt; horizon</code> are invisible to all current/future transactions and can be vacuumed.</p>
+      <p>The <strong>database horizon</strong> = oldest xmin of all active transactions. Vacuum can only remove tuples beyond this horizon.</p>
+      <div class="fact yellow">⚠️ A long-running transaction <em>holds the database horizon</em>, preventing vacuum from cleaning up dead tuples — leading to table bloat.</div>
+      <ul>
+        <li><strong>Repeatable Read / Serializable</strong>: holds horizon for entire transaction duration</li>
+        <li><strong>Read Committed (real XID)</strong>: holds horizon even when idle ("idle in transaction")</li>
+        <li><strong>Read Committed (virtual XID)</strong>: holds horizon only during statement execution</li>
+      </ul>
+      <p>Monitor: <code>pg_stat_activity.backend_xmin</code></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">📤</span>
+      <span class="card-title">Exporting Snapshots</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>Use <code>pg_export_snapshot()</code> to get a snapshot ID that another transaction can import with <code>SET TRANSACTION SNAPSHOT '...'</code>. Requires Repeatable Read or Serializable level.</p>
+      <p>Used by <code>pg_dump --parallel</code> so all workers see the same consistent state.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHAPTER 5 ============ -->
+<div class="chapter" id="ch5">
+  <div class="chapter-header">
+    <div class="ch-num">5</div>
+    <div>
+      <h2>Page Pruning &amp; HOT Updates</h2>
+      <div class="ch-sub">Lightweight cleanup · Heap-Only Tuples · Chain updates</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">✂️</span>
+      <span class="card-title">Page Pruning</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>A fast, single-page cleanup triggered during <strong>reads or writes</strong> when:</p>
+      <ul>
+        <li>Previous UPDATE couldn't fit new tuple in same page</li>
+        <li>Page data exceeds <code>fillfactor</code> percent</li>
+      </ul>
+      <p>Removes tuples beyond the database horizon. Pruned pointers become <strong>dead</strong> (not freed) because indexes may still reference them. Dead pointers are cleared during index scans (marked dead in index too).</p>
+      <div class="fact">Does NOT update visibility map or free space map (so recovered space is for updates, not inserts). Does NOT touch indexes.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🔥</span>
+      <span class="card-title">HOT Updates (Heap-Only Tuple)</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>When an UPDATE modifies <strong>no indexed columns</strong>, PG uses HOT to avoid creating new index entries:</p>
+      <ul>
+        <li>Old tuple marked <em>Heap Hot Updated</em> (HHU bit) → ctid points to new version</li>
+        <li>New tuple marked <em>Heap Only Tuple</em> (HOT bit) → not in any index</li>
+        <li>Index keeps only ONE entry pointing to the chain head</li>
+      </ul>
+      <p>Index scan follows HHU chain, checking visibility of each version. Chain stays within ONE page (no cross-page chains → no extra I/O).</p>
+      <div class="fact green">HOT dramatically reduces index bloat for frequently updated non-indexed columns. Lower <code>fillfactor</code> reserves space for HOT chain growth.</div>
+      <p><strong>HOT Chain Split</strong>: If the page is full and pruning can't free space (held by active snapshot), a new chain starts in another page — the index gets a second entry. HOT benefit is lost for that update.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🔗</span>
+      <span class="card-title">HOT Pruning &amp; Redirect Pointers</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>When a HOT chain is pruned, the <strong>head pointer</strong> (referenced by index) is converted to <strong>redirect</strong> status pointing to the current chain start. Other freed pointers get <strong>unused</strong> status (available for reuse).</p>
+      <p>Index pruning also happens before B-tree page splits — removes entries already marked dead, or entries for rows beyond the horizon (bottom-up deletion, v14).</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHAPTER 6 ============ -->
+<div class="chapter" id="ch6">
+  <div class="chapter-header">
+    <div class="ch-num green">6</div>
+    <div>
+      <h2>Vacuum &amp; Autovacuum</h2>
+      <div class="ch-sub">Phases · Thresholds · Throttling · Monitoring</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🧹</span>
+      <span class="card-title">Vacuum: Overview &amp; Phases</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>Routine <code>VACUUM</code> cleans the whole table and removes dead tuples from both the heap AND all indexes. Runs concurrently (does not block reads/writes, but blocks ALTER TABLE etc.).</p>
+      <p>Uses visibility map to skip already-clean pages.</p>
+      <p><strong>Phases (per table):</strong></p>
+      <ol>
+        <li><strong>Heap Scan</strong> — find dead tuples; store their TIDs in a memory array (size = <code>maintenance_work_mem</code> / 6 bytes each)</li>
+        <li><strong>Index Vacuuming</strong> — full scan of each index to remove entries pointing to dead tuples. Can be parallel (one worker per index ≥ <code>min_parallel_index_scan_size</code>)</li>
+        <li><strong>Heap Vacuuming</strong> — remove actual heap tuples and free pointers (now safe since index refs removed)</li>
+        <li><em>Repeat 1–3 if TID array fills up</em></li>
+        <li><strong>Heap Truncation</strong> — if ≥1/16 of table is empty pages at end, truncate file (requires brief exclusive lock, max 5 seconds wait)</li>
+      </ol>
+      <div class="fact orange">If TID array fills before full scan → multiple passes = multiple full index scans. Fix: increase <code>maintenance_work_mem</code> or vacuum more frequently.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🤖</span>
+      <span class="card-title">Autovacuum: Mechanism</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>Autovacuum launcher runs continuously, spawning workers every <code>autovacuum_naptime</code> (default 1 min). Max workers: <code>autovacuum_max_workers</code> (default 3).</p>
+      <p><strong>Vacuum triggered when:</strong></p>
+      <ul>
+        <li><code>n_dead_tup &gt; autovacuum_vacuum_threshold (50) + autovacuum_vacuum_scale_factor (0.2) × reltuples</code></li>
+        <li><em>v13+:</em> <code>n_ins_since_vacuum &gt; autovacuum_vacuum_insert_threshold (1000) + autovacuum_vacuum_insert_scale_factor (0.2) × reltuples</code></li>
+      </ul>
+      <p><strong>Analyze triggered when:</strong></p>
+      <ul>
+        <li><code>n_mod_since_analyze &gt; autovacuum_analyze_threshold (50) + autovacuum_analyze_scale_factor (0.1) × reltuples</code></li>
+      </ul>
+      <div class="fact yellow">⚠️ <code>autovacuum_vacuum_scale_factor = 0.2</code> (20%) is too large for big tables. Tune per-table with storage parameters.</div>
+      <div class="fact">First time a new table is vacuumed, <code>reltuples = -1</code> (unknown), so threshold formula uses 0 → threshold = just the fixed part.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🎚️</span>
+      <span class="card-title">Throttling</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>After every <code>vacuum_cost_limit</code> units of "cost work", vacuum sleeps for <code>vacuum_cost_delay</code>.</p>
+      <p>Cost per page: <code>vacuum_cost_page_hit</code> (1, cached), <code>vacuum_cost_page_miss</code> (2, disk), <code>vacuum_cost_page_dirty</code> (20, dirtied by vacuum).</p>
+      <div class="fact">Manual VACUUM: <code>vacuum_cost_delay = 0</code> (no sleep) by default. Autovacuum: <code>autovacuum_vacuum_cost_delay = 2ms</code> by default (was 20ms before v14!).</div>
+      <p>All autovacuum workers <em>share</em> the cost limit — adding more workers doesn't increase total I/O impact. To speed up: increase both <code>autovacuum_max_workers</code> AND <code>autovacuum_vacuum_cost_limit</code>.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">📡</span>
+      <span class="card-title">Monitoring</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><code>VACUUM VERBOSE</code> — prints detailed report after completion</li>
+        <li><code>pg_stat_progress_vacuum</code> — live progress (phase, pages scanned/vacuumed, index_vacuum_count)</li>
+        <li><code>pg_stat_all_tables</code> — n_dead_tup, n_ins_since_vacuum, last_autovacuum</li>
+        <li><code>log_autovacuum_min_duration = 0</code> — log all autovacuum runs to server log</li>
+      </ul>
+      <div class="fact green"><strong>Key signal</strong>: if <code>index_vacuum_count &gt; 1</code>, maintenance_work_mem is too small — vacuum had to scan indexes multiple times.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHAPTER 7 ============ -->
+<div class="chapter" id="ch7">
+  <div class="chapter-header">
+    <div class="ch-num orange">7</div>
+    <div>
+      <h2>Freezing</h2>
+      <div class="ch-sub">XID Wraparound · Frozen Tuples · Freezing Parameters</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">❄️</span>
+      <span class="card-title">XID Wraparound Problem</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>Transaction IDs are <strong>32-bit integers</strong> (~4 billion). PG compares ages (modular arithmetic), not absolute XIDs. Think of XIDs on a clock face — half the circle is "past", half is "future".</p>
+      <p>Without intervention, an old XID will eventually appear to be in the "future" of newer transactions — making old changes invisible. <strong>Catastrophic!</strong></p>
+      <p><strong>Solution: Freezing</strong> — vacuum marks old tuples as "frozen" (both committed+aborted hint bits set). Frozen tuples are visible in all snapshots; their XID can be safely reused.</p>
+      <div class="fact orange">64-bit XIDs exist internally but don't go into data pages (each tuple header has 2 XIDs, adding 4 bytes per XID would be too costly).</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🌡️</span>
+      <span class="card-title">Four Freezing Parameters</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <table>
+        <tr><th>Parameter</th><th>Default</th><th>Effect</th></tr>
+        <tr><td><code>vacuum_freeze_min_age</code></td><td>50M</td><td>Min XID age before freeze. Low = more freezing overhead; high = risk of skipping hot rows.</td></tr>
+        <tr><td><code>vacuum_freeze_table_age</code></td><td>150M</td><td>When <code>age(relfrozenxid)</code> exceeds this, vacuum ignores visibility map and freezes ALL pages (aggressive mode).</td></tr>
+        <tr><td><code>autovacuum_freeze_max_age</code></td><td>200M</td><td>Forces autovacuum even if disabled, to prevent wraparound. Restart required to change.</td></tr>
+        <tr><td><code>vacuum_failsafe_age</code></td><td>1.6B</td><td>v14: if this age reached, vacuum drops index cleanup and throttling to freeze ASAP.</td></tr>
+      </table>
+      <div class="fact">Each table has <code>pg_class.relfrozenxid</code> — all XIDs older than this are guaranteed frozen. Database has <code>pg_database.datfrozenxid</code>. Autovacuum uses these to decide when to force freezing.</div>
+      <div class="fact green">Aggressive freezing scans every page but uses freeze map (<code>_vm</code> second bit) to skip already-frozen pages.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🚀</span>
+      <span class="card-title">Manual Freezing</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><code>VACUUM FREEZE table</code> — freezes all tuples regardless of age (as if freeze_min_age = 0)</li>
+        <li><code>COPY ... WITH FREEZE</code> — freezes tuples during initial bulk load (table must be created/truncated in the same transaction). Breaks RR/Serializable isolation slightly but usually acceptable for data loading.</li>
+      </ul>
+      <div class="fact yellow">After VACUUM FULL or COPY FREEZE, run regular VACUUM to set visibility map bits — otherwise even frozen pages may be revisited.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHAPTER 8 ============ -->
+<div class="chapter" id="ch8">
+  <div class="chapter-header">
+    <div class="ch-num yellow">8</div>
+    <div>
+      <h2>Rebuilding Tables &amp; Indexes</h2>
+      <div class="ch-sub">VACUUM FULL · CLUSTER · REINDEX · Preventive Measures</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🔨</span>
+      <span class="card-title">VACUUM FULL</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p>Routine VACUUM frees space within pages but rarely reduces file size (no empty tail pages). <code>VACUUM FULL</code> rebuilds the entire table + all indexes from scratch:</p>
+      <ul>
+        <li>Packs data as densely as possible (respects <code>fillfactor</code>)</li>
+        <li><strong>Exclusively locks the table</strong> (blocks ALL reads and writes)</li>
+        <li>Needs 2× disk space temporarily (old + new files)</li>
+        <li>Freezes all tuples for free</li>
+        <li>Creates new file paths (filenames change)</li>
+      </ul>
+      <div class="fact orange">After VACUUM FULL, run regular VACUUM to set visibility map — VACUUM FULL doesn't update it.</div>
+      <p>Monitor with: <code>pg_stat_progress_cluster</code> view</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🔃</span>
+      <span class="card-title">Other Rebuild Commands</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <ul>
+        <li><code>CLUSTER table USING index</code> — rebuilds like VACUUM FULL + reorders rows by index. Physical order degrades over time (no ongoing clustering). VACUUM FULL is internally a CLUSTER without reordering.</li>
+        <li><code>REINDEX</code> — rebuilds one or more indexes. Used by VACUUM FULL / CLUSTER internally.</li>
+        <li><code>TRUNCATE</code> — deletes all rows by creating new empty file. Much faster than DELETE (no tuple marking, no vacuum needed). Exclusively locks table.</li>
+      </ul>
+      <p><strong>Zero-downtime alternatives:</strong></p>
+      <ul>
+        <li><code>pg_repack</code> — rebuilds with minimal lock (exclusive only at start/end; uses trigger to replay changes)</li>
+        <li><code>pgcompacttable</code> — fake updates to gradually move rows toward file start; then truncation; no extra space needed but slower</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🛡️</span>
+      <span class="card-title">Preventive Measures Against Bloat</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <p><strong>Long-running transactions + updates = bloat.</strong> Solutions:</p>
+      <ul>
+        <li>Route long reads to replicas (OLAP vs OLTP separation)</li>
+        <li><code>idle_in_transaction_session_timeout</code> (v9.6) — abort idle transactions automatically</li>
+        <li><code>old_snapshot_threshold</code> (v9.6) — permit removing old tuples after timeout; transaction gets "snapshot too old" error if still needed</li>
+      </ul>
+      <p><strong>Batch large updates</strong> to avoid doubling table size:</p>
+      <pre style="background:var(--surface2);padding:8px;border-radius:6px;font-size:11px;margin:8px 0;overflow-x:auto;color:var(--accent2)">WITH batch AS (
+  SELECT id FROM table WHERE NOT processed 
+  LIMIT 1000 FOR UPDATE SKIP LOCKED
+)
+UPDATE table SET processed = true
+WHERE id IN (SELECT id FROM batch);</pre>
+      <p><code>SKIP LOCKED</code> allows parallel workers; vacuum can reclaim space between batches.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PARAMETER CHEATSHEET ============ -->
+<div class="chapter" id="params">
+  <div class="chapter-header">
+    <div class="ch-num" style="background:#7c5cbf">⚙</div>
+    <div>
+      <h2>Key Parameters Cheatsheet</h2>
+      <div class="ch-sub">All critical config parameters with defaults</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">📋</span>
+      <span class="card-title">Vacuum &amp; Autovacuum Parameters</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="param-grid">
+        <div class="param-item"><span class="param-name">autovacuum</span>Default: <span class="param-default">on</span> — enables autovacuum</div>
+        <div class="param-item"><span class="param-name">autovacuum_naptime</span>Default: <span class="param-default">1min</span> — worker spawn interval</div>
+        <div class="param-item"><span class="param-name">autovacuum_max_workers</span>Default: <span class="param-default">3</span> — parallel worker limit</div>
+        <div class="param-item"><span class="param-name">autovacuum_vacuum_scale_factor</span>Default: <span class="param-default">0.2</span> (20%) — ⚠️ too high for big tables</div>
+        <div class="param-item"><span class="param-name">autovacuum_vacuum_threshold</span>Default: <span class="param-default">50</span> dead tuples</div>
+        <div class="param-item"><span class="param-name">autovacuum_analyze_scale_factor</span>Default: <span class="param-default">0.1</span> (10%)</div>
+        <div class="param-item"><span class="param-name">autovacuum_analyze_threshold</span>Default: <span class="param-default">50</span> mod rows</div>
+        <div class="param-item"><span class="param-name">maintenance_work_mem</span>Default: <span class="param-default">64MB</span> — TID array for vacuum</div>
+        <div class="param-item"><span class="param-name">autovacuum_work_mem</span>Default: <span class="param-default">-1</span> (uses maintenance_work_mem)</div>
+        <div class="param-item"><span class="param-name">vacuum_cost_delay</span>Default: <span class="param-default">0</span> (no sleep for manual vacuum)</div>
+        <div class="param-item"><span class="param-name">autovacuum_vacuum_cost_delay</span>Default: <span class="param-default">2ms</span> (was 20ms pre-v14)</div>
+        <div class="param-item"><span class="param-name">vacuum_cost_limit</span>Default: <span class="param-default">200</span> cost units</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🧊</span>
+      <span class="card-title">Freezing Parameters</span>
+      <span class="card-arrow">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="param-grid">
+        <div class="param-item"><span class="param-name">vacuum_freeze_min_age</span>Default: <span class="param-default">50M</span> XID age before freeze</div>
+        <div class="param-item"><span class="param-name">vacuum_freeze_table_age</span>Default: <span class="param-default">150M</span> → aggressive (ignore VM)</div>
+        <div class="param-item"><span class="param-name">autovacuum_freeze_max_age</span>Default: <span class="param-default">200M</span> → forced autovacuum</div>
+        <div class="param-item"><span class="param-name">vacuum_failsafe_age</span>Default: <span class="param-default">1.6B</span> (v14) → emergency mode</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ QUIZ ============ -->
+<div class="chapter" id="quiz">
+  <div class="chapter-header">
+    <div class="ch-num" style="background:#e040fb">⚡</div>
+    <div>
+      <h2>Practice Quiz</h2>
+      <div class="ch-sub">Tap a question, then reveal the answer</div>
+    </div>
+  </div>
+
+  <div class="quiz-section">
+    <h3>🎯 Test Your Knowledge</h3>
+
+    <div class="quiz-item">
+      <div class="quiz-q" onclick="toggleQuiz(this)">Q1. What are the three mandatory forks of any table, and what does each do?</div>
+      <div class="quiz-a">Main fork (actual row data), Free Space Map (_fsm: tracks available space in each page), Visibility Map (_vm: two bits per page — all-visible and all-frozen). Unlogged tables also have an initialization fork (_init).</div>
+      <button class="quiz-btn" onclick="toggleQuiz(this.previousElementSibling)">Show / Hide Answer</button>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q" onclick="toggleQuiz(this)">Q2. What is the difference between Dirty Read, Non-Repeatable Read, and Phantom Read?</div>
+      <div class="quiz-a"><strong>Dirty Read</strong>: reading another transaction's uncommitted changes. <strong>Non-Repeatable Read</strong>: same row read twice, another TX updated/deleted it between reads → different result. <strong>Phantom Read</strong>: same query run twice, another TX inserted/deleted rows matching the WHERE clause → different row count.</div>
+      <button class="quiz-btn" onclick="toggleQuiz(this.previousElementSibling)">Show / Hide Answer</button>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q" onclick="toggleQuiz(this)">Q3. In PostgreSQL, what are xmin and xmax in a tuple header, and what does xmax=0 with xmax_aborted bit set mean?</div>
+      <div class="quiz-a"><strong>xmin</strong> = XID of the transaction that inserted this row version. <strong>xmax</strong> = XID of the transaction that deleted/updated it (0 means not deleted). xmax=0 with xmax_aborted bit set is the initial state for a live tuple — it means "no deleting transaction exists" (PG treats non-existent TX as aborted for visibility purposes).</div>
+      <button class="quiz-btn" onclick="toggleQuiz(this.previousElementSibling)">Show / Hide Answer</button>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q" onclick="toggleQuiz(this)">Q4. What are hint bits, why are they set lazily, and what side effect do they have?</div>
+      <div class="quiz-a">Hint bits cache the commit/abort status of xmin/xmax transactions in the tuple header to avoid repeated CLOG lookups. They are set lazily (by the first transaction to access the tuple after commit/abort) because at commit time PG doesn't know which pages were modified. Side effect: even read-only SELECT queries can dirty pages (requiring WAL records and eventual disk write).</div>
+      <button class="quiz-btn" onclick="toggleQuiz(this.previousElementSibling)">Show / Hide Answer</button>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q" onclick="toggleQuiz(this)">Q5. What is a snapshot's xmin, xmax, and xip_list, and how do they determine tuple visibility?</div>
+      <div class="quiz-a"><strong>xmin</strong>: oldest active XID when snapshot was taken — all older XIDs are committed or aborted. <strong>xmax</strong>: upper boundary (max committed XID + 1) — all XIDs ≥ xmax are invisible. <strong>xip_list</strong>: list of active XIDs at snapshot time — even if between xmin and xmax, these are NOT visible. A tuple is visible if its xmin transaction is committed and not in xip_list (or < xmin), AND its xmax transaction is not visible.</div>
+      <button class="quiz-btn" onclick="toggleQuiz(this.previousElementSibling)">Show / Hide Answer</button>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q" onclick="toggleQuiz(this)">Q6. How does HOT update work and what are its two requirements?</div>
+      <div class="quiz-a">HOT (Heap-Only Tuple) update avoids creating new index entries when an update doesn't modify any indexed columns AND the new tuple fits in the same page. The old tuple is marked "Heap Hot Updated" (HHU) with ctid pointing to new version; the new tuple is marked "Heap Only Tuple" (HOT) — not in indexes. Index keeps one entry pointing to chain head. Requirements: (1) updated column not in any index, (2) new tuple fits in same page.</div>
+      <button class="quiz-btn" onclick="toggleQuiz(this.previousElementSibling)">Show / Hide Answer</button>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q" onclick="toggleQuiz(this)">Q7. What are the four phases of VACUUM and what can go wrong if maintenance_work_mem is too small?</div>
+      <div class="quiz-a">Phases: (1) Heap Scan — collect dead tuple TIDs into memory array, (2) Index Vacuuming — full scan of each index to remove dead entries, (3) Heap Vacuuming — remove dead tuples from heap, (4) Heap Truncation — trim empty pages at file end. If maintenance_work_mem is too small, the TID array fills before the full scan completes → phases 1-3 must repeat multiple times → multiple full index scans = massive I/O. Monitor via index_vacuum_count in pg_stat_progress_vacuum.</div>
+      <button class="quiz-btn" onclick="toggleQuiz(this.previousElementSibling)">Show / Hide Answer</button>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q" onclick="toggleQuiz(this)">Q8. Why does PostgreSQL need freezing, and what is relfrozenxid?</div>
+      <div class="quiz-a">XIDs are 32-bit and wrap around after ~4 billion. PG compares transaction ages modularly (like a clock). Without intervention, an old XID will eventually appear "newer" than recent transactions — making old tuples suddenly invisible (catastrophic data loss). Freezing marks old tuples as visible-in-all-snapshots (both committed+aborted hint bits set), allowing their XIDs to be reused. <strong>relfrozenxid</strong> (in pg_class) is the XID below which all tuples in the table are guaranteed frozen — used to determine when aggressive/forced freezing is needed.</div>
+      <button class="quiz-btn" onclick="toggleQuiz(this.previousElementSibling)">Show / Hide Answer</button>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q" onclick="toggleQuiz(this)">Q9. What is the difference between page pruning and regular VACUUM?</div>
+      <div class="quiz-a"><strong>Page pruning</strong>: lightweight, single-page only, triggered automatically during reads/writes when page exceeds fillfactor. Does NOT touch indexes (leaves dead pointers) or update visibility/free space maps. Very fast. <strong>VACUUM</strong>: processes entire table, removes dead tuples from both heap AND all indexes, updates visibility map and free space map. Allows space to be reused for inserts. Can truncate file. Much more thorough but takes longer.</div>
+      <button class="quiz-btn" onclick="toggleQuiz(this.previousElementSibling)">Show / Hide Answer</button>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q" onclick="toggleQuiz(this)">Q10. What is write skew and why doesn't Repeatable Read prevent it?</div>
+      <div class="quiz-a">Write skew: T1 and T2 each read a set of rows satisfying a condition. Each independently decides it can safely update a DIFFERENT row. Both commit. Together their updates violate the consistency rule. Example: "total balance must be ≥ 0" — T1 sees $900 total and debits account A by $600; T2 also sees $900 and debits account B by $600; both commit → total is -$300. RR doesn't prevent this because the transactions update DIFFERENT rows (no serialization conflict is detected). Serializable level detects the read/write dependency cycle and aborts one transaction.</div>
+      <button class="quiz-btn" onclick="toggleQuiz(this.previousElementSibling)">Show / Hide Answer</button>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q" onclick="toggleQuiz(this)">Q11. When does autovacuum trigger and what are the autovacuum_vacuum_scale_factor thresholds?</div>
+      <div class="quiz-a">Dead tuples trigger: <code>n_dead_tup > autovacuum_vacuum_threshold(50) + autovacuum_vacuum_scale_factor(0.2) × reltuples</code>. Insert-only trigger (v13+): <code>n_ins_since_vacuum > autovacuum_vacuum_insert_threshold(1000) + autovacuum_vacuum_insert_scale_factor(0.2) × reltuples</code>. Analyze trigger: <code>n_mod_since_analyze > autovacuum_analyze_threshold(50) + autovacuum_analyze_scale_factor(0.1) × reltuples</code>. The 20% scale factor is problematic for large tables — a 10M row table needs 2M dead tuples before vacuum triggers.</div>
+      <button class="quiz-btn" onclick="toggleQuiz(this.previousElementSibling)">Show / Hide Answer</button>
+    </div>
+
+    <div class="quiz-item">
+      <div class="quiz-q" onclick="toggleQuiz(this)">Q12. What is the database horizon, and what type of transaction holds it longest?</div>
+      <div class="quiz-a">The database horizon = the oldest xmin across all active transaction snapshots. Vacuum can only remove tuples with xmax below this horizon. <strong>Longest holders</strong>: Real transactions at any isolation level, even "idle in transaction" state, hold the horizon for their entire duration. A long-running Repeatable Read/Serializable transaction is worst since its snapshot xmin is fixed for the whole transaction. Virtual transactions at RC only hold it while executing a statement.</div>
+      <button class="quiz-btn" onclick="toggleQuiz(this.previousElementSibling)">Show / Hide Answer</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>Study guide based on <em>PostgreSQL 14 Internals</em> by Egor Rogov · Postgres Professional, 2022</p>
+  <p style="margin-top:6px">All 8 chapters covered · Part I: Isolation &amp; MVCC</p>
+</div>
+
+</div><!-- .section -->
+
+<script>
+  // Toggle cards
+  document.querySelectorAll('.card-head').forEach(head => {
+    head.addEventListener('click', () => {
+      const card = head.parentElement;
+      card.classList.toggle('open');
+      updateProgress();
+    });
+  });
+
+  function toggleQuiz(el) {
+    const ans = el.classList.contains('quiz-q')
+      ? el.nextElementSibling
+      : el.previousElementSibling;
+    ans.classList.toggle('show');
+  }
+
+  function updateProgress() {
+    const total = document.querySelectorAll('.card').length;
+    const opened = document.querySelectorAll('.card.open').length;
+    const pct = Math.round((opened / total) * 100);
+    document.getElementById('progress').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = `${opened} / ${total} cards opened`;
+  }
+
+  updateProgress();
+</script>
+</body>
+</html>

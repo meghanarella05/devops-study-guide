@@ -1,0 +1,473 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.guide{padding:1.5rem 0;max-width:680px}
+.hero{text-align:center;padding:2rem 1rem 1.5rem;border-bottom:0.5px solid var(--border);margin-bottom:1.5rem}
+.hero h1{font-size:28px;font-weight:500;color:var(--text-primary);letter-spacing:-0.5px;line-height:1.2}
+.hero p{font-size:14px;color:var(--text-muted);margin-top:8px;font-style:italic}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;padding:0 0 1rem;border-bottom:0.5px solid var(--border);margin-bottom:1.5rem}
+.tab{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:400;cursor:pointer;border:0.5px solid var(--border);background:transparent;color:var(--text-secondary);transition:all 0.15s}
+.tab.active{background:var(--text-primary);color:var(--surface-2);border-color:var(--text-primary)}
+.section{display:none}
+.section.active{display:block}
+.domain{margin-bottom:2rem}
+.domain-title{font-size:13px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.card{background:var(--surface-1);border:0.5px solid var(--border);border-radius:12px;padding:1rem 1.1rem;cursor:pointer;transition:border-color 0.15s}
+.card:hover{border-color:var(--border-strong)}
+.card-icon{font-size:18px;color:var(--text-muted);margin-bottom:6px}
+.card h3{font-size:14px;font-weight:500;color:var(--text-primary);margin-bottom:4px}
+.card p{font-size:12px;color:var(--text-muted);line-height:1.5}
+.detail-panel{background:var(--surface-1);border:0.5px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;display:none}
+.detail-panel.open{display:block}
+.dp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.dp-title{font-size:16px;font-weight:500;color:var(--text-primary)}
+.dp-close{background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:20px;padding:2px 6px;border-radius:4px}
+.dp-close:hover{background:var(--surface-2);color:var(--text-primary)}
+.checklist{list-style:none}
+.checklist li{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:14px;color:var(--text-primary);line-height:1.5}
+.checklist li:last-child{border-bottom:none}
+.check{width:18px;height:18px;border:0.5px solid var(--border);border-radius:4px;flex-shrink:0;margin-top:2px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.1s}
+.check.done{background:var(--text-primary);border-color:var(--text-primary)}
+.check.done::after{content:'';width:4px;height:7px;border:1.5px solid var(--surface-2);border-top:none;border-left:none;transform:rotate(42deg) translateY(-1px)}
+.checklist li.done-item>span{color:var(--text-muted);text-decoration:line-through}
+.quote{border-left:2px solid var(--border-strong);padding:0.75rem 1rem;margin:1rem 0;background:var(--surface-2);border-radius:0 8px 8px 0}
+.quote p{font-size:13px;color:var(--text-secondary);font-style:italic;line-height:1.6}
+.quote cite{font-size:11px;color:var(--text-muted);display:block;margin-top:4px}
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;border:0.5px solid var(--border);color:var(--text-muted);margin-right:4px;margin-bottom:4px}
+.daily-stack{display:flex;flex-direction:column;gap:8px}
+.time-block{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.time-block:last-child{border-bottom:none}
+.time-label{font-size:11px;color:var(--text-muted);min-width:72px;padding-top:2px}
+.time-content h4{font-size:13px;font-weight:500;color:var(--text-primary)}
+.time-content p{font-size:12px;color:var(--text-secondary);line-height:1.5;margin-top:2px}
+.pill-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:0.5rem}
+.pill{padding:4px 12px;border-radius:20px;font-size:12px;border:0.5px solid var(--border);color:var(--text-secondary)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:460px){.two-col{grid-template-columns:1fr}}
+</style>
+
+<div class="guide">
+<div class="hero">
+  <h1>Your peak performance life guide</h1>
+  <p>Based on the Flow Research Collective curriculum — use it every day</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showSection('daily')">Daily system</button>
+  <button class="tab" onclick="showSection('flow')">Flow states</button>
+  <button class="tab" onclick="showSection('mind')">Mind & grit</button>
+  <button class="tab" onclick="showSection('body')">Body</button>
+  <button class="tab" onclick="showSection('goals')">Goals</button>
+  <button class="tab" onclick="showSection('skills')">Strengths</button>
+</div>
+
+<div id="dp" class="detail-panel">
+  <div class="dp-header">
+    <span class="dp-title" id="dp-title"></span>
+    <button class="dp-close" onclick="closeDetail()"><i class="ti ti-x"></i></button>
+  </div>
+  <div id="dp-body"></div>
+</div>
+
+<div id="daily" class="section active">
+  <div class="daily-stack">
+    <div class="time-block">
+      <span class="time-label">Wake up</span>
+      <div class="time-content">
+        <h4>Morning anchor</h4>
+        <p>Set a consistent wake time. Before touching your phone, define your single highest-leverage task for today. Hydrate immediately (one full glass).</p>
+      </div>
+    </div>
+    <div class="time-block">
+      <span class="time-label">First 90 min</span>
+      <div class="time-content">
+        <h4>Deep work block (peak performance window)</h4>
+        <p>Your first alert hours are your biological prime time. Block this for your hardest, most important work — no email, no notifications. This is your flow window.</p>
+      </div>
+    </div>
+    <div class="time-block">
+      <span class="time-label">Mid-morning</span>
+      <div class="time-content">
+        <h4>Movement + release</h4>
+        <p>15–30 min walk or light movement. This is your "release trigger" — the transition out of struggle into recovery, letting insights incubate.</p>
+      </div>
+    </div>
+    <div class="time-block">
+      <span class="time-label">Midday</span>
+      <div class="time-content">
+        <h4>Shallow work + connections</h4>
+        <p>Email, admin, meetings, communication. Protect your morning for deep work — reactive tasks belong here. Eat high protein, low sugar to avoid afternoon slump.</p>
+      </div>
+    </div>
+    <div class="time-block">
+      <span class="time-label">Afternoon</span>
+      <div class="time-content">
+        <h4>Second deep work block (optional)</h4>
+        <p>A second focused work session if needed. Followed by a parasympathetic breath reset: 4 sec inhale → 4 hold → 6 exhale → 4 hold. Repeat 10×.</p>
+      </div>
+    </div>
+    <div class="time-block">
+      <span class="time-label">Evening</span>
+      <div class="time-content">
+        <h4>Wind-down protocol</h4>
+        <p>No screens 60 min before bed. Review tomorrow's single highest-leverage task. Practice gratitude — 3 specific things. Keep the bedroom cold and dark.</p>
+      </div>
+    </div>
+    <div class="time-block">
+      <span class="time-label">Sleep</span>
+      <div class="time-content">
+        <h4>Non-negotiable (8 hrs)</h4>
+        <p>Sleep is the most impactful performance variable — above nutrition and exercise. Guard it ruthlessly. It compounds everything else on this list.</p>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:1.5rem">
+    <div class="domain-title">Daily checklist — burnout-proofing basics</div>
+    <ul class="checklist" id="daily-check">
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Prioritized sleep (8 hrs target)</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Deep work block protected (no interruptions)</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Walked 10,000+ steps</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Drank water consistently (aim for pale yellow)</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Ate whole foods, avoided hyper-palatable junk</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Said no to at least one low-leverage request</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Practiced gratitude or mindfulness (even 5 min)</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Meaningful time with someone I care about</span></li>
+    </ul>
+  </div>
+</div>
+
+<div id="flow" class="section">
+  <div class="domain-title">What flow is</div>
+  <div class="quote"><p>Flow is the state of optimal experience — complete absorption in a challenging task where time distorts, self-consciousness disappears, and performance peaks.</p></div>
+
+  <div class="domain" style="margin-top:1.5rem">
+    <div class="domain-title">The flow cycle — 4 stages</div>
+    <div class="cards">
+      <div class="card" onclick="openDetail('struggle','Struggle',struggle)">
+        <div class="card-icon"><i class="ti ti-flame" aria-hidden="true"></i></div>
+        <h3>1. Struggle</h3>
+        <p>Load your mind with the problem. Push past resistance. This stage is uncomfortable by design.</p>
+      </div>
+      <div class="card" onclick="openDetail('release','Release',release)">
+        <div class="card-icon"><i class="ti ti-wind" aria-hidden="true"></i></div>
+        <h3>2. Release</h3>
+        <p>Step away. Stop fighting. Let go of conscious control so insight can emerge.</p>
+      </div>
+      <div class="card" onclick="openDetail('flowstate','Flow',flowstate)">
+        <div class="card-icon"><i class="ti ti-bolt" aria-hidden="true"></i></div>
+        <h3>3. Flow</h3>
+        <p>Deep absorption begins. Performance and creativity peak. Protect this state.</p>
+      </div>
+      <div class="card" onclick="openDetail('recovery','Recovery',recovery)">
+        <div class="card-icon"><i class="ti ti-moon" aria-hidden="true"></i></div>
+        <h3>4. Recovery</h3>
+        <p>Replenish neurochemicals. Integrate learning. Prepare for the next cycle.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="domain">
+    <div class="domain-title">Flow triggers — use these to enter flow faster</div>
+    <div class="cards">
+      <div class="card" onclick="openDetail('challenge','Challenge / skill balance',challenge)">
+        <div class="card-icon"><i class="ti ti-adjustments" aria-hidden="true"></i></div>
+        <h3>Challenge / skill ratio</h3>
+        <p>Task must be 4–10% harder than your current skill level. Too easy = boredom. Too hard = anxiety.</p>
+      </div>
+      <div class="card" onclick="openDetail('deep','Deep embodiment',deepemb)">
+        <div class="card-icon"><i class="ti ti-body-scan" aria-hidden="true"></i></div>
+        <h3>Deep embodiment</h3>
+        <p>Full sensory engagement. Move your body, use your hands. Physical awareness accelerates flow.</p>
+      </div>
+      <div class="card" onclick="openDetail('autonomy','Autonomy',autonomy)">
+        <div class="card-icon"><i class="ti ti-key" aria-hidden="true"></i></div>
+        <h3>Autonomy</h3>
+        <p>Choose HOW you do the work. Control over method amplifies intrinsic motivation and flow.</p>
+      </div>
+      <div class="card" onclick="openDetail('feedback','Clear feedback',feedback)">
+        <div class="card-icon"><i class="ti ti-refresh" aria-hidden="true"></i></div>
+        <h3>Clear, immediate feedback</h3>
+        <p>Know instantly if you're on track. Build feedback loops into every task.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="domain">
+    <div class="domain-title">The one-day month — your deep work superweapon</div>
+    <ul class="checklist">
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Schedule 1× per month as a repeating calendar event</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Day before: define crystal-clear goals and map tasks to calendar</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Guard your sleep the night before (AC + eye mask)</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Block all technology and alert everyone you're going dark</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Automate every routine decision for that day (meals, clothes, etc.)</span></li>
+    </ul>
+  </div>
+</div>
+
+<div id="mind" class="section">
+  <div class="domain">
+    <div class="domain-title">The 5 forms of grit — train one per month</div>
+    <div class="cards">
+      <div class="card" onclick="openDetail('persevere','Grit to persevere',persevere)">
+        <h3>Grit to persevere</h3>
+        <p>Stay on task through boredom, resistance, and setbacks. The backbone of long-term achievement.</p>
+      </div>
+      <div class="card" onclick="openDetail('thoughts','Grit to control thoughts',thoughts)">
+        <h3>Grit to control thoughts</h3>
+        <p>Direct your mental narrative. Replace catastrophizing with curiosity and adaptive self-talk.</p>
+      </div>
+      <div class="card" onclick="openDetail('worst','Grit to be best at your worst',worst)">
+        <h3>Best at your worst</h3>
+        <p>Perform when tired, sick, or stressed. Build systems that work even when motivation fails.</p>
+      </div>
+      <div class="card" onclick="openDetail('fear','Grit to master fear',feargrit)">
+        <h3>Grit to master fear</h3>
+        <p>Fear doesn't stop. You act anyway. Recognize and use fear as a signal, not a stop sign.</p>
+      </div>
+      <div class="card" onclick="openDetail('recover2','Grit to recover',recover2)">
+        <h3>Grit to recover</h3>
+        <p>Bounce back from failure, injury, or loss. Recovery is a skill, not just time passing.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="domain">
+    <div class="domain-title">80/20 EQ — the emotional skills that move the needle</div>
+    <div class="cards">
+      <div class="card" onclick="openDetail('selfctrl','Self-control',selfctrl)">
+        <div class="card-icon"><i class="ti ti-shield" aria-hidden="true"></i></div>
+        <h3>Delay gratification</h3>
+        <p>Stifle impulsiveness. Choose the action that serves your future self, not your present comfort.</p>
+      </div>
+      <div class="card" onclick="openDetail('selfaware','Self-awareness',selfaware)">
+        <div class="card-icon"><i class="ti ti-eye" aria-hidden="true"></i></div>
+        <h3>Know yourself</h3>
+        <p>Recognize your emotional triggers, strengths, weaknesses, and patterns before they run you.</p>
+      </div>
+      <div class="card" onclick="openDetail('empathy','Empathy',empathy)">
+        <div class="card-icon"><i class="ti ti-heart" aria-hidden="true"></i></div>
+        <h3>Empathy</h3>
+        <p>Understand others' perspectives and emotional states. The foundation of collaboration and leadership.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="domain">
+    <div class="domain-title">Overwhelm assassination — 10-step protocol</div>
+    <ul class="checklist" id="overwhelm-check">
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Qualify urgency — is this truly urgent or just loud?</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Blanket ban everything non-essential to a fixed future date</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Process linearly — one thing at a time, completely</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Go dark — remove yourself from the stimulus</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Change your explanatory style (this is temporary, not permanent)</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Reduce cognitive load — eliminate, simplify, automate</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Cut losses with cutthroat prioritization (ruthless triage)</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Accept small sacrifices — let some things drop</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Avoid meta-stress — radical acceptance of what you can't control</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Take a walk, breathe — walks, breaks, and breath resets</span></li>
+    </ul>
+  </div>
+</div>
+
+<div id="body" class="section">
+  <div class="domain">
+    <div class="domain-title">The 80/20 of health — in priority order</div>
+    <div class="cards">
+      <div class="card" onclick="openDetail('sleep2','Sleep (priority #1)',sleep2)">
+        <div class="card-icon"><i class="ti ti-moon-stars" aria-hidden="true"></i></div>
+        <h3>Sleep</h3>
+        <p>The single highest-leverage health variable. Everything else depends on this. 8 hrs, consistent schedule, cold dark room.</p>
+      </div>
+      <div class="card" onclick="openDetail('nutrition','Nutrition (priority #2)',nutrition)">
+        <div class="card-icon"><i class="ti ti-leaf" aria-hidden="true"></i></div>
+        <h3>Nutrition</h3>
+        <p>High satiety, low calorie density foods. Narrow your eating window. Avoid hyper-palatable processed food.</p>
+      </div>
+      <div class="card" onclick="openDetail('exercise','Exercise (priority #3)',exercise)">
+        <div class="card-icon"><i class="ti ti-run" aria-hidden="true"></i></div>
+        <h3>Exercise</h3>
+        <p>150 min moderate or 75 min vigorous aerobic per week. Daily movement practice. Walk 10k steps minimum.</p>
+      </div>
+      <div class="card" onclick="openDetail('psych','Psychological wellbeing',psych)">
+        <div class="card-icon"><i class="ti ti-brain" aria-hidden="true"></i></div>
+        <h3>Psychological wellbeing</h3>
+        <p>Mindfulness, gratitude, relationships, setting limits. This runs parallel to the other three and amplifies them.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="domain">
+    <div class="domain-title">Daily movement practice (5–10 min)</div>
+    <ul class="checklist" id="move-check">
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Forward bend into deep squat — breathe in/out slowly</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Cat/cow spinal movement from yoga</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Spinal and thoracic rotations left and right</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>3 rounds of sun salutations — coordinating breath with movement</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Foam rolling (hip flexors, thoracic spine, calves)</span></li>
+    </ul>
+  </div>
+
+  <div class="domain">
+    <div class="domain-title">Hydration protocol</div>
+    <ul class="checklist">
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Always have a water bottle on hand — keep it full</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Maintain 1:3 coffee-to-water ratio when drinking coffee</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Rehydrate hard after exercise (electrolytes + water)</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Aim for almost-clear urine color as target</span></li>
+    </ul>
+  </div>
+
+  <div class="domain">
+    <div class="domain-title">Sensory gating — protect your nervous system</div>
+    <div class="pill-row">
+      <span class="pill">Wear sunglasses in harsh light</span>
+      <span class="pill">Noise-cancelling headphones</span>
+      <span class="pill">Eye mask for sleep</span>
+      <span class="pill">Sit with back to wall in loud spaces</span>
+      <span class="pill">Enter hyper-stimulating environments with a clear action list</span>
+    </div>
+  </div>
+</div>
+
+<div id="goals" class="section">
+  <div class="domain">
+    <div class="domain-title">Goal stacking — all time horizons in alignment</div>
+    <div class="cards">
+      <div class="card" onclick="openDetail('mtp','Massive transformative purpose',mtp)">
+        <div class="card-icon"><i class="ti ti-rocket" aria-hidden="true"></i></div>
+        <h3>Massive transformative purpose</h3>
+        <p>Your north star. Why you exist professionally. Guides every decision at every level below.</p>
+      </div>
+      <div class="card" onclick="openDetail('hhg','High hard goals (1–5 years)',hhg)">
+        <div class="card-icon"><i class="ti ti-mountain" aria-hidden="true"></i></div>
+        <h3>High hard goals</h3>
+        <p>Measurable, definable, binary. Specific enough to know exactly when you've achieved them.</p>
+      </div>
+      <div class="card" onclick="openDetail('annual','Annual goals',annual)">
+        <div class="card-icon"><i class="ti ti-calendar" aria-hidden="true"></i></div>
+        <h3>Annual goals</h3>
+        <p>What this calendar year must deliver toward your high hard goal. Concrete and measurable.</p>
+      </div>
+      <div class="card" onclick="openDetail('quarterly','Quarterly goals',quarterly)">
+        <div class="card-icon"><i class="ti ti-calendar-month" aria-hidden="true"></i></div>
+        <h3>Quarterly goals</h3>
+        <p>The 90-day sprint. Very specific deliverables that advance the annual goal.</p>
+      </div>
+      <div class="card" onclick="openDetail('monthly','Weekly and daily targets',monthly)">
+        <div class="card-icon"><i class="ti ti-list-check" aria-hidden="true"></i></div>
+        <h3>Weekly and daily targets</h3>
+        <p>The ground game. Today's single most important task that moves the quarterly goal forward.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="domain">
+    <div class="domain-title">Vision of dangerous — your definition of peak life</div>
+    <div class="quote"><p>Define it concretely: how you feel internally each morning, how you engage with loved ones, what your environment contains, what work you do, what you're proud of, and what three words describe your lifestyle at its best.</p></div>
+    <div style="margin-top:1rem">
+      <div class="domain-title">Review this quarterly — ask yourself:</div>
+      <ul class="checklist">
+        <li><div class="check" onclick="toggleCheck(this)"></div><span>What 3 things am I most proud of accomplishing in the past 3 months?</span></li>
+        <li><div class="check" onclick="toggleCheck(this)"></div><span>What has gotten meaningfully easier for me?</span></li>
+        <li><div class="check" onclick="toggleCheck(this)"></div><span>What new goals have emerged?</span></li>
+        <li><div class="check" onclick="toggleCheck(this)"></div><span>Am I spending time in the ways this vision requires?</span></li>
+        <li><div class="check" onclick="toggleCheck(this)"></div><span>What are the 3 things I'm most excited about right now?</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div id="skills" class="section">
+  <div class="domain">
+    <div class="domain-title">Identifying your strengths — the Buckingham test</div>
+    <div class="quote"><p>A true strength meets all four criteria: you're great at it (not just good), anticipating it creates excitement, you drop into flow easily doing it, and performing it energizes rather than drains you.</p></div>
+  </div>
+
+  <div class="domain">
+    <div class="domain-title">Strengths assessment protocol</div>
+    <ul class="checklist" id="strength-check">
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Take Angela Duckworth's Grit Scale assessment</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Take StrengthsFinder 2.0 (by Tom Rath) — find your top 5</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>List activities where you consistently enter flow</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Identify your "Buckingham strengths" — what energizes AND you excel at</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Ask 3 people who know you well: "what do you see me doing at my best?"</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Build your "baseball card" — a one-page profile of your strengths, tendencies, and weaknesses</span></li>
+    </ul>
+  </div>
+
+  <div class="domain">
+    <div class="domain-title">The million dollar question</div>
+    <div style="background:var(--surface-1);border:0.5px solid var(--border);border-radius:12px;padding:1.25rem;text-align:center">
+      <p style="font-size:15px;color:var(--text-primary);line-height:1.6;font-style:italic">"How would you engage yourself daily if money was infinite?"</p>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:8px">Your answer points directly to your latent leverage — what you're uniquely positioned to do in the world.</p>
+    </div>
+  </div>
+
+  <div class="domain">
+    <div class="domain-title">Amygdala bias warning</div>
+    <div class="quote"><p>Your brain is evolutionarily wired to direct attention to weaknesses, not strengths. This is a protection mechanism — but it actively blocks peak performance. Build your life and career around your strengths; manage, don't obsess over, your weaknesses.</p></div>
+  </div>
+
+  <div class="domain">
+    <div class="domain-title">Feedback mastery — how elite performers operate</div>
+    <ul class="checklist">
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Hunt feedback actively — don't wait for it or avoid it</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Seek immediate feedback wherever possible — build it into your workflow</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Treat all feedback as data, not identity — detach ego from results</span></li>
+      <li><div class="check" onclick="toggleCheck(this)"></div><span>Distinguish feedback (information) from reassurance (emotional validation) — you want the former</span></li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<script>
+const struggle=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Load the problem deeply — read, research, immerse in complexity</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Push past initial resistance (this discomfort is the neurological loading phase)</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Be willing to struggle long enough before releasing — don't quit too soon</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Avoid self-distraction during the struggle phase — stay in it</span></li></ul>`;
+const release=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Take a release walk — exercise-induced transient hypofrontality</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Box breathing: 4 sec inhale → 4 hold → 6 exhale → 4 hold (10 rounds)</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Slow, gentle stretching — completely non-cognitive</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Build your personal list of release triggers (what works for you?)</span></li></ul>`;
+const flowstate=`<div class="quote"><p>When flow arrives: protect it at all costs. Don't check messages. Don't switch tasks. Don't break the absorption. A flow state can last 90–120 minutes — the neurochemical cocktail is expensive to recreate.</p></div><ul class="checklist" style="margin-top:1rem"><li><div class="check" onclick="toggleCheck(this)"></div><span>No phone or notifications during a flow session</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Close all browser tabs unrelated to the task</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Use noise-cancelling headphones or music without lyrics</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Let others know you're unavailable for the block</span></li></ul>`;
+const recovery=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Active recovery (walk, stretch, light movement) — not more screen time</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Nutrition: replenish after deep cognitive work</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Sleep: where memory consolidation and neurochemical replenishment happen</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Mindfulness or stillness — even 10 minutes changes the recovery curve</span></li></ul>`;
+const challenge=`<div class="quote"><p>The sweet spot for flow is tasks that are 4–10% beyond your current ability. Too easy and your brain checks out. Too hard and anxiety blocks access. Calibrate intentionally.</p></div><ul class="checklist" style="margin-top:1rem"><li><div class="check" onclick="toggleCheck(this)"></div><span>Identify your current skill level in the target domain</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Adjust task difficulty up or down to stay in the challenge band</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>If bored: add constraints, raise the stakes, or time-pressure the work</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>If anxious: break the task into smaller, more achievable steps</span></li></ul>`;
+const deepemb=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Daily movement practice — engage the body to engage the mind</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Practice mindful interoception — regularly check in with body sensations</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Yoga, tai chi, pilates, or dance — any body-mind integration practice</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Use your hands during creative work where possible</span></li></ul>`;
+const autonomy=`<div class="quote"><p>Autonomy is one of the most powerful flow triggers. Even in constrained environments, choosing HOW to approach a task dramatically increases intrinsic motivation and flow access.</p></div><ul class="checklist" style="margin-top:1rem"><li><div class="check" onclick="toggleCheck(this)"></div><span>Negotiate for control over method, not just outcome</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>When given a task, choose your own approach before defaulting to convention</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Protect your deep work time as non-negotiable — it is your highest autonomy</span></li></ul>`;
+const feedback=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Build a way to measure progress into every project before you start</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Make feedback immediate — the shorter the loop, the deeper the flow</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Hunt feedback, don't avoid it — treat it as data, not judgment</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Create personal dashboards or scorecards for your key performance domains</span></li></ul>`;
+const sleep2=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Consistent wake and sleep time — 7 days a week</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Bedroom cold (65–68°F / 18–20°C), dark, and quiet</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>No screens 60 minutes before bed</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Avoid alcohol — it fragments sleep architecture even if it aids falling asleep</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>No caffeine after 1pm (half-life is 5–7 hours)</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Use eye mask and earplugs if environment isn't ideal</span></li></ul>`;
+const nutrition=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Track caloric intake — awareness alone shifts behavior</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Walk 10,000+ steps per day to boost energy expenditure without spiking appetite</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Eat high-volume, low-calorie foods (vegetables) — high satiety, lower overall intake</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Narrow your feeding window — 8–12 hours, fast the rest</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Avoid hyper-palatable calorie-dense processed foods</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Review supplements at examine.com — remove unnecessary ones</span></li></ul>`;
+const exercise=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>150 min moderate aerobic activity per week (or 75 min vigorous)</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Spread sessions throughout the week — daily beats cramming</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Daily movement practice: bend, squat, cat/cow, rotations, sun salutations</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Walk 10,000+ steps — boosts endocannabinoid system, enhances mood and focus</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Resistance training 2× per week (bodyweight, kettlebell, or gym)</span></li></ul>`;
+const psych=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Daily gratitude practice — 3 specific things, not generic ones</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Mindfulness or meditation — even 10 minutes reshapes stress response</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Prioritize in-person relationships — schedule them, don't leave them to chance</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Say no and set limits — protecting your energy IS performance</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Engage in at least one flow-inducing hobby outside of work</span></li></ul>`;
+const mtp=`<div class="quote"><p>Your Massive Transformative Purpose is the "why" behind everything. It should be so compelling it pulls you forward even on hard days. It lives above all your specific goals and guides how you allocate your finite time and energy.</p></div><p style="font-size:13px;color:var(--text-secondary);margin-top:1rem;line-height:1.6">Write yours as: "To [action verb] [impact] for [who] so that [why it matters]."</p>`;
+const hhg=`<div class="quote"><p>High hard goals span 1–5 years and must be measurable, definable, and binary — you either achieved them or you didn't. Ambiguous goals produce ambiguous effort.</p></div><ul class="checklist" style="margin-top:1rem"><li><div class="check" onclick="toggleCheck(this)"></div><span>Write your high hard goal in a single specific sentence</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Add a measurable threshold (number, date, milestone)</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Confirm it connects directly to your MTP</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Review it weekly</span></li></ul>`;
+const annual=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Set your annual goal at the start of each calendar year</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Make it measurable, definable, and binary</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Ensure it's a direct stepping stone toward your high hard goal</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Review and adjust at mid-year</span></li></ul>`;
+const quarterly=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Set quarterly goals aligned to each financial quarter</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Make them very specific deliverables, not vague intentions</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>They should be achievable in 90 days with focused effort</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Review weekly — adjust tactically, not strategically</span></li></ul>`;
+const monthly=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Each Monday: identify your single most important task for the week</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Each morning: identify today's highest-leverage task and do it first</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Ask daily: "Does what I'm doing right now move my quarterly goal forward?"</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>End each week with a 15-min review — what moved, what didn't, what to adjust</span></li></ul>`;
+const persevere=`<div class="quote"><p>Schedule perseverance training: pick one domain where you quit too early and deliberately extend the duration of effort before stopping. Log it.</p></div><ul class="checklist" style="margin-top:1rem"><li><div class="check" onclick="toggleCheck(this)"></div><span>Identify one current goal where you're prone to quitting</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Set a new minimum — "I will persist for X longer than feels comfortable"</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Log each time you push through the quit point</span></li></ul>`;
+const thoughts=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>When a catastrophizing thought arises, name it: "That's a catastrophizing thought"</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Replace with a curiosity frame: "What's actually true here?"</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Practice cognitive defusion — thoughts are events, not facts</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Build a personal list of adaptive self-talk phrases that work for you</span></li></ul>`;
+const worst=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Build systems and routines that work even when motivation is zero</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Train in suboptimal conditions occasionally — tired, hungry, uncomfortable</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Develop a "minimum viable performance" protocol for bad days</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Separate identity from state: "I feel bad today" not "I am bad at this"</span></li></ul>`;
+const feargrit=`<div class="quote"><p>Fear is the most common emotion in peak performers' lives — not its absence. The difference is what they choose to do with it.</p><cite>— Laird Hamilton</cite></div><ul class="checklist" style="margin-top:1rem"><li><div class="check" onclick="toggleCheck(this)"></div><span>Name the specific fear — vague fear is stronger than named fear</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Identify the worst realistic outcome — it's usually survivable</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Take one action toward the fear before analyzing it to death</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Debrief after: what actually happened vs. what you feared?</span></li></ul>`;
+const recover2=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Allow yourself to grieve or process — suppression delays recovery</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Reframe the failure as data: what does this teach?</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Take one forward action within 24 hours of a setback</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Maintain physical basics (sleep, movement, nutrition) through hard periods</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Lean on relationships — social support is a recovery multiplier</span></li></ul>`;
+const selfctrl=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Pause 10 seconds before any impulsive decision</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Ask: "Does this action serve my 3-month self or my right-now self?"</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Remove temptation from your environment — friction is your friend</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Build routines that automate the right choice (no willpower needed)</span></li></ul>`;
+const selfaware=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Journal 5 min daily — what triggered you emotionally today and why?</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>After each important decision, note your emotional state at the time</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Take a strengths assessment and a personality profile — map your patterns</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Ask for honest feedback from 3 trusted people annually</span></li></ul>`;
+const empathy=`<ul class="checklist"><li><div class="check" onclick="toggleCheck(this)"></div><span>Before responding to a difficult person, name what emotion they're likely experiencing</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Ask one extra question before offering solutions: "Tell me more about that"</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Practice perspective-taking: "If I were them, what would matter most right now?"</span></li><li><div class="check" onclick="toggleCheck(this)"></div><span>Distinguish empathy (feeling with) from agreement — you can understand without endorsing</span></li></ul>`;
+
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  closeDetail();
+}
+function openDetail(id,title,content){
+  document.getElementById('dp-title').textContent=title;
+  document.getElementById('dp-body').innerHTML=content;
+  const dp=document.getElementById('dp');
+  dp.classList.add('open');
+  dp.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeDetail(){document.getElementById('dp').classList.remove('open')}
+function toggleCheck(el){
+  el.classList.toggle('done');
+  const li=el.closest('li');
+  const span=li.querySelector('span');
+  li.classList.toggle('done-item');
+}
+</script>

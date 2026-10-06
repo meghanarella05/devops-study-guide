@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>Programming TypeScript — Exam Cram</title>
+<style>
+  :root{
+    --bg:#0d1117;
+    --panel:#151b23;
+    --panel2:#1c2430;
+    --ink:#e6edf3;
+    --muted:#8b98a5;
+    --accent:#5ee6c1;
+    --accent2:#ffb454;
+    --danger:#ff6b6b;
+    --code-bg:#0a0e14;
+    --border:#2a3441;
+    --kw:#ff7b9c;
+    --type:#5ee6c1;
+    --str:#ffb454;
+    --com:#6b7785;
+    --fn:#82aaff;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-text-size-adjust:100%;}
+  .wrap{max-width:760px;margin:0 auto;padding:0 14px 80px;}
+  header.top{position:sticky;top:0;z-index:50;background:rgba(13,17,23,0.96);
+    backdrop-filter:blur(6px);border-bottom:1px solid var(--border);padding:10px 14px;}
+  header.top .row{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  header.top h1{font-size:15px;margin:0;font-weight:700;letter-spacing:.2px;}
+  header.top h1 span{color:var(--accent);}
+  #timer{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;background:var(--panel2);
+    border:1px solid var(--border);border-radius:8px;padding:4px 10px;color:var(--accent2);white-space:nowrap;}
+  .hero{padding:18px 0 6px;}
+  .hero h2{font-size:22px;margin:6px 0 4px;}
+  .hero p{color:var(--muted);font-size:13.5px;margin:0;line-height:1.5;}
+  nav.toc{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 6px;}
+  nav.toc a{font-size:11.5px;background:var(--panel2);border:1px solid var(--border);color:var(--ink);
+    padding:5px 9px;border-radius:20px;text-decoration:none;}
+  nav.toc a:active{background:var(--accent);color:#06241c;}
+
+  section.block{margin:22px 0;}
+  .cram{background:linear-gradient(155deg,#1a2e29,#151b23);border:1px solid #2f6b56;border-radius:14px;padding:16px;}
+  .cram h2{margin:0 0 10px;font-size:16px;color:var(--accent);}
+  .cram ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.55;}
+  .cram li{margin-bottom:6px;}
+  .cram code{background:var(--code-bg);padding:1px 5px;border-radius:5px;font-size:12.5px;}
+
+  details.ch{background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;}
+  details.ch>summary{list-style:none;cursor:pointer;padding:13px 14px;display:flex;align-items:center;gap:10px;font-weight:600;font-size:14.5px;}
+  details.ch>summary::-webkit-details-marker{display:none;}
+  details.ch>summary .num{background:var(--accent);color:#06241c;font-size:11px;font-weight:800;
+    width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  details.ch>summary .car{margin-left:auto;color:var(--muted);transition:transform .15s;font-size:12px;}
+  details.ch[open]>summary .car{transform:rotate(90deg);}
+  .ch-body{padding:0 14px 16px;font-size:13.5px;line-height:1.6;}
+  .ch-body h4{font-size:13px;color:var(--accent2);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.4px;}
+  .ch-body h4:first-child{margin-top:4px;}
+  .ch-body p{margin:4px 0 8px;color:#cdd6e0;}
+  .ch-body ul{margin:4px 0 10px;padding-left:18px;}
+  .ch-body li{margin-bottom:4px;}
+  .ch-body b{color:var(--ink);}
+
+  pre{background:var(--code-bg);border:1px solid var(--border);border-radius:9px;padding:10px 12px;
+    overflow-x:auto;font-size:12.3px;line-height:1.5;margin:6px 0 12px;-webkit-overflow-scrolling:touch;}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+  pre code{color:#d6dee8;}
+  .kw{color:var(--kw);} .ty{color:var(--type);} .st{color:var(--str);} .cm{color:var(--com);font-style:italic;} .fn{color:var(--fn);}
+
+  .trap{background:#2a1518;border:1px solid #5c2630;border-radius:9px;padding:9px 11px;margin:8px 0;font-size:12.8px;}
+  .trap b{color:var(--danger);}
+
+  .quizsec{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:24px;}
+  .quizsec h2{font-size:16px;margin:0 0 4px;color:var(--accent2);}
+  .quizsec>p{color:var(--muted);font-size:12.5px;margin:0 0 12px;}
+  .card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;}
+  .card .q{font-size:13.3px;font-weight:600;}
+  .card .a{display:none;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-size:13px;color:var(--accent);}
+  .card.open .a{display:block;}
+  .card .tag{font-size:10px;color:var(--muted);float:right;}
+  .progress{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;color:var(--muted);}
+  #shuffleBtn{background:var(--accent);color:#06241c;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;}
+
+  footer{text-align:center;color:var(--muted);font-size:11.5px;margin-top:30px;padding-bottom:10px;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="row">
+    <h1>📘 Programming<span>TypeScript</span> Cram</h1>
+    <div id="timer">⏱ --:--</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h2>13 chapters → 1 exam</h2>
+    <p>Boris Cherny's <i>Programming TypeScript</i>, compressed. Start with the cram box, skim chapters in order if you have time, hit the flashcards last for active recall.</p>
+  </div>
+
+  <nav class="toc">
+    <a href="#cram">⚡ Cram</a>
+    <a href="#c1">1 Intro</a><a href="#c2">2 10k View</a><a href="#c3">3 Types</a>
+    <a href="#c4">4 Functions</a><a href="#c5">5 Classes</a><a href="#c6">6 Advanced</a>
+    <a href="#c7">7 Errors</a><a href="#c8">8 Async</a><a href="#c9">9 Frameworks</a>
+    <a href="#c10">10 Modules</a><a href="#c11">11 Interop</a><a href="#c12">12 Build</a>
+    <a href="#c13">13 Wrap-up</a><a href="#quiz">🧠 Quiz</a>
+  </nav>
+
+  <section class="block cram" id="cram">
+    <h2>⚡ 60-Second Cram (read this even if nothing else)</h2>
+    <ul>
+      <li><b>Structural typing:</b> TS cares about shape, not name. If it has the right fields/methods, it's compatible — no <code>implements</code> needed.</li>
+      <li><b>any vs unknown:</b> <code>any</code> disables checking entirely. <code>unknown</code> is safe — you must narrow/assert before using it.</li>
+      <li><b>never</b> = subtype of everything, occurs with unreachable code / exhaustiveness checks. <b>any</b> = super/subtype of everything (escape hatch).</li>
+      <li><b>Type widening:</b> <code>let x = 'a'</code> widens to <code>string</code>; <code>const x = 'a'</code> stays literal <code>'a'</code>.</li>
+      <li><code>interface</code> can be declaration-merged & extended; <code>type</code> alias cannot be reopened but supports unions/conditional types. Interfaces extend with <code>extends</code>; type aliases "extend" via <code>&amp;</code>.</li>
+      <li><b>Function param bivariance:</b> method params are checked bivariantly (looser); standalone function params are checked contravariantly (stricter) under <code>strictFunctionTypes</code>.</li>
+      <li><b>keyof</b> gets a union of property names; <b>typeof</b> gets the type of a value; <code>T[K]</code> is a lookup/indexed-access type.</li>
+      <li><b>Mapped types:</b> <code>{ [K in keyof T]: T[K] }</code> — base of <code>Partial</code>, <code>Readonly</code>, <code>Record</code>, <code>Pick</code>.</li>
+      <li><b>Conditional types:</b> <code>T extends U ? X : Y</code>; <code>infer</code> pulls a type out mid-condition (used in <code>ReturnType&lt;T&gt;</code>).</li>
+      <li><b>Type guards:</b> narrowing via <code>typeof</code>, <code>instanceof</code>, <code>in</code>, discriminated unions (a shared literal "tag" field), or a custom <code>function isFoo(x): x is Foo</code>.</li>
+      <li><b>Assertions are NOT casts:</b> <code>as</code> / <code>!</code> tell the compiler "trust me," they do nothing at runtime and can produce real bugs if wrong.</li>
+      <li><b>tsconfig:</b> <code>strict: true</code> turns on <code>strictNullChecks</code>, <code>noImplicitAny</code>, <code>strictFunctionTypes</code>, etc. Always exam-favorite.</li>
+      <li><b>Modules vs Namespaces:</b> use ES modules (<code>import</code>/<code>export</code>) for real projects; namespaces are legacy, mainly for global-script / ambient typing.</li>
+      <li><b>.d.ts files</b> contain only types/declarations, never runtime code — used for <code>@types/*</code> packages and untyped JS interop.</li>
+      <li><b>tsc</b> = TypeScript compiler/typechecker; it both <i>checks</i> types and <i>emits</i> JS. <code>--noEmit</code> checks only.</li>
+    </ul>
+  </section>
+
+  <!-- CHAPTER 1 -->
+  <details class="ch" id="c1" open>
+    <summary><span class="num">1</span> Introduction<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <p>Why TypeScript: JS lets you call methods on <code>undefined</code>, pass wrong arg counts, typo properties — and the bug only shows up <i>at runtime</i>. A <b>type system</b> is a set of rules a checker uses to assign types to a program and flag mismatches <i>before</i> running it.</p>
+      <h4>Key terms</h4>
+      <ul>
+        <li><b>Type checker</b> — validates your code against rules; catches type errors at compile time.</li>
+        <li><b>Compiler</b> — turns TS into plain JS (downlevels new syntax for older runtimes too).</li>
+        <li><b>Static vs dynamic typing</b> — static = checked before running (TS); dynamic = checked while running (JS).</li>
+        <li>TS is a <b>superset of JS</b> — all valid JS is (almost) valid TS.</li>
+      </ul>
+      <div class="trap">🪤 Exam trap: TypeScript code still ultimately compiles down to JavaScript — types are erased at runtime, they have <b>zero runtime cost/representation</b>.</div>
+    </div>
+  </details>
+
+  <!-- CHAPTER 2 -->
+  <details class="ch" id="c2">
+    <summary><span class="num">2</span> TypeScript: A 10,000-Foot View<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <h4>Compiler pipeline</h4>
+      <p>Code → <b>Parser</b> (tokens → AST) → <b>Type checker</b> (checks AST, infers/validates types) → <b>Emitter</b> (AST + types → JS). <code>tsc</code> can run just the checker (<code>--noEmit</code>) or also emit.</p>
+      <h4>Core ideas</h4>
+      <ul>
+        <li><b>Type inference</b> — TS guesses types from how you initialize/use a value, so you often don't annotate everything.</li>
+        <li><b>Structural typing</b> — compatibility is based on members present, not declared names/inheritance (unlike Java/C#'s nominal typing).</li>
+        <li>TS adds types <i>on top of</i> JS — values still exist only at runtime; types only exist at compile time (erased after).</li>
+      </ul>
+      <pre><code><span class="kw">function</span> <span class="fn">add</span>(a<span class="ty">: number</span>, b<span class="ty">: number</span>) {
+  <span class="kw">return</span> a + b   <span class="cm">// return type inferred: number</span>
+}</code></pre>
+    </div>
+  </details>
+
+  <!-- CHAPTER 3 -->
+  <details class="ch" id="c3">
+    <summary><span class="num">3</span> All About Types<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <h4>The type universe (top → bottom)</h4>
+      <p><code>any</code> (top, opt-out of checking) → object types/unions → primitives → <code>never</code> (bottom, no values, unreachable).</p>
+      <h4>Primitives & special types</h4>
+      <ul>
+        <li><code>boolean</code>, <code>number</code>, <code>string</code>, <code>bigint</code>, <code>symbol</code></li>
+        <li><b>Literal types</b>: <code>let dir: 'up'|'down'</code> — a specific value as its own type.</li>
+        <li><code>null</code> / <code>undefined</code> — with <code>strictNullChecks</code>, NOT assignable to other types unless explicitly unioned.</li>
+        <li><code>void</code> — return type meaning "nothing useful returned" (functions with side effects).</li>
+        <li><code>never</code> — function never returns (throws/infinite loop) or unreachable type after narrowing.</li>
+        <li><code>unknown</code> — type-safe <code>any</code>: anything assignable to it, but it's assignable to nothing until narrowed.</li>
+      </ul>
+      <h4>Object types</h4>
+      <pre><code><span class="kw">let</span> obj<span class="ty">: {x: number, y?: string}</span> = {x: 1}  <span class="cm">// y is optional</span>
+<span class="kw">type</span> Dict = {[key<span class="ty">: string</span>]<span class="ty">: number</span>}      <span class="cm">// index signature</span></code></pre>
+      <ul>
+        <li><b>Arrays</b>: <code>number[]</code> or <code>Array&lt;number&gt;</code>.</li>
+        <li><b>Tuples</b>: <code>[string, number]</code> — fixed length & per-slot types; can label slots, support optional/rest elements.</li>
+        <li><b>enum</b>: named set of numeric/string constants; <code>const enum</code> is inlined at compile time (no object emitted) — faster, less reflective.</li>
+        <li><b>type alias</b> vs <b>interface</b>: aliases can name unions/primitives/tuples; interfaces describe object shapes and support declaration merging + <code>extends</code>.</li>
+      </ul>
+      <pre><code><span class="kw">interface</span> Animal { name<span class="ty">: string</span> }
+<span class="kw">interface</span> Animal { age<span class="ty">: number</span> }  <span class="cm">// merges! Animal now needs name AND age</span>
+
+<span class="kw">type</span> ID = string | number      <span class="cm">// union</span>
+<span class="kw">type</span> Both = A & B             <span class="cm">// intersection</span></code></pre>
+      <div class="trap">🪤 Trap: union (<code>|</code>) = "could be either," you can only use members <i>common to all</i> without narrowing. Intersection (<code>&amp;</code>) = "must satisfy both," combines all members.</div>
+    </div>
+  </details>
+
+  <!-- CHAPTER 4 -->
+  <details class="ch" id="c4">
+    <summary><span class="num">4</span> Functions<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <h4>Declaring functions</h4>
+      <pre><code><span class="kw">function</span> <span class="fn">greet</span>(name<span class="ty">: string</span>, greeting = <span class="st">'Hi'</span>)<span class="ty">: string</span> {
+  <span class="kw">return</span> `${greeting}, ${name}`
+}
+<span class="cm">// rest params</span>
+<span class="kw">function</span> <span class="fn">sum</span>(...nums<span class="ty">: number[]</span>)<span class="ty">: number</span> { ... }</code></pre>
+      <ul>
+        <li><b>Optional params</b> (<code>name?: string</code>) must come after required ones; <b>default params</b> are optional automatically.</li>
+        <li><b>Overloads</b>: multiple call signatures for one implementation, resolved top-to-bottom by the checker.</li>
+        <li><b>this types</b>: you can type <code>this</code> as the first "fake" parameter to control method context safely.</li>
+        <li><b>Generics</b>: <code>function id&lt;T&gt;(x: T): T</code> — preserves the specific type through a function instead of widening to a union/any.</li>
+      </ul>
+      <h4>Variance of function types (high-yield)</h4>
+      <ul>
+        <li><b>Parameters are (checked) contravariantly</b>: a function accepting a wider/supertype param is a subtype of one accepting a narrower one — fewer assumptions about input = safer to substitute.</li>
+        <li><b>Return types are covariant</b>: a function returning a narrower/subtype is a subtype — fine to give "more than promised."</li>
+        <li>Methods (vs standalone function types) are checked <b>bivariantly</b> by default — looser, a known unsoundness for OOP ergonomics.</li>
+      </ul>
+      <pre><code><span class="kw">function</span> <span class="fn">map</span>&lt;T, U&gt;(arr<span class="ty">: T[]</span>, f<span class="ty">: (t: T) =&gt; U</span>)<span class="ty">: U[]</span> {
+  <span class="kw">return</span> arr.map(f)
+}</code></pre>
+    </div>
+  </details>
+
+  <!-- CHAPTER 5 -->
+  <details class="ch" id="c5">
+    <summary><span class="num">5</span> Classes and Interfaces<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <pre><code><span class="kw">class</span> <span class="fn">Animal</span> {
+  <span class="kw">private</span> name<span class="ty">: string</span>
+  <span class="kw">protected</span> <span class="kw">readonly</span> id<span class="ty">: number</span>
+  <span class="kw">constructor</span>(name<span class="ty">: string</span>) { <span class="kw">this</span>.name = name; <span class="kw">this</span>.id = 1 }
+  <span class="fn">speak</span>()<span class="ty">: void</span> { console.log(<span class="kw">this</span>.name) }
+}
+<span class="kw">class</span> <span class="fn">Dog</span> <span class="kw">extends</span> Animal {
+  <span class="fn">speak</span>() { <span class="kw">super</span>.speak(); console.log(<span class="st">'Woof'</span>) }
+}</code></pre>
+      <ul>
+        <li><b>public</b> (default) / <b>private</b> (this class only) / <b>protected</b> (this + subclasses) — compile-time only enforcement, erased at runtime!</li>
+        <li><b>readonly</b> — assignable only at declaration or in constructor.</li>
+        <li><b>abstract class</b> — cannot be instantiated directly; can declare abstract methods subclasses must implement.</li>
+        <li><b>interface</b> describes shape only (no implementation); a class <code>implements</code> an interface to promise that shape; classes <code>extend</code> one base class but can <code>implement</code> multiple interfaces.</li>
+        <li>Because typing is <b>structural</b>, you don't strictly need <code>implements</code> at all — any matching-shape object/class is compatible.</li>
+        <li><b>Polymorphism</b>: generic classes (<code>class Box&lt;T&gt;</code>) let one class work over many types safely.</li>
+        <li><b>Mixins</b> — functions that take a class and return an extended class, used to compose behavior since TS lacks multiple inheritance.</li>
+      </ul>
+      <div class="trap">🪤 Trap: private/protected are erased at compile time — at runtime, all fields are accessible like normal JS properties. They don't give real encapsulation/security.</div>
+    </div>
+  </details>
+
+  <!-- CHAPTER 6 -->
+  <details class="ch" id="c6">
+    <summary><span class="num">6</span> Advanced Types<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <h4>Subtyping & variance</h4>
+      <ul>
+        <li><b>Subtype</b>: if B is a subtype of A, a B can be used anywhere an A is required. e.g. <code>Tuple</code> ⊂ <code>Array</code> ⊂ <code>Object</code>; <code>never</code> ⊂ everything; everything ⊂ <code>any</code>.</li>
+        <li><b>Variance kinds</b>: <i>covariant</i> (preserves subtype direction — return types, readonly arrays), <i>contravariant</i> (reverses it — function params), <i>invariant</i> (must match exactly — mutable array element types in strict situations), <i>bivariant</i> (both directions OK — method params, looser/legacy).</li>
+      </ul>
+      <h4>Control flow / refinement</h4>
+      <ul>
+        <li>TS narrows types automatically based on checks: <code>typeof x === 'string'</code>, <code>x instanceof Foo</code>, <code>'prop' in x</code>, truthiness checks, discriminated unions, equality checks.</li>
+        <li><b>Discriminated union</b>: each member has a common literal "tag" field so a <code>switch</code>/<code>if</code> on it narrows exactly: </li>
+      </ul>
+      <pre><code><span class="kw">type</span> Shape =
+  | {kind<span class="ty">: 'circle'</span>, r<span class="ty">: number</span>}
+  | {kind<span class="ty">: 'square'</span>, side<span class="ty">: number</span>}
+
+<span class="kw">function</span> <span class="fn">area</span>(s<span class="ty">: Shape</span>) {
+  <span class="kw">switch</span> (s.kind) {
+    <span class="kw">case</span> <span class="st">'circle'</span><span class="kw">:</span> <span class="kw">return</span> Math.PI * s.r ** 2
+    <span class="kw">case</span> <span class="st">'square'</span><span class="kw">:</span> <span class="kw">return</span> s.side ** 2
+  }
+}</code></pre>
+      <li><b>Totality</b> — handling every case of a union (often enforced via a <code>never</code>-typed default branch so adding a new case breaks the build).</li>
+      <h4>keyof / typeof / lookup types</h4>
+      <pre><code><span class="kw">type</span> Point = {x<span class="ty">: number</span>, y<span class="ty">: number</span>}
+<span class="kw">type</span> Keys = <span class="kw">keyof</span> Point        <span class="cm">// 'x' | 'y'</span>
+<span class="kw">type</span> XType = Point[<span class="st">'x'</span>]      <span class="cm">// number (lookup/indexed access)</span>
+<span class="kw">const</span> p = {x: 1, y: 2}
+<span class="kw">type</span> PType = <span class="kw">typeof</span> p          <span class="cm">// {x: number, y: number}</span></code></pre>
+      <h4>Mapped & conditional types</h4>
+      <pre><code><span class="kw">type</span> Partial&lt;T&gt; = { [K <span class="kw">in</span> <span class="kw">keyof</span> T]?<span class="ty">: T[K]</span> }
+<span class="kw">type</span> Readonly&lt;T&gt; = { <span class="kw">readonly</span> [K <span class="kw">in</span> <span class="kw">keyof</span> T]<span class="ty">: T[K]</span> }
+<span class="kw">type</span> Record&lt;K extends string, V&gt; = { [P <span class="kw">in</span> K]<span class="ty">: V</span> }
+
+<span class="kw">type</span> IsString&lt;T&gt; = T <span class="kw">extends</span> string ? <span class="st">true</span> : <span class="st">false</span>
+<span class="kw">type</span> Unwrap&lt;T&gt; = T <span class="kw">extends</span> Promise&lt;<span class="kw">infer</span> U&gt; ? U : T</code></pre>
+      <p><code>ReturnType&lt;T&gt;</code>, <code>Parameters&lt;T&gt;</code>, <code>Pick&lt;T,K&gt;</code>, <code>Omit&lt;T,K&gt;</code>, <code>Exclude&lt;T,U&gt;</code>, <code>Extract&lt;T,U&gt;</code> are all built with conditional + mapped types.</p>
+      <h4>Custom type guards & assertions</h4>
+      <pre><code><span class="kw">function</span> <span class="fn">isString</span>(x<span class="ty">: unknown</span>)<span class="ty">: x is string</span> {
+  <span class="kw">return</span> <span class="kw">typeof</span> x === <span class="st">'string'</span>
+}
+<span class="kw">const</span> el = document.getElementById(<span class="st">'x'</span>) <span class="kw">as</span> HTMLInputElement  <span class="cm">// type assertion</span>
+<span class="kw">let</span> y<span class="ty">!: number</span>   <span class="cm">// definite assignment assertion: "I promise I'll set this before use"</span></code></pre>
+      <ul>
+        <li><b>const assertion</b> (<code>as const</code>) — freezes literal types & infers narrowest possible (e.g. tuple instead of array).</li>
+        <li><b>Companion object pattern</b> — a value (often a class or const) and a type sharing the same name, used to attach static-like behavior generically.</li>
+        <li><b>Nominal typing simulation</b> — add a private "brand" property so structurally-identical types are no longer interchangeable.</li>
+      </ul>
+      <div class="trap">🪤 Trap: <code>as</code> / <code>!</code> are <b>unsafe escape hatches</b> — they don't perform any runtime check or conversion, just silence the compiler. If you're wrong, you get a runtime error, not a compile error.</div>
+    </div>
+  </details>
+
+  <!-- CHAPTER 7 -->
+  <details class="ch" id="c7">
+    <summary><span class="num">7</span> Handling Errors<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <h4>Strategies (in increasing explicitness)</h4>
+      <ul>
+        <li><b>Return null/undefined</b> — forces caller to check (especially with <code>strictNullChecks</code>); cheap but easy to forget to check.</li>
+        <li><b>Throw exceptions</b> — TS can't track what a function throws in its type signature, so callers must know to wrap in <code>try/catch</code> by convention/docs.</li>
+        <li><b>Return an explicit "result" type</b> (Either/Result-style union of success | failure) — makes failure visible in the type system, forces handling via narrowing.</li>
+      </ul>
+      <pre><code><span class="kw">type</span> Result&lt;T&gt; = {ok<span class="ty">: true</span>, value<span class="ty">: T</span>} | {ok<span class="ty">: false</span>, error<span class="ty">: Error</span>}
+
+<span class="kw">function</span> <span class="fn">parse</span>(s<span class="ty">: string</span>)<span class="ty">: Result&lt;number&gt;</span> {
+  <span class="kw">const</span> n = Number(s)
+  <span class="kw">return</span> isNaN(n) ? {ok: <span class="st">false</span>, error: <span class="kw">new</span> Error(<span class="st">'bad'</span>)} : {ok: <span class="st">true</span>, value: n}
+}</code></pre>
+      <ul>
+        <li><b>Custom error classes</b> extend <code>Error</code> to carry structured info; remember to call <code>super(message)</code>.</li>
+        <li><code>catch (e)</code> — <code>e</code> is typed <code>unknown</code> (or <code>any</code> pre-4.0) since anything can be thrown; narrow with <code>instanceof Error</code> before reading <code>.message</code>.</li>
+      </ul>
+      <div class="trap">🪤 Trap: TypeScript has <b>no checked exceptions</b> — a function's type signature never tells you it might throw. That's why explicit Result/Either types are favored in TS-heavy codebases.</div>
+    </div>
+  </details>
+
+  <!-- CHAPTER 8 -->
+  <details class="ch" id="c8">
+    <summary><span class="num">8</span> Async, Concurrency & Parallelism<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <ul>
+        <li><b>Concurrency</b> — multiple tasks make progress over overlapping time (JS's single-threaded event loop interleaves them). <b>Parallelism</b> — tasks literally run at the same time (multiple threads/cores, e.g. Web Workers).</li>
+        <li>JS is single-threaded with an <b>event loop</b>: sync code runs first, then microtasks (promises), then macrotasks (timers/IO).</li>
+      </ul>
+      <pre><code><span class="kw">function</span> <span class="fn">fetchUser</span>(id<span class="ty">: number</span>)<span class="ty">: Promise&lt;User&gt;</span> {
+  <span class="kw">return</span> fetch(`/users/${id}`).then(r =&gt; r.json())
+}
+<span class="kw">async</span> <span class="kw">function</span> <span class="fn">main</span>() {
+  <span class="kw">try</span> {
+    <span class="kw">const</span> user = <span class="kw">await</span> fetchUser(1)
+  } <span class="kw">catch</span> (e) { <span class="cm">// handle rejection</span> }
+}</code></pre>
+      <ul>
+        <li><code>Promise&lt;T&gt;</code> — generic over the resolved value; <code>async</code> functions always return a <code>Promise</code>, and <code>await</code> unwraps one level.</li>
+        <li><b>Promise.all</b> — run concurrently, fails fast on first rejection. <b>Promise.race</b> — settles as soon as one settles. <b>Promise.allSettled</b> — waits for all, never rejects.</li>
+        <li><b>Generators</b> (<code>function*</code> / <code>yield</code>) — pausable functions; typed as <code>Generator&lt;YieldType, ReturnType, NextType&gt;</code>; async generators (<code>for await...of</code>) combine async + iteration.</li>
+      </ul>
+      <div class="trap">🪤 Trap: an <code>async</code> function that returns <code>T</code> in its body is typed <code>Promise&lt;T&gt;</code> from the outside — never write <code>async function f(): T</code>.</div>
+    </div>
+  </details>
+
+  <!-- CHAPTER 9 -->
+  <details class="ch" id="c9">
+    <summary><span class="num">9</span> Frontend & Backend Frameworks<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <ul>
+        <li><b>React + TS</b>: type props with an interface; <code>useState&lt;T&gt;()</code> for generics on hooks; function components typed as <code>React.FC&lt;Props&gt;</code> (or just a typed function returning JSX).</li>
+        <li><b>Generic components</b>: components can take type params just like functions, e.g. a generic <code>List&lt;T&gt;</code> rendering <code>T[]</code>.</li>
+        <li><b>Node/Express + TS</b>: type request/response generics (<code>Request&lt;Params, ResBody, ReqBody, Query&gt;</code>); use <code>@types/express</code> since Express itself ships untyped JS.</li>
+        <li>General theme: frameworks built with structural typing in mind compose well with TS generics; untyped libraries need <code>@types</code> packages (Ch. 11).</li>
+      </ul>
+      <pre><code><span class="kw">type</span> Props = {name<span class="ty">: string</span>, onClick<span class="ty">: () =&gt; void</span>}
+<span class="kw">const</span> Button<span class="ty">: React.FC&lt;Props&gt;</span> = ({name, onClick}) =&gt;
+  &lt;button onClick={onClick}&gt;{name}&lt;/button&gt;</code></pre>
+    </div>
+  </details>
+
+  <!-- CHAPTER 10 -->
+  <details class="ch" id="c10">
+    <summary><span class="num">10</span> Namespaces & Modules<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <ul>
+        <li><b>Module</b> = a file with top-level <code>import</code>/<code>export</code>; has its own scope (nothing leaks globally).</li>
+        <li><b>Namespace</b> (older <code>namespace Foo {}</code>, formerly "internal modules") — groups code under a global-ish named object; mostly legacy/used for ambient global typings, not for app code structure.</li>
+        <li><b>Module systems</b>: CommonJS (<code>require</code>/<code>module.exports</code>, Node default historically), ES Modules (<code>import</code>/<code>export</code>, the modern standard), AMD/UMD (older browser/async loaders) — <code>tsconfig</code>'s <code>module</code> flag picks the emitted format.</li>
+        <li><b>Declaration merging</b>: interfaces with the same name merge; namespaces can merge with classes/functions/enums to attach extra static members.</li>
+        <li><b>Ambient modules</b> (<code>declare module 'foo' {...}</code>) — describe the shape of a module that has no types of its own (e.g. importing CSS/JSON, or an untyped npm package).</li>
+      </ul>
+      <pre><code><span class="kw">export</span> <span class="kw">function</span> <span class="fn">add</span>(a<span class="ty">: number</span>, b<span class="ty">: number</span>) { <span class="kw">return</span> a + b }
+<span class="kw">import</span> { add } <span class="kw">from</span> <span class="st">'./math'</span>
+
+<span class="kw">declare</span> <span class="kw">module</span> <span class="st">'*.svg'</span> { <span class="kw">const</span> src<span class="ty">: string</span>; <span class="kw">export</span> <span class="kw">default</span> src }</code></pre>
+    </div>
+  </details>
+
+  <!-- CHAPTER 11 -->
+  <details class="ch" id="c11">
+    <summary><span class="num">11</span> Interoperating with JavaScript<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <ul>
+        <li><code>allowJs</code> — lets <code>tsc</code> compile plain <code>.js</code> files alongside <code>.ts</code>; <code>checkJs</code> additionally typechecks them (often paired with JSDoc annotations for inline types in JS).</li>
+        <li><b>.d.ts (declaration) files</b> — contain <i>only</i> type info, no implementation; used to describe the shape of existing JS code/libraries.</li>
+        <li><b>DefinitelyTyped / <code>@types/*</code></b> — community-maintained <code>.d.ts</code> packages for popular untyped JS libraries (<code>npm i -D @types/lodash</code>).</li>
+        <li><code>declare</code> keyword — tells TS "this exists at runtime, trust me, just take my word for its type" (used for globals, ambient values, and inside <code>.d.ts</code> files).</li>
+        <li>Writing your own type definitions for an untyped library is a normal real-world task — model the public API's shape as closely as possible.</li>
+      </ul>
+      <pre><code><span class="cm">// my-lib.d.ts</span>
+<span class="kw">declare</span> <span class="kw">function</span> <span class="fn">myLib</span>(x<span class="ty">: number</span>)<span class="ty">: string</span>
+
+<span class="cm">// JSDoc typing inside a .js file (checkJs)</span>
+<span class="cm">/** @param {number} x @returns {string} */</span>
+<span class="kw">function</span> <span class="fn">f</span>(x) { <span class="kw">return</span> String(x) }</code></pre>
+    </div>
+  </details>
+
+  <!-- CHAPTER 12 -->
+  <details class="ch" id="c12">
+    <summary><span class="num">12</span> Building & Running TypeScript<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <h4>Key tsconfig.json flags</h4>
+      <pre><code>{
+  <span class="st">"compilerOptions"</span>: {
+    <span class="st">"target"</span>: <span class="st">"es2019"</span>,        <span class="cm">// JS version to downlevel to</span>
+    <span class="st">"module"</span>: <span class="st">"commonjs"</span>,     <span class="cm">// emitted module format</span>
+    <span class="st">"lib"</span>: [<span class="st">"dom"</span>, <span class="st">"es2019"</span>], <span class="cm">// ambient APIs available</span>
+    <span class="st">"strict"</span>: <span class="kw">true</span>,           <span class="cm">// bundles all strict-mode flags</span>
+    <span class="st">"noImplicitAny"</span>: <span class="kw">true</span>,
+    <span class="st">"strictNullChecks"</span>: <span class="kw">true</span>,
+    <span class="st">"esModuleInterop"</span>: <span class="kw">true</span>,  <span class="cm">// smoother default-import interop w/ CJS</span>
+    <span class="st">"outDir"</span>: <span class="st">"./dist"</span>,
+    <span class="st">"sourceMap"</span>: <span class="kw">true</span>,
+    <span class="st">"noEmit"</span>: <span class="kw">false</span>
+  }
+}</code></pre>
+      <ul>
+        <li><b>tsc</b> typechecks AND can emit JS; many projects use <b>Babel</b> (or esbuild/swc) just to <i>transpile</i> fast, while <code>tsc --noEmit</code> runs only the typechecker in parallel/CI.</li>
+        <li><b>Source maps</b> — map compiled JS back to original TS for debugging.</li>
+        <li><b>Bundlers</b> (webpack, Parcel, esbuild) — combine modules into deployable bundles; TS integrates via loaders/plugins.</li>
+        <li><b>Monorepos / project references</b> (<code>tsconfig</code> <code>references</code>) — let TS incrementally build multiple inter-dependent packages (faster, isolated builds) — paired with tools like Lerna/Yarn workspaces.</li>
+        <li><b>Strictness flags you should recognize</b>: <code>noImplicitAny</code>, <code>strictNullChecks</code>, <code>strictFunctionTypes</code>, <code>strictPropertyInitialization</code>, <code>noUnusedLocals</code>, <code>noImplicitReturns</code>.</li>
+      </ul>
+    </div>
+  </details>
+
+  <!-- CHAPTER 13 -->
+  <details class="ch" id="c13">
+    <summary><span class="num">13</span> Conclusion (Recap)<span class="car">▶</span></summary>
+    <div class="ch-body">
+      <p>Big picture to hold onto: types are a tool for <b>documentation + safety</b>, inferred wherever possible, checked structurally, and fully erased at runtime. Use the type system to make illegal states unrepresentable (discriminated unions, branded types, exhaustiveness checks) instead of relying on runtime checks/comments alone.</p>
+    </div>
+  </details>
+
+  <section class="quizsec" id="quiz">
+    <h2>🧠 Flashcard Quiz</h2>
+    <p>Tap a card to flip. Mix of all 13 chapters — go through everything once before your exam.</p>
+    <div class="progress">
+      <span id="progLabel">0 / 0 reviewed</span>
+      <button id="shuffleBtn">🔀 Shuffle</button>
+    </div>
+    <div id="cards"></div>
+  </section>
+
+  <footer>Built from <i>Programming TypeScript</i> — Boris Cherny (O'Reilly, 2019) · good luck, you've got this 💪</footer>
+</div>
+
+<script>
+const QA = [
+  ["What's the difference between any and unknown?","any disables all type checking; unknown is type-safe — must be narrowed/asserted before you can use it."],
+  ["What is structural typing?","Compatibility is based on the shape (members) a type has, not on its declared name or where it was defined."],
+  ["Is never a subtype or supertype of everything?","Subtype of everything — it has no values, so it's safely usable wherever any other type is required."],
+  ["Difference between interface and type alias for merging?","interface declarations with the same name merge automatically; type aliases cannot be redeclared/merged."],
+  ["What does 'as const' do?","Freezes a literal to its narrowest type and makes arrays read-only tuples instead of widened arrays."],
+  ["How are function parameter types checked (variance)?","Contravariantly for standalone functions (wider accepted param = subtype); methods are checked bivariantly by default."],
+  ["What is a discriminated union?","A union of object types that share a literal 'tag' field, letting TS narrow exactly which member you have via switch/if."],
+  ["What does keyof do?","Produces a union of a type's property names as string literal types."],
+  ["What is infer used for?","Inside a conditional type, to capture/extract a type variable from a matched pattern (e.g. ReturnType<T>)."],
+  ["Are private/protected enforced at runtime?","No — they're compile-time only checks; at runtime all fields are accessible like normal JS properties."],
+  ["What type is a caught exception (catch(e))?","unknown (TS 4.4+ strict mode), since JS lets you throw any value."],
+  ["What does an async function's return type actually become?","Always wrapped in Promise<T>, even if the function body returns T directly."],
+  ["Promise.all vs Promise.allSettled?","all() rejects immediately if any promise rejects; allSettled() waits for all and never rejects, returning each result's status."],
+  ["What's an ambient module declaration for?","Describing the type shape of a module that has no types of its own (untyped npm package, .svg/.css imports, etc.)."],
+  ["What do .d.ts files contain?","Only type declarations — no runtime implementation code."],
+  ["What does the strict compiler flag actually do?","Turns on a bundle of stricter checks at once: noImplicitAny, strictNullChecks, strictFunctionTypes, strictPropertyInitialization, etc."],
+  ["Difference between target and lib in tsconfig?","target sets which JS syntax version to downlevel-compile to; lib sets which built-in API type declarations (DOM, ES2019, etc.) are available to the checker."],
+  ["What's the totality / exhaustiveness check pattern?","Adding a default branch typed as never so that if a new union member is added later and not handled, the compiler errors."],
+  ["What does 'x!' (definite assignment assertion) mean?","Tells the compiler 'I guarantee this is assigned before use,' suppressing a possibly-undefined error without a runtime check."],
+  ["Type assertions (as) vs type guards — which is checked at runtime?","Only type guards (typeof, instanceof, in, custom `x is T` functions) actually check anything at runtime; assertions are compiler-only and unchecked."],
+  ["What's the difference between concurrency and parallelism?","Concurrency: multiple tasks make interleaved progress (JS event loop, single thread). Parallelism: tasks literally execute simultaneously (multiple threads/cores)."],
+  ["Why use Result/Either return types instead of throwing?","TS can't express 'this function might throw' in its type signature, so an explicit success|failure union return type makes errors visible and force-checked by the type system."],
+  ["Generic function syntax basics?","function id<T>(x: T): T — T is inferred from the call site and preserves the specific input type through the function instead of widening it."],
+  ["What's a mapped type, structurally?","{ [K in keyof T]: SomeTransform<T[K]> } — iterates over a type's keys to build a new type, basis of Partial/Readonly/Record/Pick."],
+];
+
+const cardsDiv = document.getElementById('cards');
+const progLabel = document.getElementById('progLabel');
+let order = QA.map((_,i)=>i);
+let reviewed = new Set();
+
+function render(){
+  cardsDiv.innerHTML = '';
+  order.forEach((idx, displayIdx) => {
+    const [q,a] = QA[idx];
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `<span class="tag">#${displayIdx+1}</span><div class="q">Q: ${q}</div><div class="a">A: ${a}</div>`;
+    card.addEventListener('click', () => {
+      card.classList.toggle('open');
+      if(card.classList.contains('open')){ reviewed.add(idx); updateProg(); }
+    });
+    cardsDiv.appendChild(card);
+  });
+}
+function updateProg(){ progLabel.textContent = `${reviewed.size} / ${QA.length} reviewed`; }
+document.getElementById('shuffleBtn').addEventListener('click', () => {
+  for(let i=order.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [order[i],order[j]]=[order[j],order[i]]; }
+  render();
+});
+render(); updateProg();
+
+// countdown timer (set to 2 hours from page open; tap to reset)
+const timerEl = document.getElementById('timer');
+let endTime = Date.now() + 4*60*60*1000;
+function tick(){
+  const diff = endTime - Date.now();
+  if(diff <= 0){ timerEl.textContent = '⏰ TIME UP'; return; }
+  const h = Math.floor(diff/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const s = Math.floor((diff%60000)/1000);
+  timerEl.textContent = `⏱ ${h>0?h+':':''}${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  requestAnimationFrame(()=>setTimeout(tick,250));
+}
+timerEl.addEventListener('click', () => { endTime = Date.now() + 4*60*60*1000; });
+tick();
+</script>
+</body>
+</html>
