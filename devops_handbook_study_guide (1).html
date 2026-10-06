@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>DevOps Handbook — 2HR Crunch Guide</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --panel2:#1f232f; --border:#2b2f3d;
+    --text:#e9ecf3; --sub:#9aa3b8; --accent:#5ee0c0; --accent2:#ffb454;
+    --danger:#ff6b81; --good:#5ee0c0; --part1:#5ee0c0; --part2:#7aa2ff;
+    --part3:#ffb454; --part4:#c792ea; --part5:#ff8a8a; --part6:#82e0aa;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--text); padding-bottom:60px;
+  }
+  header{
+    position:sticky; top:0; z-index:50; background:linear-gradient(135deg,#11141c,#1a1f2b);
+    padding:14px 16px 10px; border-bottom:1px solid var(--border);
+  }
+  header h1{margin:0 0 2px; font-size:1.15rem; letter-spacing:.2px;}
+  header p{margin:0; color:var(--sub); font-size:.78rem;}
+  .timerbar{
+    margin-top:10px; display:flex; gap:8px; align-items:center; background:var(--panel2);
+    border:1px solid var(--border); border-radius:10px; padding:8px 10px;
+  }
+  .timerbar span#clock{font-weight:700; font-size:1.05rem; color:var(--accent2); font-family:monospace;}
+  .timerbar button{
+    background:var(--accent); color:#0f1117; border:none; border-radius:8px; padding:6px 10px;
+    font-size:.72rem; font-weight:700;
+  }
+  nav.tabs{
+    display:flex; overflow-x:auto; gap:6px; padding:10px 16px; background:var(--bg);
+    border-bottom:1px solid var(--border); position:sticky; top:78px; z-index:40;
+    -webkit-overflow-scrolling:touch;
+  }
+  nav.tabs button{
+    flex:0 0 auto; background:var(--panel2); color:var(--sub); border:1px solid var(--border);
+    border-radius:20px; padding:7px 13px; font-size:.74rem; font-weight:600; white-space:nowrap;
+  }
+  nav.tabs button.active{background:var(--accent); color:#0f1117; border-color:var(--accent);}
+  main{padding:14px 14px 0;}
+  .section{display:none;}
+  .section.active{display:block;}
+  .card{
+    background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    padding:14px 14px; margin-bottom:12px;
+  }
+  .card h2{margin:0 0 6px; font-size:1rem;}
+  .card h3{margin:14px 0 4px; font-size:.92rem; color:var(--accent2);}
+  .card p, .card li{font-size:.86rem; line-height:1.45; color:#d6dae3;}
+  .card ul{margin:4px 0 4px 18px; padding:0;}
+  .pill{
+    display:inline-block; font-size:.62rem; font-weight:700; padding:2px 8px; border-radius:10px;
+    margin-bottom:6px; letter-spacing:.3px; text-transform:uppercase;
+  }
+  .p1 .pill{background:rgba(94,224,192,.15); color:var(--part1);}
+  .p2 .pill{background:rgba(122,162,255,.15); color:var(--part2);}
+  .p3 .pill{background:rgba(255,180,84,.15); color:var(--part3);}
+  .p4 .pill{background:rgba(199,146,234,.15); color:var(--part4);}
+  .p5 .pill{background:rgba(255,138,138,.15); color:var(--part5);}
+  .p6 .pill{background:rgba(130,224,170,.15); color:var(--part6);}
+  details{
+    background:var(--panel2); border:1px solid var(--border); border-radius:12px;
+    margin-bottom:10px; overflow:hidden;
+  }
+  details summary{
+    padding:11px 13px; font-weight:700; font-size:.86rem; cursor:pointer; list-style:none;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  details summary::-webkit-details-marker{display:none;}
+  details summary::after{content:"+"; color:var(--accent); font-size:1.1rem; font-weight:900;}
+  details[open] summary::after{content:"–";}
+  details .inner{padding:0 13px 13px; font-size:.84rem; color:#d6dae3; line-height:1.5;}
+  details .inner ul{margin:6px 0 6px 18px; padding:0;}
+  details .inner li{margin-bottom:4px;}
+  .tag{
+    display:inline-block; background:var(--panel2); border:1px solid var(--border);
+    color:var(--accent2); font-size:.68rem; padding:2px 7px; border-radius:8px; margin:2px 3px 2px 0;
+  }
+  .grid2{display:grid; grid-template-columns:1fr; gap:8px;}
+  @media(min-width:600px){.grid2{grid-template-columns:1fr 1fr;}}
+  .mini{background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:10px;}
+  .mini b{color:var(--accent);}
+  input#glossarySearch{
+    width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border);
+    background:var(--panel2); color:var(--text); font-size:.85rem; margin-bottom:10px;
+  }
+  .gItem{border-bottom:1px dashed var(--border); padding:8px 0;}
+  .gItem b{color:var(--accent);}
+  .gItem p{margin:2px 0 0; font-size:.82rem; color:var(--sub);}
+  /* Quiz */
+  .qcard{background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:10px;}
+  .qcard p.q{font-weight:700; font-size:.86rem; margin:0 0 8px;}
+  .opt{
+    display:block; width:100%; text-align:left; background:var(--panel); color:var(--text);
+    border:1px solid var(--border); border-radius:9px; padding:9px 10px; margin-bottom:6px; font-size:.82rem;
+  }
+  .opt.correct{background:rgba(94,224,192,.18); border-color:var(--good); color:var(--good);}
+  .opt.wrong{background:rgba(255,107,129,.18); border-color:var(--danger); color:var(--danger);}
+  .opt:disabled{opacity:.95;}
+  #scoreBar{
+    position:sticky; bottom:0; background:var(--panel); border-top:1px solid var(--border);
+    padding:10px 14px; font-size:.82rem; display:flex; justify-content:space-between; align-items:center;
+  }
+  #scoreBar b{color:var(--accent2);}
+  .flashWrap{display:flex; flex-direction:column; gap:10px;}
+  .flash{
+    background:var(--panel2); border:1px solid var(--border); border-radius:12px; padding:18px;
+    min-height:90px; display:flex; align-items:center; justify-content:center; text-align:center;
+    font-size:.92rem; font-weight:600; cursor:pointer;
+  }
+  .flash.back{color:var(--accent2); font-weight:500; font-size:.84rem;}
+  .flashControls{display:flex; gap:8px; margin-top:8px;}
+  .flashControls button{
+    flex:1; background:var(--accent); color:#0f1117; border:none; border-radius:9px; padding:9px; font-weight:700; font-size:.8rem;
+  }
+  .flashControls button.alt{background:var(--panel2); color:var(--text); border:1px solid var(--border);}
+  .counter{text-align:center; color:var(--sub); font-size:.74rem; margin-bottom:4px;}
+  .crunch li{margin-bottom:6px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚙️ The DevOps Handbook — Crunch Guide</h1>
+  <p>Kim · Humble · Debois · Willis — full-book exam prep, optimized for ~2 hours</p>
+  <div class="timerbar">
+    <span id="clock">02:00:00</span>
+    <button onclick="startTimer()">Start</button>
+    <button onclick="resetTimer()" style="background:#2b2f3d;color:#e9ecf3;">Reset</button>
+    <span style="color:var(--sub); font-size:.7rem; margin-left:auto;">Tap a tab below ➜</span>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-t="cram" class="active">🚨 60-Sec Core</button>
+  <button data-t="p1">Part I</button>
+  <button data-t="p2">Part II</button>
+  <button data-t="p3">Part III</button>
+  <button data-t="p4">Part IV</button>
+  <button data-t="p5">Part V</button>
+  <button data-t="p6">Part VI</button>
+  <button data-t="glossary">📖 Glossary</button>
+  <button data-t="flash">🔁 Flashcards</button>
+  <button data-t="quiz">📝 Quiz</button>
+</nav>
+
+<main>
+
+<!-- ============ 60 SEC CORE ============ -->
+<section class="section active" id="cram">
+  <div class="card">
+    <h2>🚨 If you only read ONE section, read this</h2>
+    <p><b>DevOps = ​</b> the application of Lean/Toyota Production System principles to the entire IT value stream (Product Mgmt → Dev → QA → Ops → Security) to enable fast flow + fast feedback + a culture of learning, so organizations can deliver value to customers quickly, reliably, and safely.</p>
+
+    <h3>The Three Ways (THE spine of the whole book)</h3>
+    <ul>
+      <li><b>First Way — Flow:</b> work moves <i>left → right</i>, Dev → Ops → Customer, fast, visibly, never flowing backward. Focus: global goals, never pass defects downstream, never allow local optimization to hurt the whole system.</li>
+      <li><b>Second Way — Feedback:</b> fast, constant feedback flows <i>right → left</i> from Ops back to Dev, so problems are seen and fixed at the source, continuously.</li>
+      <li><b>Third Way — Continual Learning & Experimentation:</b> a culture of high-trust, scientific experimentation, risk-taking, and learning from failure that drives mastery and constant improvement.</li>
+    </ul>
+
+    <h3>The Four Types of Work (memorize this — shows up everywhere)</h3>
+    <ul>
+      <li><b>Business projects</b> (new features, planned work)</li>
+      <li><b>Internal IT projects</b> (infra, tooling)</li>
+      <li><b>Changes</b> (smaller scope, often bundled with above)</li>
+      <li><b>Unplanned work / firefighting</b> (the most expensive — always at the cost of planned work)</li>
+    </ul>
+
+    <h3>Westrum's Organizational Typology (HIGH-YIELD)</h3>
+    <ul>
+      <li><b>Pathological (power-oriented):</b> low cooperation, info hoarded/distorted, fear, blame.</li>
+      <li><b>Bureaucratic (rule-oriented):</b> rules/process over mission; departmental "turf."</li>
+      <li><b>Generative (performance-oriented):</b> high cooperation, info flows freely, failure → inquiry not blame. <i>This is the DevOps target culture.</i></li>
+    </ul>
+
+    <h3>Core mental models to know cold</h3>
+    <ul>
+      <li><b>Theory of Constraints</b> (Goldratt): improving anything other than the bottleneck is an illusion — find and elevate the constraint.</li>
+      <li><b>Value Stream:</b> the sequence of activities to convert a business hypothesis into a value-delivering service for the customer.</li>
+      <li><b>Deployment Pipeline:</b> automated path from "code commit" → build → test → deploy → production, giving fast feedback at every stage.</li>
+      <li><b>Conway's Law:</b> "Organizations design systems that mirror their own communication structure." → design org structure deliberately to get loosely-coupled architecture.</li>
+      <li><b>Andon Cord:</b> anyone can "stop the line" when the deployment pipeline breaks — the whole team swarms to fix it before new work continues.</li>
+      <li><b>Blameless Post-Mortems:</b> root-cause analysis after incidents focused on systemic fixes, not punishing individuals.</li>
+      <li><b>Hypothesis-Driven Development / A-B testing:</b> treat features as experiments with measurable business hypotheses, not assumptions.</li>
+      <li><b>ChatOps:</b> running operations commands via chat (Slack/HipChat) so actions + context are visible to the whole team.</li>
+      <li><b>Game Days / Chaos Engineering:</b> deliberately injecting failure (à la Netflix Chaos Monkey) to build resilience and confidence.</li>
+    </ul>
+
+    <h3>Famous case studies — know who did what</h3>
+    <ul>
+      <li><b>Etsy (2009):</b> after a bad outsourced/waterfall era, moved to continuous deployment, blameless postmortems, "Morgue" tool.</li>
+      <li><b>Nordstrom (Courtney Kissler):</b> functional silos → cross-functional value-stream teams.</li>
+      <li><b>Target:</b> embedded Ops engineers into Dev teams; "Dunbar number" team sizing.</li>
+      <li><b>Google:</b> SRE model, error budgets.</li>
+      <li><b>Amazon:</b> two-pizza teams, "you build it, you run it," service-oriented architecture migration (mandated by Bezos).</li>
+      <li><b>18F (US Government):</b> open-source-first, public-domain case study on rapid, secure government software delivery.</li>
+      <li><b>Capital One / financial services:</b> proof that DevOps works even in heavily regulated industries.</li>
+      <li><b>Netflix:</b> Chaos Monkey/Simian Army, full self-service infra for engineers.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ PART I ============ -->
+<section class="section p1" id="p1">
+  <div class="card">
+    <span class="pill">Part I</span>
+    <h2>The Three Ways (Ch. 1–4)</h2>
+    <p>Foundational principles. Everything downstream in the book is "how to implement these in practice."</p>
+  </div>
+
+  <details><summary>Ch.1 — Agile, Continuous Delivery & The Three Ways</summary>
+    <div class="inner">
+      <ul>
+        <li>Traces DevOps lineage: <b>Lean manufacturing</b> (Toyota/TPS) → <b>Agile Manifesto (2001)</b> → <b>Velocity conference / Agile Infrastructure movement (2009, Allspaw & Hammond "10 Deploys a Day")</b> → <b>Continuous Delivery</b> (Humble/Farley) → <b>Toyota Kata</b> (Mike Rother) → DevOpsDays (Patrick Debois, 2009, Belgium).</li>
+        <li>Defines the <b>Technology Value Stream</b>: from "code committed" to "value delivered to customer in production."</li>
+        <li>Introduces the manufacturing value stream analogy and <b>lead time</b> as the north-star metric for flow.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.2 — The First Way: Principles of Flow</summary>
+    <div class="inner">
+      <ul>
+        <li>Goal: fast, smooth flow of work from Dev → Ops → Customer.</li>
+        <li><b>Make work visible</b> (kanban boards).</li>
+        <li><b>Reduce batch sizes</b> — smaller batches = faster feedback, less WIP, lower risk (analogy: stuffing envelopes one-at-a-time beats doing all-folding-then-all-stuffing).</li>
+        <li><b>Reduce the number of handoffs</b> — every handoff loses context/knowledge (telephone game).</li>
+        <li><b>Continually identify & elevate constraints</b> (Theory of Constraints) — in most orgs the constraint is Ops/IT Operations, not Dev.</li>
+        <li><b>Eliminate hardships and waste in the value stream</b> — the 8 wastes (Lean) e.g. unnecessary motion, waiting, defects.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.3 — The Second Way: Principles of Feedback</summary>
+    <div class="inner">
+      <ul>
+        <li>Goal: create fast, frequent feedback loops right-to-left so problems are caught early.</li>
+        <li><b>See problems as they occur</b> (telemetry everywhere — not just servers, but business + customer + security).</li>
+        <li><b>Swarm and solve problems</b> to build new knowledge — when a problem is found, everyone stops and fixes it together (like the Andon cord at Toyota).</li>
+        <li><b>Push quality closer to the source</b> — don't pass defects downstream; build quality in at every step (vs. inspecting at the end).</li>
+        <li>References Dr. Sidney Dekker (human error), Dr. Charles Perrow (Normal Accidents/complex systems), Mike Rother & the NUMMI story.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.4 — The Third Way: Continual Learning & Experimentation</summary>
+    <div class="inner">
+      <ul>
+        <li>Goal: a culture of high-trust, scientific risk-taking, and rapid learning.</li>
+        <li>Introduces <b>Westrum's typology</b> (Pathological / Bureaucratic / Generative) as the key culture lens.</li>
+        <li><b>Just Culture</b> (Sidney Dekker) — replaces "name, blame, shame" with systemic learning.</li>
+        <li>Examples: Alcoa's Paul O'Neill (safety-first culture → massive profit gains), Toyota's "stop the line" mentality.</li>
+        <li>Frames failure as an unavoidable byproduct of experimentation — the goal is to make failure cheap and fast to learn from.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<!-- ============ PART II ============ -->
+<section class="section p2" id="p2">
+  <div class="card">
+    <span class="pill">Part II</span>
+    <h2>Where to Start (Ch. 5–8)</h2>
+    <p>How to pick a pilot value stream and structure teams/org for DevOps to succeed.</p>
+  </div>
+
+  <details><summary>Ch.5 — Selecting Which Value Streams to Start With</summary>
+    <div class="inner">
+      <ul>
+        <li>Don't start with the highest-risk/most-complex system. Pick a <b>greenfield project</b> OR a system that's sympathetic/innovative and has supportive leadership.</li>
+        <li><b>Systems of Record vs Systems of Engagement</b> (Gartner Bimodal IT idea) — engagement systems (customer-facing, fast-changing) are great early DevOps candidates.</li>
+        <li>Case refs: Nordstrom, CSG, Etsy timelines for adoption.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.6 — Understand & Make the Work Visible; Expand Across the Org</summary>
+    <div class="inner">
+      <ul>
+        <li>Build a <b>Value Stream Map</b>: identify every team touching the value stream end-to-end.</li>
+        <li>Create a <b>dedicated transformation team</b> (not a side-project / 20%-time effort).</li>
+        <li><b>Agree on a shared goal</b> across all stakeholders.</li>
+        <li>Keep improvement planning horizons <b>short</b> (weekly/biweekly, not annual).</li>
+        <li>Reserve time to pay down technical debt as a standing practice, not an afterthought.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.7 — Org & Architecture Design with Conway's Law</summary>
+    <div class="inner">
+      <ul>
+        <li><b>Conway's Law</b>: software architecture mirrors org communication structure — so design org structure on purpose.</li>
+        <li><b>Functional orientation</b> (silos: all devs together, all ops together) = efficient resource utilization but slow, lots of handoffs.</li>
+        <li><b>Market-oriented teams</b> (cross-functional, full-stack teams owning a service end-to-end) = fast flow, preferred for DevOps.</li>
+        <li><b>Loosely-coupled architecture</b> + small, autonomous teams (Amazon's "two-pizza teams") let teams develop, test, deploy independently.</li>
+        <li><b>Fund services & products, not projects</b> — long-lived teams owning a service, not temporary project teams that disband.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.8 — Integrate Ops into Daily Work of Development</summary>
+    <div class="inner">
+      <ul>
+        <li><b>Create shared services</b> (common tooling) so every team doesn't reinvent logging/deploy/monitoring.</li>
+        <li><b>Embed Ops engineers</b> into dev teams, or at minimum assign an <b>Ops liaison</b> to each service team.</li>
+        <li>Invite Ops to <b>dev standups & retrospectives</b>; put Ops work on the <b>shared Kanban board</b> so it's visible.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<!-- ============ PART III ============ -->
+<section class="section p3" id="p3">
+  <div class="card">
+    <span class="pill">Part III</span>
+    <h2>First Way — Technical Practices of FLOW (Ch. 9–13)</h2>
+    <p>This is the most technical, most exam-dense part. Deployment pipeline, testing, CI, release, architecture.</p>
+  </div>
+
+  <details><summary>Ch.9 — Foundations of the Deployment Pipeline</summary>
+    <div class="inner">
+      <ul>
+        <li>Enable <b>on-demand creation of Dev/Test/Prod environments</b> — self-service, automated.</li>
+        <li><b>Single repository of truth</b> for the entire system (all code + config + scripts in version control).</li>
+        <li><b>Make infrastructure easier to rebuild than to repair</b> → leads to <b>Infrastructure as Code</b> and <b>immutable infrastructure</b>.</li>
+        <li>"Definition of Done" must include "runs correctly in a production-like environment."</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.10 — Fast & Reliable Automated Testing</summary>
+    <div class="inner">
+      <ul>
+        <li><b>Continuously build, test, integrate</b> code + environments.</li>
+        <li>Build a <b>fast, reliable automated test suite</b> — catch errors as early as possible (shift-left).</li>
+        <li><b>Write tests before code</b> (TDD-influenced) where feasible; automate manual/regression tests.</li>
+        <li>Integrate <b>performance testing</b> and <b>non-functional requirements (NFR) testing</b> into the suite (security, scalability, etc.).</li>
+        <li><b>Pull the Andon Cord</b> whenever the deployment pipeline breaks — whole team stops to fix, just like Toyota's assembly line.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.11 — Enable & Practice Continuous Integration</summary>
+    <div class="inner">
+      <ul>
+        <li>Problem: infrequent code commits to <b>trunk</b> create giant, risky merges ("merge hell").</li>
+        <li>Solution: <b>Trunk-Based Development</b> — small, frequent commits straight to trunk/mainline, short-lived (or no) feature branches.</li>
+        <li>CI = every commit triggers an automated build + test; broken build = top priority fix.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.12 — Automate & Enable Low-Risk Releases</summary>
+    <div class="inner">
+      <ul>
+        <li><b>Self-service, automated deployments</b> — devs can deploy without filing tickets to Ops.</li>
+        <li><b>Decouple deployments from releases</b> — deploying code ≠ exposing it to users.</li>
+        <li>Key release patterns:
+          <ul>
+            <li><b>Blue-Green Deployment</b> — two identical prod environments, swap traffic instantly, instant rollback.</li>
+            <li><b>Canary Releases</b> — release to a small subset of servers/users first, expand if healthy.</li>
+            <li><b>Feature Flags / Toggles</b> — turn features on/off without redeploying, enables "dark launching."</li>
+            <li><b>Dark Launching</b> — deploy code to prod hidden from users to test load/perf before full rollout.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.13 — Architect for Low-Risk Releases</summary>
+    <div class="inner">
+      <ul>
+        <li><b>Monolith vs Microservices/SOA</b> archetypes — monoliths are easy to develop early but hard to scale/deploy independently later.</li>
+        <li><b>Strangler Fig Application Pattern</b> — incrementally replace pieces of a legacy monolith with new services, routing traffic gradually, until the old system is "strangled" out.</li>
+        <li>Goal architecture property: <b>testability + deployability</b> — any team should be able to test & deploy their service independent of others.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<!-- ============ PART IV ============ -->
+<section class="section p4" id="p4">
+  <div class="card">
+    <span class="pill">Part IV</span>
+    <h2>Second Way — Technical Practices of FEEDBACK (Ch. 14–18)</h2>
+    <p>Telemetry, monitoring, anomaly detection, dev/ops feedback loops, hypothesis-driven dev, review processes.</p>
+  </div>
+
+  <details><summary>Ch.14 — Create Telemetry to See & Solve Problems</summary>
+    <div class="inner">
+      <ul>
+        <li>Build <b>centralized telemetry infrastructure</b> — logs, metrics, events from every layer.</li>
+        <li>Telemetry types: <b>application/business metrics</b> + <b>infrastructure metrics</b>.</li>
+        <li>Create <b>self-service access</b> to telemetry + <b>information radiators</b> (big visible dashboards) so everyone sees system health.</li>
+        <li>Actively <b>find and fill telemetry gaps</b> — "if you can't measure it, you can't improve it" (Deming).</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.15 — Analyze Telemetry to Anticipate Problems</summary>
+    <div class="inner">
+      <ul>
+        <li>Use <b>means & standard deviations</b> to flag anomalies — but beware: most ops data is <b>non-Gaussian</b> (multi-modal, skewed), so naive stddev thresholds give false positives/negatives.</li>
+        <li>Use proper <b>anomaly detection techniques</b> for non-normal distributions (e.g., smoothing, percentile-based, seasonal decomposition).</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.16 — Enable Feedback So Dev & Ops Can Safely Deploy</summary>
+    <div class="inner">
+      <ul>
+        <li><b>Have developers follow their code downstream</b> into production — see how it actually behaves.</li>
+        <li><b>"You build it, you run it"</b> (Amazon) — developers initially self-manage their own production service before handing off.</li>
+        <li>Goal: shrink the feedback loop between "I wrote code" and "I know if it's working in prod."</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.17 — Hypothesis-Driven Development & A/B Testing</summary>
+    <div class="inner">
+      <ul>
+        <li>Treat every feature as a <b>testable business hypothesis</b>, not an assumption ("Build–Measure–Learn," Lean Startup influence).</li>
+        <li><b>Feature planning</b> ties every story to a measurable customer/business outcome.</li>
+        <li><b>A/B testing</b> in production validates whether a feature actually improves outcomes before fully rolling out.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.18 — Review & Coordination Processes</summary>
+    <div class="inner">
+      <ul>
+        <li>Critiques traditional <b>heavyweight Change Approval Boards (CAB)</b> — slow, often don't reduce risk, create huge queues.</li>
+        <li>Better alternatives: <b>peer review</b> of changes, <b>pair programming</b>, lightweight <b>pull request</b> review.</li>
+        <li>Goal: <b>fearlessly cut bureaucratic processes</b> that don't actually reduce risk — replace heavyweight approval with fast automated tests + peer review.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<!-- ============ PART V ============ -->
+<section class="section p5" id="p5">
+  <div class="card">
+    <span class="pill">Part V</span>
+    <h2>Third Way — Continual Learning & Experimentation (Ch. 19–21)</h2>
+    <p>Building organizational learning, resilience engineering, and culture rituals.</p>
+  </div>
+
+  <details><summary>Ch.19 — Enable & Inject Learning into Daily Work</summary>
+    <div class="inner">
+      <ul>
+        <li><b>Establish a Just Culture</b> — blameless, learning-oriented response to incidents.</li>
+        <li><b>Blameless post-mortem meetings</b> after every accident/outage — published as widely as possible.</li>
+        <li><b>Decrease incident tolerance</b> over time to surface ever-weaker failure signals before they become big.</li>
+        <li><b>Redefine failure</b> — encourage calculated risk-taking instead of punishing it.</li>
+        <li><b>Inject production failures deliberately</b> (Chaos Engineering, e.g. Netflix's Chaos Monkey) to build resilience.</li>
+        <li><b>Game Days</b> — scheduled rehearsals of failure scenarios (like fire drills) to build muscle memory for incident response.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.20 — Convert Local Discoveries into Global Improvements</summary>
+    <div class="inner">
+      <ul>
+        <li><b>ChatOps</b> — use chat rooms/bots (Slack/HipChat + bots) to run ops commands, automatically capturing org knowledge in a searchable, visible log.</li>
+        <li><b>Automate standardized processes</b> into reusable software/scripts/runbooks.</li>
+        <li><b>Single shared source code repository</b> for the whole org (à la Google's monorepo) so fixes/learnings propagate everywhere.</li>
+        <li>Use <b>automated tests as living documentation</b>; build <b>communities of practice</b> (guilds) across teams.</li>
+        <li><b>Design for Operations</b> — bake non-functional requirements (NFRs) into dev from the start.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.21 — Reserve Time for Org Learning & Improvement</summary>
+    <div class="inner">
+      <ul>
+        <li><b>Institutionalize rituals</b> to pay down technical debt (e.g., dedicated "improvement sprints," 20% time).</li>
+        <li><b>Enable everyone to teach and learn</b> — internal tech talks, brown bags.</li>
+        <li><b>Share experiences from DevOps conferences</b> (DevOpsDays, DOES — DevOps Enterprise Summit) back into the org.</li>
+        <li><b>Create internal consulting/coaching</b> functions to spread practices across teams (similar to Toyota's "sensei" model).</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<!-- ============ PART VI ============ -->
+<section class="section p6" id="p6">
+  <div class="card">
+    <span class="pill">Part VI</span>
+    <h2>Integrating Security, Change Mgmt & Compliance (Ch. 22–23)</h2>
+    <p>"DevSecOps" — security as everyone's job, not a separate gate at the end.</p>
+  </div>
+
+  <details><summary>Ch.22 — Information Security as Everyone's Job, Every Day</summary>
+    <div class="inner">
+      <ul>
+        <li><b>Integrate security into iteration demos</b>, defect tracking, and post-mortems — security bugs treated like any other bug.</li>
+        <li><b>Integrate preventive security controls</b> into shared source repos and shared services (so every team gets secure defaults for free).</li>
+        <li><b>Integrate security into the deployment pipeline</b> — automated security scanning (SAST/DAST) on every build.</li>
+        <li><b>Secure the software supply chain</b> — verify/lock dependencies, scan for vulnerable libraries.</li>
+        <li><b>Secure the environment</b> + create <b>security telemetry</b> in both apps and infrastructure.</li>
+        <li><b>Protect the deployment pipeline itself</b> — it's a high-value attack target.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details><summary>Ch.23 — Protecting the Deployment Pipeline / Compliance</summary>
+    <div class="inner">
+      <ul>
+        <li><b>Integrate security & compliance into the change approval process</b> rather than bolting it on at the end.</li>
+        <li><b>Re-categorize most changes as low-risk "standard changes"</b> pre-approved (because they're small, tested, reversible) — only high-risk changes need heavyweight approval (ITIL-aligned reframing).</li>
+        <li><b>Reduce reliance on "separation of duty"</b> as the only control — replace with peer review + automated testing + full audit trail (who/what/when from version control & pipeline logs).</li>
+        <li><b>Provide auditors/compliance officers proof</b> via pipeline logs instead of manual change tickets — "show, don't tell."</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<!-- ============ GLOSSARY ============ -->
+<section class="section" id="glossary">
+  <div class="card">
+    <h2>📖 Glossary — tap to search</h2>
+    <input id="glossarySearch" placeholder="Search a term… e.g. 'WIP' or 'kata'">
+    <div id="glossaryList"></div>
+  </div>
+</section>
+
+<!-- ============ FLASHCARDS ============ -->
+<section class="section" id="flash">
+  <div class="card">
+    <h2>🔁 Flashcards</h2>
+    <div class="counter" id="fCounter">1 / 1</div>
+    <div class="flashWrap">
+      <div class="flash" id="flashCard" onclick="flipCard()">Loading…</div>
+      <div class="flashControls">
+        <button class="alt" onclick="prevCard()">← Prev</button>
+        <button onclick="flipCard()">Flip</button>
+        <button class="alt" onclick="nextCard()">Next →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="section" id="quiz">
+  <div class="card">
+    <h2>📝 Self-Test (25 Qs)</h2>
+    <p style="color:var(--sub)">Tap an answer. Score updates live at the bottom.</p>
+    <div id="quizList"></div>
+  </div>
+</section>
+
+</main>
+
+<div id="scoreBar">Quiz score: <b id="scoreVal">0 / 0</b> &nbsp; <span style="color:var(--sub)">Tap reset to retry ↻</span> <button onclick="resetQuiz()" style="margin-left:8px;background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:4px 8px;font-size:.7rem;">Reset</button></div>
+
+<script>
+// ---------- TABS ----------
+const tabs = document.querySelectorAll('#tabs button');
+tabs.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    tabs.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.getElementById(btn.dataset.t).classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+
+// ---------- TIMER ----------
+let totalSeconds = 2*3600, timerInt=null, running=false;
+function renderClock(){
+  const h=String(Math.floor(totalSeconds/3600)).padStart(2,'0');
+  const m=String(Math.floor((totalSeconds%3600)/60)).padStart(2,'0');
+  const s=String(totalSeconds%60).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+}
+function startTimer(){
+  if(running) return;
+  running=true;
+  timerInt=setInterval(()=>{
+    if(totalSeconds>0){totalSeconds--; renderClock();}
+    else {clearInterval(timerInt); running=false;}
+  },1000);
+}
+function resetTimer(){
+  clearInterval(timerInt); running=false; totalSeconds=2*3600; renderClock();
+}
+renderClock();
+
+// ---------- GLOSSARY DATA ----------
+const glossary = [
+["DevOps","Cultural + technical movement applying Lean/Toyota principles across Dev, Ops, QA, Security to get fast, reliable, safe flow of value to customers."],
+["The Three Ways","Flow (1st), Feedback (2nd), Continual Learning & Experimentation (3rd) — the organizing principle of the entire book."],
+["Value Stream","The full sequence of activities needed to convert a business hypothesis into a value-delivering service for the customer."],
+["Deployment Pipeline","Automated process taking code from commit through build, test, and deploy into production."],
+["Lead Time","Time from work being requested to it being delivered — the core flow metric (vs. cycle time which starts when work begins)."],
+["Theory of Constraints","Goldratt's idea: any improvement not made at the bottleneck is an illusion; find & elevate the constraint."],
+["Conway's Law","Organizations design systems that mirror their own communication structure."],
+["Westrum Typology","Org culture types: Pathological (power-oriented, fear), Bureaucratic (rule-oriented), Generative (performance-oriented, high trust — the DevOps goal)."],
+["Just Culture","Sidney Dekker's concept: balance safety & accountability; replace blame with systemic learning."],
+["Andon Cord","Toyota practice: any worker can stop the production line when a defect is found; DevOps analog = stopping the deployment pipeline."],
+["Blameless Post-Mortem","Incident review focused on root systemic causes, not individual blame, published widely to spread learning."],
+["Kanban","Visual board limiting and visualizing Work In Progress (WIP) to expose bottlenecks and improve flow."],
+["WIP (Work In Progress)","Work started but not finished; reducing WIP improves flow and reduces context-switching costs."],
+["Batch Size","Amount of work moved through a process at once; smaller batches = faster feedback, lower risk."],
+["Toyota Kata","Mike Rother's coaching routine for continuous, scientific improvement (PDCA-like loop)."],
+["Trunk-Based Development","Developers commit small, frequent changes directly to the mainline/trunk instead of long-lived feature branches."],
+["Continuous Integration (CI)","Practice of merging all developer code to trunk frequently, with automated build+test on every commit."],
+["Continuous Delivery (CD)","Ensuring code is always in a deployable state through an automated pipeline; deployment to prod may still be manual."],
+["Continuous Deployment","Every change that passes automated tests is automatically deployed to production with no human gate."],
+["Blue-Green Deployment","Two identical production environments; switch traffic between them for instant release & rollback."],
+["Canary Release","Roll out a change to a small subset of users/servers first, expand gradually if healthy."],
+["Feature Flag / Toggle","Code switch to turn a feature on/off at runtime without redeploying."],
+["Dark Launching","Deploying functionality to production hidden from users, to test performance/load before full release."],
+["Strangler Fig Pattern","Incrementally replace a legacy monolith by routing traffic to new services until the old system is fully replaced."],
+["Infrastructure as Code (IaC)","Managing infrastructure (servers, networks) via versioned code/config instead of manual changes."],
+["Immutable Infrastructure","Servers/containers are never modified in place — replaced wholesale on every change."],
+["Telemetry","Data emitted from apps/infra (logs, metrics, traces) used to monitor and debug systems in real time."],
+["Information Radiator","Always-visible dashboard broadcasting key metrics/health info to the whole team."],
+["ChatOps","Running operational commands through chat (e.g., Slack bots) so actions and context are visible to everyone."],
+["Hypothesis-Driven Development","Treating every feature as a testable hypothesis tied to a measurable business outcome, validated via A/B testing."],
+["Change Approval Board (CAB)","Traditional heavyweight committee that reviews/approves changes before deployment; the book argues for replacing it with peer review + automated testing for most changes."],
+["Standard Change","Pre-approved, low-risk, well-understood, repeatable change that skips heavyweight CAB review."],
+["Game Day","Scheduled rehearsal of failure scenarios to build team readiness, similar to a fire drill."],
+["Chaos Engineering","Deliberately injecting failures into production (e.g., Netflix's Chaos Monkey) to test and build system resilience."],
+["Two-Pizza Team","Amazon's small, autonomous, cross-functional team size — small enough to be fed by two pizzas."],
+["You Build It, You Run It","Amazon principle: developers operate the services they build, closing the feedback loop."],
+["Market-Oriented Team","Cross-functional team organized around a customer-facing service/value stream rather than a technical function."],
+["Functional Orientation","Org structure grouping people by skill/function (all devs together, all ops together) — efficient per-resource but slow flow."],
+["Systems of Record vs Engagement","Gartner's Bimodal IT split: stable backend systems (record) vs fast-changing customer-facing systems (engagement)."],
+["Technical Debt","Accumulated cost of past shortcuts in code/infra that slows future work until repaid."],
+["Shift Left","Moving testing, security, and quality checks earlier in the development process instead of at the end."],
+["DevSecOps","Integrating security practices throughout the DevOps pipeline rather than as a final gate."],
+["Mean Time To Restore (MTTR)","Average time taken to recover service after an incident — a core DevOps performance metric."],
+["Deployment Frequency","How often an org successfully releases to production — a core high-performer metric (DORA)."],
+["Change Fail Rate","Percentage of changes/deployments that result in degraded service or require remediation."],
+["Non-Functional Requirements (NFR)","Requirements about how a system performs (security, scalability, performance) vs. what it does."],
+["Lean Manufacturing / TPS","Toyota Production System — origin of waste-elimination, flow, and pull-based principles DevOps borrows from."],
+["Andon / Swarming","When a problem is found, the team stops and swarms to fix it immediately rather than letting it pass downstream."],
+];
+function renderGlossary(filter=""){
+  const list = document.getElementById('glossaryList');
+  list.innerHTML="";
+  glossary
+    .filter(([t,d])=> t.toLowerCase().includes(filter.toLowerCase()) || d.toLowerCase().includes(filter.toLowerCase()))
+    .sort((a,b)=>a[0].localeCompare(b[0]))
+    .forEach(([t,d])=>{
+      const div=document.createElement('div');
+      div.className="gItem";
+      div.innerHTML=`<b>${t}</b><p>${d}</p>`;
+      list.appendChild(div);
+    });
+}
+renderGlossary();
+document.getElementById('glossarySearch').addEventListener('input', e=>renderGlossary(e.target.value));
+
+// ---------- FLASHCARDS ----------
+const flashcards = glossary.map(([t,d])=>({front:t, back:d}));
+// add a few concept flashcards (Three Ways / Four types of work etc)
+flashcards.unshift(
+  {front:"What are the Three Ways?", back:"1) Flow (Dev→Ops fast) 2) Feedback (Ops→Dev fast) 3) Continual Learning & Experimentation (culture)."},
+  {front:"What are the Four Types of Work?", back:"Business projects, Internal IT projects, Changes, Unplanned work/firefighting."},
+  {front:"Generative culture (Westrum) — define.", back:"Performance-oriented; high cooperation; info flows freely; failure leads to inquiry, not blame. The DevOps target culture."},
+  {front:"Why are smaller batch sizes better?", back:"Faster feedback, less WIP, smaller blast radius for defects, easier to diagnose what broke."},
+  {front:"Conway's Law in one line", back:"System architecture mirrors the org's communication structure — so design org structure deliberately."},
+);
+let fIndex=0, flipped=false;
+function renderFlash(){
+  document.getElementById('fCounter').textContent = `${fIndex+1} / ${flashcards.length}`;
+  const el = document.getElementById('flashCard');
+  el.classList.remove('back');
+  el.textContent = flashcards[fIndex].front;
+  flipped=false;
+}
+function flipCard(){
+  const el = document.getElementById('flashCard');
+  flipped = !flipped;
+  if(flipped){ el.textContent = flashcards[fIndex].back; el.classList.add('back'); }
+  else { el.textContent = flashcards[fIndex].front; el.classList.remove('back'); }
+}
+function nextCard(){ fIndex=(fIndex+1)%flashcards.length; renderFlash(); }
+function prevCard(){ fIndex=(fIndex-1+flashcards.length)%flashcards.length; renderFlash(); }
+renderFlash();
+
+// ---------- QUIZ ----------
+const quiz = [
+["Which of the Three Ways focuses on fast flow of work from Dev to Ops to Customer?",["First Way","Second Way","Third Way","Fourth Way"],0],
+["The Second Way is primarily concerned with:",["Reducing batch size","Fast, constant feedback from right to left","Hiring more QA staff","Annual planning cycles"],1],
+["In Westrum's typology, which culture type is the DevOps target?",["Pathological","Bureaucratic","Generative","Autocratic"],2],
+["Which of the Four Types of Work is described as the most costly and disruptive?",["Business projects","Internal IT projects","Changes","Unplanned work/firefighting"],3],
+["Conway's Law states that:",["Code quality determines team size","Org communication structure shapes system architecture","Testing should always come last","Bigger teams ship faster"],1],
+["The 'Andon Cord' practice means:",["Only managers can stop work","Anyone can stop the line when a defect/problem is found","Cords are used to wire servers","A type of automated test"],1],
+["A blameless post-mortem focuses on:",["Identifying who made the mistake","Systemic root causes and learning","Punishing the on-call engineer","Closing the incident ticket quickly"],1],
+["Trunk-Based Development primarily helps avoid:",["Security vulnerabilities","Database failures","Large, risky 'merge hell' integrations","Slow internet connections"],2],
+["Blue-Green deployment enables:",["Slower releases","Instant traffic switch & rollback between two environments","Permanently merging environments","Removal of all testing"],1],
+["A Canary Release means:",["Releasing to all users at once","Releasing to a small subset first, then expanding","Releasing only on Fridays","Releasing without monitoring"],1],
+["The Strangler Fig Pattern is used to:",["Speed up databases","Incrementally replace a legacy monolith with new services","Add more manual testing","Reduce headcount"],1],
+["Feature flags/toggles allow teams to:",["Permanently delete code","Turn features on/off without redeploying","Bypass all security checks","Skip code review"],1],
+["Theory of Constraints (Goldratt) argues that:",["All parts of a system should be optimized equally","Improving anything other than the bottleneck is an illusion","Constraints don't matter in software","Constraints should be ignored"],1],
+["'You build it, you run it' is a principle from:",["Google","Amazon","Etsy","Target"],1],
+["A 'Two-Pizza Team' refers to a team size principle from:",["Netflix","Amazon","Nordstrom","18F"],1],
+["Hypothesis-Driven Development means:",["Writing code without requirements","Treating features as testable hypotheses tied to business outcomes","Skipping QA entirely","Only using waterfall planning"],1],
+["ChatOps refers to:",["Chatting casually at work","Running ops commands via chat tools so actions are visible to the team","A chatbot that replaces all engineers","A type of database"],1],
+["Game Days are best described as:",["Casual Friday team games","Scheduled rehearsals of failure scenarios to build resilience","Sports days for engineers","Annual performance reviews"],1],
+["Chaos Engineering (e.g., Netflix's Chaos Monkey) is used to:",["Cause random outages with no purpose","Deliberately inject failure to test & build system resilience","Replace monitoring tools","Slow down deployments intentionally"],1],
+["Market-oriented teams differ from functionally-oriented teams in that they:",["Are organized by technical skill only","Are cross-functional and organized around a customer-facing value stream","Never include Ops","Always require more headcount"],1],
+["Which book/movement most directly preceded and inspired Continuous Delivery practices in the DevOps Handbook?",["The Lean Startup only","Agile Infrastructure / Velocity movement (2009)","Six Sigma","Waterfall methodology"],1],
+["A 'standard change' in the book's compliance model is:",["Always high-risk and requires CAB approval","Pre-approved, low-risk, well-understood and repeatable","Only allowed in production-down emergencies","Never automated"],1],
+["The book argues heavyweight Change Approval Boards (CABs) often:",["Eliminate all risk","Create large queues without proportionally reducing risk","Are required by law everywhere","Speed up releases"],1],
+["Integrating security 'shift-left' means:",["Moving security review to the very end of the pipeline","Moving security testing/practices earlier in the development process","Removing security entirely","Outsourcing all security to auditors"],1],
+["18F is referenced in the book as a case study about:",["A private bank","A US government digital services team delivering software rapidly and openly","A Japanese car manufacturer","A retail company"],1],
+];
+let score=0, answered=0;
+function renderQuiz(){
+  const list=document.getElementById('quizList');
+  list.innerHTML="";
+  quiz.forEach((q,i)=>{
+    const div=document.createElement('div');
+    div.className="qcard";
+    div.innerHTML = `<p class="q">${i+1}. ${q[0]}</p>` +
+      q[1].map((opt,j)=>`<button class="opt" data-qi="${i}" data-oi="${j}">${opt}</button>`).join("");
+    list.appendChild(div);
+  });
+  document.querySelectorAll('.opt').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const qi = +btn.dataset.qi, oi = +btn.dataset.oi;
+      const correctIdx = quiz[qi][2];
+      const siblings = document.querySelectorAll(`.opt[data-qi="${qi}"]`);
+      if(siblings[0].disabled) return; // already answered
+      siblings.forEach(s=>s.disabled=true);
+      siblings[correctIdx].classList.add('correct');
+      if(oi!==correctIdx) siblings[oi].classList.add('wrong');
+      answered++;
+      if(oi===correctIdx) score++;
+      document.getElementById('scoreVal').textContent = `${score} / ${answered}`;
+    });
+  });
+}
+function resetQuiz(){ score=0; answered=0; document.getElementById('scoreVal').textContent="0 / 0"; renderQuiz(); }
+renderQuiz();
+</script>
+</body>
+</html>
